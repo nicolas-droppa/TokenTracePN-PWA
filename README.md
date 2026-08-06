@@ -1,16 +1,34 @@
-# React + Vite
+## 📝 TODO & Ideas Backlog
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+### 🎨 Visual & UI/UX
+- [ ] **Interaktívny Onboarding Tutorial:** Walkthrough pre nových používateľov s využitím knižnice (napr. Driver.js), stav uložený v `localStorage` s možnosťou kedykoľvek ho spustiť znova z menu.
+- [ ] **Dynamic Theme Engine Extensions:** Možnosť vytvárať vlastné používateľské témy alebo exportovať/importovať farebné schémy.
+- [ ] **Mini-mapa plátna:** Navigation overview v rohu obrazovky pre rýchly posun v rozsiahlych sieťach.
+- [ ] **Snap-to-Grid & Alignment Guides:** Pomocné vodiace čiary pre presné zarovnávanie uzlov pri drag-and-drop.
 
-Currently, two official plugins are available:
+### ⚡ Funkcionalita Editora & Engine
+- [ ] **Vytváranie hrán (Arcs):** Prepojenie uzlov potiahnutím z uzla na uzol alebo interaktívnym výberom.
+- [ ] **Validácia Petriho siete:** Zamedzenie vytvoreniu neplatných hrán (napr. Place $\rightarrow$ Place alebo Transition $\rightarrow$ Transition).
+- [ ] **Vlastnosti hrán & uzlov:** Nastavovanie váhy hrán (arc weight), kapacity miest a počtu tokenov cez property panel.
+- [ ] **Undo / Redo história:** Implementácia stohu zmien v Zustand store pre krok späť/dopredu.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🚀 Simulácia & Analýza
+- [ ] **Kroková simulácia:** Manuálne odpálenie (fire) vykonateľných prechodov kliknutím používateľa.
+- [ ] **Automatická simulácia:** Pustenie/pozastavenie simulácie s nastaviteľnou rýchlosťou (play/pause/speed slider).
+- [ ] **Generovanie grafu dosiahnuteľnosti:** Detekcia uviaznutia (deadlock) a analýza živosti siete.
 
-## React Compiler
+### 💾 Import / Export & PWA
+- [ ] **Export do formátov:** PNML (Petri Net Markup Language - štandardizovaný XML formát), JSON, PNG a SVG.
+- [ ] **Offline PWA support:** Nastavenie Service Workerov a offline cache pre plnú funkčnosť bez pripojenia k internetu.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## 📚 Teoretické podklady pre písomnú časť DP
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- [ ] **Formálna definícia Petriho sietí:** 5-tica $N = (P, T, F, W, M_0)$ (množiny miest, prechodov, hrán, váhová funkcia, počiatočné značenie).
+- [ ] **Dynamika a pravidlá prechodu:** Podmienky vykonateľnosti prechodov (enabled transitions), pravidlá konzumácie a generovania tokenov.
+- [ ] **Analytické metódy:** Graf dosiahnuteľnosti (Reachability Graph), maticová reprezentácia (Incidence Matrix), pokryteľnosť a invarianty.
+- [ ] **State Management v SPAs:** Porovnanie Zustand vs. Redux/Context API, architektúra jediného zdroja pravdy (Single Source of Truth), immutable zmeny stavu.
+- [ ] **Vykresľovací engine (SVG vs. Canvas):** Dôvody voľby deklaratívneho SVG pre interaktívne node-graph editory (DOM udalosť nad elementmi, škálovateľnosť pri zoomovaní).
+- [ ] **Progresívne webové aplikácie (PWA):** Service Workers, offline-first stratégia, Web App Manifest.
+- [ ] **Analýza technologického stacku:** React 18, Vite, Tailwind CSS, pnpm.
