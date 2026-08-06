@@ -10,6 +10,7 @@
 - [ ] **Vytváranie hrán (Arcs):** Prepojenie uzlov potiahnutím z uzla na uzol alebo interaktívnym výberom.
 - [ ] **Validácia Petriho siete:** Zamedzenie vytvoreniu neplatných hrán (napr. Place $\rightarrow$ Place alebo Transition $\rightarrow$ Transition).
 - [ ] **Vlastnosti hrán & uzlov:** Nastavovanie váhy hrán (arc weight), kapacity miest a počtu tokenov cez property panel.
+- [ ] **Knižnica vzorových sietí (Blueprints/Templates):** Predpripravené ukážkové Petriho siete (napr. Producer-Consumer, Readers-Writers, Dining Philosophers, Deadlock example) pre rýchle načítanie a testovanie simulácie.
 - [ ] **Undo / Redo história:** Implementácia stohu zmien v Zustand store pre krok späť/dopredu.
 
 ### 🚀 Simulácia & Analýza
