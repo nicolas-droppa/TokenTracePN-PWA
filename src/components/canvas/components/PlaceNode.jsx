@@ -1,30 +1,36 @@
 import React from 'react';
 import { usePetriStore } from '../../../store/usePetriStore';
+import { useNodeConnecting } from '../../../hooks/useNodeConnecting';
 import { THEMES } from '../../../theme';
 
-/**
- * PlaceNode component for rendering a place.
- * 
- * @param {Object} props - Component properties.
- * @param {Object} props.place - The place object data.
- * @param {Function} props.onMouseDown - Mouse down handler for drag start.
- * @returns {JSX.Element} SVG group representing the Place.
- */
 export const PlaceNode = ({ place, onMouseDown }) => {
   const activeThemeKey = usePetriStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
 
+  const { isConnectingSource, isInvalidTarget, containerProps } = useNodeConnecting(place, onMouseDown);
+
+  const strokeColor = isInvalidTarget ? theme.disabled.stroke : theme.place.stroke;
+  const labelColor = isInvalidTarget ? theme.disabled.text : theme.text.label;
+
   return (
-    <g
-      transform={`translate(${place.x}, ${place.y})`}
-      className="cursor-grab active:cursor-grabbing"
-      onMouseDown={onMouseDown}
-    >
+    <g transform={`translate(${place.x}, ${place.y})`} {...containerProps}>
+      {/* Connecting Indicator */}
+      {isConnectingSource && (
+        <circle
+          r={theme.place.radius + 6}
+          fill="none"
+          stroke={theme.arc.stroke}
+          strokeWidth="2"
+          strokeDasharray="4 4"
+          className="animate-spin-slow"
+        />
+      )}
+
       {/* Shape */}
       <circle
         r={theme.place.radius}
         fill={theme.place.fill}
-        stroke={theme.place.stroke}
+        stroke={strokeColor}
         strokeWidth={theme.place.strokeWidth}
       />
 
@@ -33,7 +39,7 @@ export const PlaceNode = ({ place, onMouseDown }) => {
         <text
           textAnchor="middle"
           dy="5"
-          fill={theme.text.token}
+          fill={isInvalidTarget ? '#4b5563' : theme.text.token}
           className="font-bold text-sm select-none"
         >
           {place.tokens}
@@ -44,7 +50,7 @@ export const PlaceNode = ({ place, onMouseDown }) => {
       <text
         textAnchor="middle"
         y={theme.place.radius + 17}
-        fill={theme.text.label}
+        fill={labelColor}
         className="text-xs font-medium select-none"
       >
         {place.label}

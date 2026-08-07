@@ -3,13 +3,13 @@ import { usePetriStore } from '../../../store/usePetriStore';
 import { THEMES } from '../../../theme';
 
 /**
- * ArcEdge component for rendering an arc connection.
+ * ArcEdge component for rendering an arc connection between nodes with optional weight display.
  * 
  * @param {Object} props - Component properties.
- * @param {Object} props.arc - The arc object data.
+ * @param {Object} props.arc - The arc object data (contains id and weight).
  * @param {Object} props.sourceNode - The source node object (Place or Transition).
  * @param {Object} props.targetNode - The target node object (Place or Transition).
- * @returns {JSX.Element|null} SVG group element or null if nodes missing.
+ * @returns {JSX.Element|null} SVG group element or null if nodes are missing.
  */
 export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const activeThemeKey = usePetriStore((state) => state.activeTheme);
@@ -19,10 +19,12 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
 
   const markerId = `arrow-${arc.id}`;
 
+  const { midX, midY } = calculateMidpoint(sourceNode, targetNode);
+
   return (
-    <g>
+    <g className="arc-edge">
       <defs>
-        {/* Arrowhead */}
+        {/* Arrowhead Marker */}
         <marker
           id={markerId}
           viewBox="0 0 10 10"
@@ -36,6 +38,7 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
         </marker>
       </defs>
 
+      {/* Connection Line */}
       <line
         x1={sourceNode.x}
         y1={sourceNode.y}
@@ -45,6 +48,37 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
         strokeWidth={theme.arc.strokeWidth}
         markerEnd={`url(#${markerId})`}
       />
+
+      {/* Arc Weight Label (renders only if weight > 1) */}
+      {arc.weight > 1 && (
+        <text
+          x={midX}
+          y={midY - 6}
+          fill={theme.arc.stroke}
+          fontSize="12"
+          fontWeight="bold"
+          textAnchor="middle"
+          className="select-none"
+        >
+          {arc.weight}
+        </text>
+      )}
     </g>
   );
+};
+
+// PRIVATE
+
+/**
+ * Calculates the center midpoint between source and target nodes.
+ * 
+ * @param {Object} source - Source node coordinates {x, y}.
+ * @param {Object} target - Target node coordinates {x, y}.
+ * @returns {{ midX: number, midY: number }}
+ */
+const calculateMidpoint = (source, target) => {
+  return {
+    midX: (source.x + target.x) / 2,
+    midY: (source.y + target.y) / 2,
+  };
 };

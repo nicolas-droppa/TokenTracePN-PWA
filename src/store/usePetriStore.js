@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createPlace, createTransition, createArc } from '../core/models';
-import { fireTransition } from '../core/petriEngine';
+import { fireTransition, isValidArc } from '../core/petriEngine';
 import { THEMES } from '../theme';
 
 /**
@@ -21,7 +21,35 @@ export const usePetriStore = create((set, get) => ({
     selectedElement: null,
     activeTheme: 'dark',
 
+    connectingSourceId: null,
+
     // ACTIONS
+    
+    /**
+     * Begins the process of connecting a source node to a target.
+     * @param {string} sourceId - 
+     */
+    startConnecting: (sourceId) => set({ connectingSourceId: sourceId }),
+
+    /**
+     * Cancels the current connection process, resetting the connecting source ID.
+     */
+    cancelConnecting: () => set({ connectingSourceId: null }),
+
+    /**
+     * Completes the connection process to a target node and creates an arc.
+     * @param {string} targetId - ID of the target node.
+     */
+    finishConnecting: (targetId) => {
+        const { connectingSourceId, addArc } = get();
+
+        if (connectingSourceId) {
+        // Zavolá tvoju existujúcu addArc akciu
+        addArc(connectingSourceId, targetId);
+        // Po vytvorení (alebo neúspešnej validácii) zrušíme prechodný stav
+        set({ connectingSourceId: null });
+        }
+    },
 
     /**
      * Sets the active theme for the application.
