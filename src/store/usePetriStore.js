@@ -44,9 +44,7 @@ export const usePetriStore = create((set, get) => ({
         const { connectingSourceId, addArc } = get();
 
         if (connectingSourceId) {
-        // Zavolá tvoju existujúcu addArc akciu
         addArc(connectingSourceId, targetId);
-        // Po vytvorení (alebo neúspešnej validácii) zrušíme prechodný stav
         set({ connectingSourceId: null });
         }
     },
@@ -131,4 +129,33 @@ export const usePetriStore = create((set, get) => ({
         const updatedPlaces = fireTransition(transitionId, places, arcs);
         set({ places: updatedPlaces });
     },
+
+    /**
+     * Function for any store element update.
+     *
+     * @param {string} id - The ID of the element to update.
+     * @param {Object} updatedData - Partial object containing updated properties (e.g., { tokens: 3 }).
+     */
+    updateElement: (id, updatedData) =>
+    set((state) => {
+        const isPlace = state.places.some((p) => p.id === id);
+        const isTransition = state.transitions.some((t) => t.id === id);
+        const isArc = state.arcs.some((a) => a.id === id);
+
+        return {
+            places: isPlace
+                ? state.places.map((p) => (p.id === id ? { ...p, ...updatedData } : p))
+                : state.places,
+            transitions: isTransition
+                ? state.transitions.map((t) => (t.id === id ? { ...t, ...updatedData } : t))
+                : state.transitions,
+            arcs: isArc
+                ? state.arcs.map((a) => (a.id === id ? { ...a, ...updatedData } : a))
+                : state.arcs,
+            selectedElement:
+                state.selectedElement?.id === id
+                ? { ...state.selectedElement, ...updatedData }
+                : state.selectedElement,
+        };
+    }),
 }));

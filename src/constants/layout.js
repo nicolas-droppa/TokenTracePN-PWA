@@ -1,0 +1,9 @@
+/**
+ * Layout and UI size config.
+ */
+export const SIDEBAR_CONFIG = {
+    DEFAULT_WIDTH_PX: 320,
+    CODE_PANEL_DEFAULT_SIZE_PERCENT: 70,
+    INSPECTOR_PANEL_DEFAULT_SIZE_PERCENT: 30,
+    MIN_PANEL_SIZE_PX: 20,
+};

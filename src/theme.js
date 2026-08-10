@@ -1,100 +1,124 @@
 export const THEMES = {
-  dark: {
-    id: 'dark',
-    label: 'VS Code Dark',
-    place: {
-      fill: '#0f172a',
-      stroke: '#38bdf8',
-      radius: 25,
-      strokeWidth: 2.5,
+    dark: {
+        id: 'dark',
+        label: 'VS Code Dark',
+        place: {
+            fill: '#0f172a',
+            stroke: '#38bdf8',
+            radius: 25,
+            strokeWidth: 2.5,
+        },
+        transition: {
+            fill: '#0f172a',
+            stroke: '#f59e0b',
+            width: 40,
+            height: 40,
+            strokeWidth: 2.5,
+            rx: 6,
+        },
+        arc: {
+            stroke: '#94a3b8',
+            strokeWidth: 2,
+        },
+        text: {
+            label: '#94a3b8',
+            token: '#ffffff',
+        },
+        disabled: {
+            stroke: '#334155',
+            text: '#475569',
+        },
+        sidebar: {
+            bg: '#0f172a',
+            border: '#1e293b',
+            inputBg: '#020617',
+            inputBorder: '#1e293b',
+            resizeHandle: '#1e293b',
+            resizeHandleHover: '#38bdf8',
+        },
+        bg: '#020617',
+        grid: '#1e293b',
     },
-    transition: {
-      fill: '#0f172a',
-      stroke: '#f59e0b',
-      width: 40,
-      height: 40,
-      strokeWidth: 2.5,
-      rx: 6,
-    },
-    arc: {
-      stroke: '#94a3b8',
-      strokeWidth: 2,
-    },
-    text: {
-      label: '#94a3b8',
-      token: '#ffffff',
-    },
-    disabled: {
-      stroke: '#334155',
-      text: '#475569',
-    },
-    bg: '#020617',
-    grid: '#1e293b',
-  },
 
-  monokai: {
-    id: 'monokai',
-    label: 'Monokai Pro',
-    place: {
-      fill: '#2d2a2e',
-      stroke: '#a9dc76',
-      radius: 25,
-      strokeWidth: 2.5,
+    monokai: {
+        id: 'monokai',
+        label: 'Monokai Pro',
+        place: {
+            fill: '#2d2a2e',
+            stroke: '#a9dc76',
+            radius: 25,
+            strokeWidth: 2.5,
+        },
+        transition: {
+            fill: '#2d2a2e',
+            stroke: '#ff6188',
+            width: 40,
+            height: 40,
+            strokeWidth: 2.5,
+            rx: 6,
+        },
+        arc: {
+            stroke: '#787878',
+            strokeWidth: 2,
+        },
+        text: {
+            label: '#c1c0c0',
+            token: '#ffd866',
+        },
+        disabled: {
+            stroke: '#49454c',
+            text: '#5b575e',
+        },
+        sidebar: {
+            bg: '#222124',
+            border: '#2d2a2e',
+            inputBg: '#19181a',
+            inputBorder: '#2d2a2e',
+            resizeHandle: '#2d2a2e',
+            resizeHandleHover: '#ff6188',
+        },
+        bg: '#19181a',
+        grid: '#222124',
     },
-    transition: {
-      fill: '#2d2a2e',
-      stroke: '#ff6188',
-      width: 40,
-      height: 40,
-      strokeWidth: 2.5,
-      rx: 6,
-    },
-    arc: {
-      stroke: '#787878',
-      strokeWidth: 2,
-    },
-    text: {
-      label: '#c1c0c0',
-      token: '#ffd866',
-    },
-    disabled: {
-      stroke: '#49454c',
-      text: '#5b575e',
-    },
-    bg: '#19181a',
-    grid: '#222124',
-  },
 
-  light: {
-    id: 'light',
-    label: 'Clean Light',
-    place: {
-      fill: '#ffffff',
-      stroke: '#0284c7',
-      radius: 25,
-      strokeWidth: 2.5,
+    light: {
+        id: 'light',
+        label: 'Clean Light',
+        place: {
+            fill: '#ffffff',
+            stroke: '#0284c7',
+            radius: 25,
+            strokeWidth: 2.5,
+        },
+        transition: {
+            fill: '#ffffff',
+            stroke: '#d97706',
+            width: 40,
+            height: 40,
+            strokeWidth: 2.5,
+            rx: 6,
+        },
+        arc: {
+            stroke: '#64748b',
+            strokeWidth: 2,
+        },
+        text: {
+            label: '#475569',
+            token: '#0f172a',
+        },
+        disabled: {
+            stroke: '#cbd5e1',
+            text: '#94a3b8',
+        },
+        sidebar: {
+            bg: '#ffffff',
+            border: '#e2e8f0',
+            inputBg: '#f8fafc',
+            inputBorder: '#cbd5e1',
+            resizeHandle: '#e2e8f0',
+            resizeHandleHover: '#0284c7',
+        },
+        bg: '#f8fafc',
+        grid: '#e2e8f0',
     },
-    transition: {
-      fill: '#ffffff',
-      stroke: '#d97706',
-      width: 40,
-      height: 40,
-      strokeWidth: 2.5,
-      rx: 6,
-    },
-    arc: {
-      stroke: '#64748b',
-      strokeWidth: 2,
-    },
-    text: {
-      label: '#475569',
-      token: '#0f172a',
-    },
-    disabled: {
-      stroke: '#cbd5e1',
-      text: '#94a3b8',
-    },
-    bg: '#f8fafc',
-    grid: '#e2e8f0',
-  },
 };
