@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePetriStore } from '../../../store/usePetriStore';
-import { useNodeConnecting } from '../../../hooks/useNodeConnecting';
+import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { THEMES } from '../../../theme';
 
 export const PlaceNode = ({ place, onMouseDown }) => {

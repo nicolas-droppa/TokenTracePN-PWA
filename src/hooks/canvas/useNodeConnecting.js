@@ -1,4 +1,4 @@
-import { usePetriStore } from '../store/usePetriStore';
+import { usePetriStore } from '../../store/usePetriStore';
 
 export const useNodeConnecting = (node, onMouseDown) => {
   const {
