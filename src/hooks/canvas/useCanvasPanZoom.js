@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { CANVAS_CONFIG } from '../../constants/layout';
+import {
+    calculateTargetZoom,
+    calculateZoomPan,
+    screenToCanvasCoordinates,
+} from './helpers/canvasPanZoom';
 
-export const useCanvasPanZoom = (selectedTool) => {
+export const useCanvasPanZoom = () => {
     const [zoom, setZoom] = useState(CANVAS_CONFIG.ZOOM.DEFAULT);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanning, setIsPanning] = useState(false);
@@ -20,22 +25,19 @@ export const useCanvasPanZoom = (selectedTool) => {
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
 
-            const direction = e.deltaY < 0 ? 1 : -1;
-
             setZoom((prevZoom) => {
-                const targetZoom = direction > 0 
-                    ? Math.min(prevZoom * CANVAS_CONFIG.ZOOM.FACTOR, CANVAS_CONFIG.ZOOM.MAX) 
-                    : Math.max(prevZoom / CANVAS_CONFIG.ZOOM.FACTOR, CANVAS_CONFIG.ZOOM.MIN);
-
+                const targetZoom = calculateTargetZoom(prevZoom, e.deltaY);
                 if (targetZoom === prevZoom) return prevZoom;
 
-                const canvasX = (mouseX - pan.x) / prevZoom;
-                const canvasY = (mouseY - pan.y) / prevZoom;
-
-                setPan({
-                    x: mouseX - canvasX * targetZoom,
-                    y: mouseY - canvasY * targetZoom,
-                });
+                setPan((prevPan) => 
+                    calculateZoomPan({
+                        mouseX,
+                        mouseY,
+                        currentPan: prevPan,
+                        currentZoom: prevZoom,
+                        targetZoom,
+                    })
+                );
 
                 return targetZoom;
             });
@@ -43,15 +45,10 @@ export const useCanvasPanZoom = (selectedTool) => {
 
         svgElement.addEventListener('wheel', handleWheel, { passive: false });
         return () => svgElement.removeEventListener('wheel', handleWheel);
-    }, [pan]);
+    }, []);
 
     const getCanvasCoordinates = (clientX, clientY) => {
-        if (!svgRef.current) return { x: 0, y: 0 };
-        const rect = svgRef.current.getBoundingClientRect();
-        return {
-            x: (clientX - rect.left - pan.x) / zoom,
-            y: (clientY - rect.top - pan.y) / zoom,
-        };
+        return screenToCanvasCoordinates(clientX, clientY, svgRef.current, pan, zoom);
     };
 
     const startPanning = (clientX, clientY) => {

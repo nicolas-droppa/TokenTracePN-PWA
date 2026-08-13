@@ -9,7 +9,18 @@ import { TransitionNode } from './components/TransitionNode';
 import { ArcEdge } from './components/ArcEdge';
 
 export const PetriCanvas = () => {
-    const { places, transitions, arcs, selectedTool, addPlace, addTransition, updateNodePosition } = usePetriStore();
+    const { 
+        places, 
+        transitions, 
+        arcs, 
+        selectedTool, 
+        setSelectedTool, 
+        cancelConnecting,
+        addPlace, 
+        addTransition, 
+        updateNodePosition 
+    } = usePetriStore();
+
     const activeThemeKey = usePetriStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
@@ -26,10 +37,11 @@ export const PetriCanvas = () => {
 
     const {
         handleMouseDown,
+        handleContextMenu,
         handleMouseMove,
         startDraggingNode,
         stopDraggingNode,
-    } = useCanvasInteractions({ selectedTool, addPlace, addTransition, updateNodePosition, getCanvasCoordinates, startPanning });
+    } = useCanvasInteractions({ selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, updateNodePosition, getCanvasCoordinates, startPanning });
 
     return (
         <svg
@@ -39,6 +51,7 @@ export const PetriCanvas = () => {
                 isPanning ? 'cursor-grabbing' : 'cursor-crosshair'
             }`}
             onMouseDown={handleMouseDown}
+            onContextMenu={handleContextMenu}
             onMouseMove={(e) => {
                 updatePanning(e.clientX, e.clientY);
                 handleMouseMove(e.clientX, e.clientY);
@@ -85,8 +98,10 @@ export const PetriCanvas = () => {
                         key={place.id}
                         place={place}
                         onMouseDown={(e) => {
-                            e.stopPropagation();
-                            startDraggingNode(place.id);
+                            if (e.button === 0) {
+                                e.stopPropagation();
+                                startDraggingNode(place.id);
+                            }
                         }}
                     />
                 ))}
@@ -96,8 +111,10 @@ export const PetriCanvas = () => {
                         key={trans.id}
                         transition={trans}
                         onMouseDown={(e) => {
-                            e.stopPropagation();
-                            startDraggingNode(trans.id);
+                            if (e.button === 0) {
+                                e.stopPropagation();
+                                startDraggingNode(trans.id);
+                            }
                         }}
                     />
                 ))}

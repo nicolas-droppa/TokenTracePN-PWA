@@ -1,4 +1,10 @@
 import { useState } from 'react';
+import {
+    shouldStartPanning,
+    isCanvasBackgroundClick,
+    handleCanvasClickAction,
+    resetCanvasTool,
+} from './helpers/canvasInteractions';
 
 export const useCanvasInteractions = ({
     selectedTool,
@@ -7,20 +13,31 @@ export const useCanvasInteractions = ({
     updateNodePosition,
     getCanvasCoordinates,
     startPanning,
+    setSelectedTool,
+    cancelConnecting,
 }) => {
     const [draggingNodeId, setDraggingNodeId] = useState(null);
 
     const handleMouseDown = (e) => {
-        if (e.button === 1 || e.shiftKey || selectedTool === 'pan') {
+        // Pravé tlačidlo rieši handleContextMenu
+        if (e.button === 2) return;
+
+        // 1. Panning
+        if (shouldStartPanning(e.button, e.shiftKey, selectedTool)) {
             startPanning(e.clientX, e.clientY);
             return;
         }
 
-        if (e.target.tagName === 'svg' || e.target.id === 'grid-bg') {
+        // 2. Pridávanie elementov na pozadie
+        if (isCanvasBackgroundClick(e.target)) {
             const coords = getCanvasCoordinates(e.clientX, e.clientY);
-            if (selectedTool === 'place') addPlace(coords.x, coords.y);
-            if (selectedTool === 'transition') addTransition(coords.x, coords.y);
+            handleCanvasClickAction({ selectedTool, coords, addPlace, addTransition });
         }
+    };
+
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        resetCanvasTool(setSelectedTool, cancelConnecting);
     };
 
     const handleMouseMove = (clientX, clientY) => {
@@ -30,19 +47,12 @@ export const useCanvasInteractions = ({
         }
     };
 
-    const startDraggingNode = (nodeId) => {
-        setDraggingNodeId(nodeId);
-    };
-
-    const stopDraggingNode = () => {
-        setDraggingNodeId(null);
-    };
-
     return {
         draggingNodeId,
         handleMouseDown,
+        handleContextMenu,
         handleMouseMove,
-        startDraggingNode,
-        stopDraggingNode,
+        startDraggingNode: setDraggingNodeId,
+        stopDraggingNode: () => setDraggingNodeId(null),
     };
 };
