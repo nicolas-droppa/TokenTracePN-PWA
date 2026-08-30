@@ -18,7 +18,9 @@ export const PetriCanvas = () => {
         cancelConnecting,
         addPlace, 
         addTransition, 
-        updateNodePosition 
+        updateNodePosition,
+        setSelectedElement,
+        deleteElement,
     } = usePetriStore();
 
     const activeThemeKey = usePetriStore((state) => state.activeTheme);
@@ -41,7 +43,7 @@ export const PetriCanvas = () => {
         handleMouseMove,
         startDraggingNode,
         stopDraggingNode,
-    } = useCanvasInteractions({ selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, updateNodePosition, getCanvasCoordinates, startPanning });
+    } = useCanvasInteractions({ selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, updateNodePosition, getCanvasCoordinates, startPanning, setSelectedElement, deleteElement });
 
     return (
         <svg
@@ -57,6 +59,10 @@ export const PetriCanvas = () => {
                 handleMouseMove(e.clientX, e.clientY);
             }}
             onMouseUp={() => {
+                stopPanning();
+                stopDraggingNode();
+            }}
+            onMouseLeave={() => {
                 stopPanning();
                 stopDraggingNode();
             }}
@@ -79,7 +85,8 @@ export const PetriCanvas = () => {
 
             <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
                 <rect 
-                    id="grid-bg" 
+                    id="grid-bg"
+                    data-canvas-background
                     x={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2} 
                     y={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2} 
                     width={CANVAS_CONFIG.PANEL_BOUNDS_PX} 

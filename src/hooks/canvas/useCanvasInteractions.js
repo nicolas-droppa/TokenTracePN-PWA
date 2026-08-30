@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { TOOLS, MOUSE_BUTTON, CANVAS_ACTION } from '../../constants/tools';
 import {
     shouldStartPanning,
     isCanvasBackgroundClick,
-    handleCanvasClickAction,
-    resetCanvasTool,
+    getElementFromEvent,
+    resolveBackgroundClickAction,
+    resolveContextMenuAction,
 } from './helpers/canvasInteractions';
 
 export const useCanvasInteractions = ({
@@ -15,36 +17,62 @@ export const useCanvasInteractions = ({
     startPanning,
     setSelectedTool,
     cancelConnecting,
+    setSelectedElement,
+    deleteElement,
 }) => {
     const [draggingNodeId, setDraggingNodeId] = useState(null);
 
     const handleMouseDown = (e) => {
-        // Pravé tlačidlo rieši handleContextMenu
-        if (e.button === 2) return;
+        if (e.button === MOUSE_BUTTON.RIGHT) return;
 
-        // 1. Panning
         if (shouldStartPanning(e.button, e.shiftKey, selectedTool)) {
             startPanning(e.clientX, e.clientY);
             return;
         }
 
-        // 2. Pridávanie elementov na pozadie
-        if (isCanvasBackgroundClick(e.target)) {
-            const coords = getCanvasCoordinates(e.clientX, e.clientY);
-            handleCanvasClickAction({ selectedTool, coords, addPlace, addTransition });
+        if (!isCanvasBackgroundClick(e.target)) return;
+
+        const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
+        const action = resolveBackgroundClickAction(selectedTool);
+
+        switch (action.type) {
+            case CANVAS_ACTION.ADD_PLACE:
+                addPlace(x, y);
+                break;
+            case CANVAS_ACTION.ADD_TRANSITION:
+                addTransition(x, y);
+                break;
+            case CANVAS_ACTION.CLEAR_SELECTION:
+                setSelectedElement(null);
+                break;
+            default:
+                break;
         }
     };
 
     const handleContextMenu = (e) => {
         e.preventDefault();
-        resetCanvasTool(setSelectedTool, cancelConnecting);
+
+        const element = getElementFromEvent(e.target);
+        const action = resolveContextMenuAction(selectedTool, element);
+
+        switch (action.type) {
+            case CANVAS_ACTION.RESET_TOOL:
+                cancelConnecting?.();
+                setSelectedTool(TOOLS.SELECT);
+                break;
+            case CANVAS_ACTION.DELETE_ELEMENT:
+                deleteElement(action.id);
+                break;
+            default:
+                break;
+        }
     };
 
     const handleMouseMove = (clientX, clientY) => {
-        if (draggingNodeId) {
-            const coords = getCanvasCoordinates(clientX, clientY);
-            updateNodePosition(draggingNodeId, coords.x, coords.y);
-        }
+        if (!draggingNodeId) return;
+        const { x, y } = getCanvasCoordinates(clientX, clientY);
+        updateNodePosition(draggingNodeId, x, y);
     };
 
     return {

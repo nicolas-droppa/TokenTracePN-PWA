@@ -120,6 +120,32 @@ export const usePetriStore = create((set, get) => ({
         }));
     },
 
+     /**
+     * Removes a place, transition or arc. Deleting a node also removes
+     * every arc incident.
+     * @param {string} id - The ID of the element to delete.
+     */
+    deleteElement: (id) =>
+        set((state) => {
+            const isArc = state.arcs.some((a) => a.id === id);
+
+            const base = {
+                selectedElement: state.selectedElement?.id === id ? null : state.selectedElement,
+                connectingSourceId: state.connectingSourceId === id ? null : state.connectingSourceId,
+            };
+
+            if (isArc) {
+                return { ...base, arcs: state.arcs.filter((a) => a.id !== id) };
+            }
+
+            return {
+                ...base,
+                places: state.places.filter((p) => p.id !== id),
+                transitions: state.transitions.filter((t) => t.id !== id),
+                arcs: state.arcs.filter((a) => a.source !== id && a.target !== id),
+            };
+        }),
+
     /**
      * Attempts to fire a transition by ID and updates places if successful.
      * @param {string} transitionId - The ID of the transition to fire.

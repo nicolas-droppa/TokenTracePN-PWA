@@ -1,45 +1,57 @@
+import { TOOLS, MOUSE_BUTTON, CANVAS_ACTION } from '../../../constants/tools.js';
+
 /**
- * Checks if panning should start based on the key pressed and the selected tool.
- * @param {number} button - Mouse button pressed (0 for left, 1 for middle, 2 for right).
- * @param {boolean} isShiftPressed - Whether the Shift key is pressed.
- * @param {string} selectedTool - Currently selected tool.
- * @returns {boolean} - True if panning should start, false otherwise.
+ * @param {number} button
+ * @param {boolean} isShiftPressed
+ * @param {string} selectedTool
+ * @returns {boolean}
  */
 export const shouldStartPanning = (button, isShiftPressed, selectedTool) => {
-    return button === 1 || isShiftPressed || selectedTool === 'pan';
+    if (button === MOUSE_BUTTON.MIDDLE) return true;
+    if (button !== MOUSE_BUTTON.LEFT) return false;
+    return isShiftPressed || selectedTool === TOOLS.PAN;
 };
 
 /**
- * Checks if the click was on the canvas background.
- * @param {HTMLElement} target - Clicked element.
- * @returns {boolean} - True if the click was on the canvas background, false otherwise.
- */ 
-export const isCanvasBackgroundClick = (target) => {
-    return target.tagName === 'svg' || target.id === 'grid-bg';
-};
-
-/**
- * Applies the action based on the selected tool when clicking on the canvas background.
- * @param {Object} params - Parameters for the action.
- * @param {string} params.selectedTool - Currently selected tool.
- * @param {Object} params.coords - Coordinates of the click.
- * @param {Function} params.addPlace - Function to add a place.
- * @param {Function} params.addTransition - Function to add a transition.
+ * @param {EventTarget} target
+ * @returns {boolean}
  */
-export const handleCanvasClickAction = ({ selectedTool, coords, addPlace, addTransition }) => {
-    if (selectedTool === 'place') {
-        addPlace(coords.x, coords.y);
-    } else if (selectedTool === 'transition') {
-        addTransition(coords.x, coords.y);
+export const isCanvasBackgroundClick = (target) =>
+    target.tagName === 'svg' || target.dataset?.canvasBackground !== undefined;
+
+/**
+ * Extracts the Petri net element under the pointer.
+ * @param {EventTarget} target
+ * @returns {{ id: string, type: string } | null}
+ */
+export const getElementFromEvent = (target) => {
+    const el = target.closest?.('[data-element-id]');
+    if (!el) return null;
+    return { id: el.dataset.elementId, type: el.dataset.elementType };
+};
+
+/**
+ * Decides what a left click on empty canvas means. Does not execute anything.
+ * @param {string} selectedTool
+ * @returns {{ type: string }}
+ */
+export const resolveBackgroundClickAction = (selectedTool) => {
+    switch (selectedTool) {
+        case TOOLS.PLACE:      return { type: CANVAS_ACTION.ADD_PLACE };
+        case TOOLS.TRANSITION: return { type: CANVAS_ACTION.ADD_TRANSITION };
+        case TOOLS.SELECT:     return { type: CANVAS_ACTION.CLEAR_SELECTION };
+        default:               return { type: CANVAS_ACTION.NONE };
     }
 };
 
 /**
- * Resets the canvas tool and cancels any active connections.
- * @param {Function} setSelectedTool - The function to set the selected tool.
- * @param {Function} cancelConnecting - The function to cancel any active connections.
+ * Right click: resets the active tool, or deletes an element in select mode.
+ * @param {string} selectedTool
+ * @param {{ id: string } | null} element
+ * @returns {{ type: string, id?: string }}
  */
-export const resetCanvasTool = (setSelectedTool, cancelConnecting) => {
-    if (cancelConnecting) cancelConnecting();
-    if (setSelectedTool) setSelectedTool('select');
+export const resolveContextMenuAction = (selectedTool, element) => {
+    if (selectedTool !== TOOLS.SELECT) return { type: CANVAS_ACTION.RESET_TOOL };
+    if (element) return { type: CANVAS_ACTION.DELETE_ELEMENT, id: element.id };
+    return { type: CANVAS_ACTION.NONE };
 };
