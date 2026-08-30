@@ -15,12 +15,16 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const activeThemeKey = usePetriStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
   const setSelectedElement = usePetriStore((state) => state.setSelectedElement);
+  const isSelected = usePetriStore((state) => state.selectedElement?.id === arc.id);
 
   if (!sourceNode || !targetNode) return null;
 
   const markerId = `arrow-${arc.id}`;
 
   const { midX, midY } = calculateMidpoint(sourceNode, targetNode);
+
+  const strokeColor = isSelected ? theme.place.stroke : theme.arc.stroke;
+  const strokeWidth = isSelected ? theme.arc.strokeWidth + 1 : theme.arc.strokeWidth;
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -44,7 +48,7 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
           markerHeight="6"
           orient="auto-start-reverse"
         >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill={theme.arc.stroke} />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill={strokeColor} />
         </marker>
       </defs>
 
@@ -67,26 +71,35 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
         y1={sourceNode.y}
         x2={targetNode.x}
         y2={targetNode.y}
-        stroke={theme.arc.stroke}
-        strokeWidth={theme.arc.strokeWidth}
+        stroke={strokeColor}
+        strokeWidth={strokeWidth}
         markerEnd={`url(#${markerId})`}
         pointerEvents="none"
       />
 
       {/* Arc Weight Label (renders only if weight > 1) */}
       {arc.weight > 1 && (
-        <text
-          x={midX}
-          y={midY - 6}
-          fill={theme.arc.stroke}
-          fontSize="13"
-          fontWeight="bold"
-          textAnchor="middle"
-          className="select-none"
-          pointerEvents="none"
-        >
-          {arc.weight}
-        </text>
+        <>
+          <circle
+            cx={midX}
+            cy={midY - 10}
+            r="9"
+            fill={theme.bg}
+            pointerEvents="none"
+          />
+          <text
+            x={midX}
+            y={midY - 6}
+            fill={strokeColor}
+            fontSize="13"
+            fontWeight="bold"
+            textAnchor="middle"
+            className="select-none"
+            pointerEvents="none"
+          >
+            {arc.weight}
+          </text>
+        </>
       )}
     </g>
   );

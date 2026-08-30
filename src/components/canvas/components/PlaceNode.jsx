@@ -3,7 +3,15 @@ import { usePetriStore } from '../../../store/usePetriStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { THEMES } from '../../../theme';
 
-export const PlaceNode = ({ place, onMouseDown }) => {
+/**
+ * Renders a single place.
+ *
+ * @param {Object} props
+ * @param {Object} props.place - The place object.
+ * @param {number} props.tokens - Token count to display.
+ * @param {Function} props.onMouseDown - Drag start handler.
+ */
+export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
   const activeThemeKey = usePetriStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
 
@@ -35,14 +43,15 @@ export const PlaceNode = ({ place, onMouseDown }) => {
       />
 
       {/* Tokens */}
-      {place.tokens > 0 && (
+      {tokens > 0 && (
         <text
           textAnchor="middle"
           dy="5"
           fill={isInvalidTarget ? '#4b5563' : theme.text.token}
           className="font-bold text-sm select-none"
+          pointerEvents="none"
         >
-          {place.tokens}
+          {tokens}
         </text>
       )}
 
@@ -52,6 +61,7 @@ export const PlaceNode = ({ place, onMouseDown }) => {
         y={theme.place.radius + 17}
         fill={labelColor}
         className="text-xs font-medium select-none"
+        pointerEvents="none"
       >
         {place.label}
       </text>

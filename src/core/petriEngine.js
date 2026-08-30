@@ -1,58 +1,57 @@
 /**
- * Checks if a transition can be fired based on the current places and arcs.
+ * Checks whether a transition is enabled under a given marking.
+ * A transition with no input places is always enabled (source transition).
  *
+ * @param {Object} net - The network structure ({ arcs }).
+ * @param {Object<string, number>} marking - Token count per place ID.
  * @param {string} transitionId - The ID of the transition to check.
- * @param {Array<Object>} places - The list of all places in the network.
- * @param {Array<Object>} arcs - The list of all arcs in the network.
- * @returns {boolean} True if the transition can fire, false otherwise.
+ * @returns {boolean} True if the transition is enabled.
  */
-export const canTransitionFire = (transitionId, places, arcs) => {
-  const incomingArcs = arcs.filter((arc) => arc.target === transitionId);
+export const isEnabled = (net, marking, transitionId) =>
+  net.arcs
+    .filter((arc) => arc.target === transitionId)
+    .every((arc) => (marking[arc.source] ?? 0) >= arc.weight);
 
-  if (incomingArcs.length === 0) return false;
+/**
+ * Fires a transition, returning the resulting marking.
+ * Returns null if the transition is not enabled.
+ *
+ * @param {Object} net - The network structure ({ arcs }).
+ * @param {Object<string, number>} marking - The current marking.
+ * @param {string} transitionId - The ID of the transition to fire.
+ * @returns {Object<string, number>|null} The new marking, or null.
+ */
+export const fire = (net, marking, transitionId) => {
+  if (!isEnabled(net, marking, transitionId)) return null;
 
-  return incomingArcs.every((arc) => {
-    const sourcePlace = places.find((p) => p.id === arc.source);
-    if (!sourcePlace) return false;
-    return sourcePlace.tokens >= arc.weight;
-  });
+  const next = { ...marking };
+
+  for (const arc of net.arcs) {
+    if (arc.target === transitionId) next[arc.source] -= arc.weight;
+    if (arc.source === transitionId) next[arc.target] += arc.weight;
+  }
+
+  return next;
 };
 
 /**
- * Fires a transition and returns a new updated array of places.
- * Also changes tokens in adjacent places.
+ * Returns the IDs of all transitions enabled under the given marking.
  *
- * @param {string} transitionId - The ID of the transition to fire.
- * @param {Array<Object>} places - The current list of places.
- * @param {Array<Object>} arcs - The list of all arcs in the network.
- * @returns {Array<Object>} A new array of updated places (immutably).
+ * @param {Object} net - The network structure ({ transitions, arcs }).
+ * @param {Object<string, number>} marking - The current marking.
+ * @returns {Array<string>} IDs of enabled transitions.
  */
-export const fireTransition = (transitionId, places, arcs) => {
-  if (!canTransitionFire(transitionId, places, arcs)) {
-    return places;
-  }
+export const getEnabledTransitions = (net, marking) =>
+  net.transitions.filter((t) => isEnabled(net, marking, t.id)).map((t) => t.id);
 
-  const updatedPlaces = places.map((place) => ({ ...place }));
-
-  const incomingArcs = arcs.filter((arc) => arc.target === transitionId);
-  const outgoingArcs = arcs.filter((arc) => arc.source === transitionId);
-
-  incomingArcs.forEach((arc) => {
-    const place = updatedPlaces.find((p) => p.id === arc.source);
-    if (place) {
-      place.tokens -= arc.weight;
-    }
-  });
-
-  outgoingArcs.forEach((arc) => {
-    const place = updatedPlaces.find((p) => p.id === arc.target);
-    if (place) {
-      place.tokens += arc.weight;
-    }
-  });
-
-  return updatedPlaces;
-};
+/**
+ * Builds the initial marking from the places' initialTokens.
+ *
+ * @param {Array<Object>} places - The list of places.
+ * @returns {Object<string, number>} The initial marking.
+ */
+export const buildInitialMarking = (places) =>
+  Object.fromEntries(places.map((p) => [p.id, p.initialTokens ?? 0]));
 
 /**
  * Validates whether an arc can be created between a source and a target node (bipartite graph).
@@ -72,8 +71,5 @@ export const isValidArc = (sourceId, targetId, places, transitions) => {
   const isSourceTransition = transitions.some((t) => t.id === sourceId);
   const isTargetTransition = transitions.some((t) => t.id === targetId);
 
-  const isPlaceToTransition = isSourcePlace && isTargetTransition;
-  const isTransitionToPlace = isSourceTransition && isTargetPlace;
-
-  return isPlaceToTransition || isTransitionToPlace;
+  return (isSourcePlace && isTargetTransition) || (isSourceTransition && isTargetPlace);
 };

@@ -3,15 +3,15 @@
  * @param {number} x - The x-coordinate of the place.
  * @param {number} y - The y-coordinate of the place.
  * @param {string} label - The label for the place.
- * @param {number} tokens - The number of tokens in the place.
+ * @param {number} initialTokens - The number of tokens in the initial marking.
  */
-export const createPlace = (x, y, label = '', tokens = 0) => ({
+export const createPlace = (x, y, label = '', initialTokens = 0) => ({
   id: `p_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
   type: 'place',
   x,
   y,
   label: label || 'P',
-  tokens: Math.max(0, Number(tokens) || 0),
+  initialTokens: Math.max(0, Number(initialTokens) || 0),
 });
 
 /**
@@ -36,6 +36,7 @@ export const createTransition = (x, y, label = '') => ({
  */
 export const createArc = (sourceId, targetId, weight = 1) => ({
   id: `a_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+  type: 'arc',
   source: sourceId,
   target: targetId,
   weight: Math.max(1, Number(weight) || 1),

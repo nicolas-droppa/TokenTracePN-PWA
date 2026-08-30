@@ -5,6 +5,7 @@
 - [ ] **Dynamic Theme Engine Extensions:** Možnosť vytvárať vlastné používateľské témy alebo exportovať/importovať farebné schémy.
 - [ ] **Mini-mapa plátna:** Navigation overview v rohu obrazovky pre rýchly posun v rozsiahlych sieťach.
 - [ ] **Snap-to-Grid & Alignment Guides:** Pomocné vodiace čiary pre presné zarovnávanie uzlov pri drag-and-drop.
+- [ ] **Radial Tool Menu:** Kruhové menu vyvolané podržaním klávesy pod kurzorom pre rýchle prepínanie nástrojov bez cesty myšou k toolbaru. Výber švihnutím smerom k položke a pustením klávesy, bez nutnosti presného zamierenia.
 
 ### ⚡ Funkcionalita Editora & Engine
 - [ ] **Vytváranie hrán (Arcs):** Prepojenie uzlov potiahnutím z uzla na uzol alebo interaktívnym výberom.

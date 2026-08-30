@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { createPlace, createTransition, createArc } from '../core/models';
-import { fireTransition, isValidArc } from '../core/petriEngine';
+import { fire, buildInitialMarking, isValidArc } from '../core/petriEngine';
 import { THEMES } from '../theme';
+import { TOOLS } from '../constants/tools';
 
 /**
  * @typedef {Object} PetriStore
@@ -13,6 +14,10 @@ import { THEMES } from '../theme';
  */
 export const usePetriStore = create((set, get) => ({
     // STATE
+
+    mode: 'edit',
+    marking: null,
+    history: [],
 
     places: [],
     transitions: [],
@@ -160,16 +165,6 @@ export const usePetriStore = create((set, get) => ({
         }),
 
     /**
-     * Attempts to fire a transition by ID and updates places if successful.
-     * @param {string} transitionId - The ID of the transition to fire.
-     */
-    fire: (transitionId) => {
-        const { places, arcs } = get();
-        const updatedPlaces = fireTransition(transitionId, places, arcs);
-        set({ places: updatedPlaces });
-    },
-
-    /**
      * Function for any store element update.
      *
      * @param {string} id - The ID of the element to update.
@@ -197,4 +192,39 @@ export const usePetriStore = create((set, get) => ({
                 : state.selectedElement,
         };
     }),
+
+    /**
+     * Enters simulation mode and initializes the marking and history.
+     */
+    startSimulation: () =>
+        set((state) => ({
+            mode: 'run',
+            marking: buildInitialMarking(state.places),
+            history: [],
+            selectedTool: TOOLS.SELECT,
+            selectedElement: null,
+            connectingSourceId: null,
+        })),
+
+    /**
+     * Returns to edit mode, discarding the current marking and history.
+     */
+    stopSimulation: () =>
+        set({ mode: 'edit', marking: null, history: [] }),
+
+    /**
+     * Fires a transition
+     * @param {string} transitionId
+     */
+    fire: (transitionId) =>
+        set((state) => {
+            const net = { transitions: state.transitions, arcs: state.arcs };
+            const next = fire(net, state.marking, transitionId);
+            if (!next) return {};
+
+            return {
+                marking: next,
+                history: [...state.history, { transitionId, marking: state.marking }],
+            };
+        }),
 }));

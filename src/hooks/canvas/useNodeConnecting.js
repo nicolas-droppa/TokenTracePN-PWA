@@ -2,12 +2,13 @@ import { usePetriStore } from '../../store/usePetriStore';
 import { TOOLS, MOUSE_BUTTON } from '../../constants/tools';
 
 export const useNodeConnecting = (node, onMouseDown) => {
-  const selectedTool       = usePetriStore((s) => s.selectedTool);
-  const connectingSourceId = usePetriStore((s) => s.connectingSourceId);
-  const startConnecting    = usePetriStore((s) => s.startConnecting);
-  const finishConnecting   = usePetriStore((s) => s.finishConnecting);
-  const cancelConnecting   = usePetriStore((s) => s.cancelConnecting);
-  const setSelectedElement = usePetriStore((s) => s.setSelectedElement);
+  const selectedTool        = usePetriStore((s) => s.selectedTool);
+  const connectingSourceId  = usePetriStore((s) => s.connectingSourceId);
+  const startConnecting     = usePetriStore((s) => s.startConnecting);
+  const finishConnecting    = usePetriStore((s) => s.finishConnecting);
+  const cancelConnecting    = usePetriStore((s) => s.cancelConnecting);
+  const setSelectedElement  = usePetriStore((s) => s.setSelectedElement);
+  const mode                = usePetriStore((s) => s.mode);
 
   const sourceType = usePetriStore((s) => {
     if (!s.connectingSourceId) return null;
@@ -43,10 +44,15 @@ export const useNodeConnecting = (node, onMouseDown) => {
     onMouseDown?.(e);
   };
 
+  const cursorClass =
+    mode === 'run'
+      ? 'cursor-default'
+      : isInvalidTarget
+        ? 'cursor-not-allowed'
+        : 'cursor-grab active:cursor-grabbing';
+
   const containerProps = {
-    className: `transition-colors duration-200 ${
-      isInvalidTarget ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
-    }`,
+    className: `transition-colors duration-200 ${cursorClass}`,
     onMouseDown: handleMouseDown,
     onClick: handleNodeClick,
     'data-element-id': node.id,
