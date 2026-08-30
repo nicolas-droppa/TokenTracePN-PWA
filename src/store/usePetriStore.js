@@ -23,6 +23,8 @@ export const usePetriStore = create((set, get) => ({
 
     connectingSourceId: null,
 
+    counters: { place: 0, transition: 0 },
+
     // ACTIONS
     
     /**
@@ -78,20 +80,28 @@ export const usePetriStore = create((set, get) => ({
      * @param {number} x - The x-coordinate on canvas.
      * @param {number} y - The y-coordinate on canvas.
      */
-    addPlace: (x, y) => {
-        const newPlace = createPlace(x, y, `P${get().places.length + 1}`);
-        set((state) => ({ places: [...state.places, newPlace] }));
-    },
+    addPlace: (x, y) =>
+        set((state) => {
+            const n = state.counters.place + 1;
+            return {
+                places: [...state.places, createPlace(x, y, `P${n}`)],
+                counters: { ...state.counters, place: n },
+            };
+        }),
 
     /**
      * Creates and adds a new transition to the store.
      * @param {number} x - The x-coordinate on canvas.
      * @param {number} y - The y-coordinate on canvas.
      */
-    addTransition: (x, y) => {
-        const newTransition = createTransition(x, y, `T${get().transitions.length + 1}`);
-        set((state) => ({ transitions: [...state.transitions, newTransition] }));
-    },
+    addTransition: (x, y) =>
+        set((state) => {
+            const n = state.counters.transition + 1;
+            return {
+                transitions: [...state.transitions, createTransition(x, y, `T${n}`)],
+                counters: { ...state.counters, transition: n },
+            };
+        }),
 
     /**
      * Creates and adds a new arc connecting two elements if valid.
@@ -99,9 +109,12 @@ export const usePetriStore = create((set, get) => ({
      * @param {string} targetId - The target element ID.
      */
     addArc: (sourceId, targetId) => {
-        const { places, transitions } = get();
+        const { places, transitions, arcs } = get();
 
-        if (!isValidArc(sourceId, targetId, places, transitions)) return
+        if (!isValidArc(sourceId, targetId, places, transitions)) return;
+
+        const exists = arcs.some((a) => a.source === sourceId && a.target === targetId);
+        if (exists) return;
 
         const newArc = createArc(sourceId, targetId);
         set((state) => ({ arcs: [...state.arcs, newArc] }));
