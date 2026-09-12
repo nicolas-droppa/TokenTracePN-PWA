@@ -4,14 +4,18 @@ import { THEMES } from '../../theme.js';
 import { TOOLS } from '../../constants/tools.js';
 
 const TOOL_ITEMS = [
-    { id: TOOLS.SELECT, label: 'Select / Move' },
-    { id: TOOLS.PAN, label: 'Pan' },
-    { id: TOOLS.PLACE, label: '+ Place' },
-    { id: TOOLS.TRANSITION, label: '+ Transition' },
-    { id: TOOLS.ARC, label: '+ Arc' },
+    { id: TOOLS.SELECT, label: 'Select', icon: '/icons/tools/select.svg' },
+    { id: TOOLS.PAN, label: 'Pan', icon: '/icons/tools/pan.svg' },
+    { id: TOOLS.PLACE, label: 'Place', icon: '/icons/tools/place.svg' },
+    { id: TOOLS.TRANSITION, label: 'Transition', icon: '/icons/tools/transition.svg' },
+    { id: TOOLS.ARC, action: TOOLS.ARC, isArc: true, label: 'Arc', icon: '/icons/tools/arc_regular.svg' },
+    { id: 'arc-read', action: TOOLS.ARC, isArc: true, label: 'Read arc', icon: '/icons/tools/arc_read.svg' },
+    { id: 'arc-inhibitor', action: TOOLS.ARC, isArc: true, label: 'Inhibitor', icon: '/icons/tools/arc_inhibitor.svg' },
+    { id: 'arc-reset', action: TOOLS.ARC, isArc: true, label: 'Reset arc', icon: '/icons/tools/arc_reset.svg' },
 ];
 
 export const CanvasToolbar = () => {
+    const [selectedArcId, setSelectedArcId] = React.useState(TOOLS.ARC);
     const selectedTool      = usePetriStore((s) => s.selectedTool);
     const setSelectedTool   = usePetriStore((s) => s.setSelectedTool);
     const activeTheme       = usePetriStore((s) => s.activeTheme);
@@ -22,6 +26,7 @@ export const CanvasToolbar = () => {
 
     const theme = THEMES[activeTheme] || THEMES.dark;
     const isRunning = mode === 'run';
+    const iconFilter = activeTheme === 'light' ? 'none' : 'invert(1)';
 
     return (
         <div
@@ -32,39 +37,59 @@ export const CanvasToolbar = () => {
             }}
         >
             {TOOL_ITEMS.map((tool) => {
-                const isActive = !isRunning && selectedTool === tool.id;
+                const isActive = !isRunning
+                    && selectedTool === (tool.action || tool.id)
+                    && (!tool.isArc || selectedArcId === tool.id);
                 return (
                     <button
                         key={tool.id}
-                        onClick={() => setSelectedTool(tool.id)}
+                        onClick={() => {
+                            setSelectedArcId(tool.id);
+                            setSelectedTool(tool.action || tool.id);
+                        }}
                         disabled={isRunning}
                         title={isRunning ? 'Stop the simulation to edit' : tool.label}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        className={`flex h-14 w-16 flex-col items-center justify-center gap-0.5 rounded-none text-[10px] font-medium transition-all ${
                             isRunning ? 'opacity-35 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                         style={{
-                            backgroundColor: isActive ? theme.place.stroke : 'transparent',
-                            color: isActive ? theme.bg : theme.text.label,
+                            backgroundColor: 'transparent',
+                            color: isActive ? theme.place.stroke : theme.text.label,
+                            borderBottom: isActive ? `2px solid ${theme.place.stroke}` : '2px solid transparent',
                         }}
                     >
+                        <img
+                            src={tool.icon}
+                            alt=""
+                            aria-hidden="true"
+                            className="h-8 w-8 object-contain"
+                            style={{ filter: iconFilter }}
+                        />
                         {tool.label}
                     </button>
                 );
             })}
 
             <div
-                className="w-px h-5 mx-1"
+                className="w-px h-10 mx-1"
                 style={{ backgroundColor: theme.sidebar.border }}
             />
 
             <button
                 onClick={isRunning ? stopSimulation : startSimulation}
-                className="px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer"
+                className="flex h-14 w-16 flex-col items-center justify-center gap-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer"
                 style={{
                     backgroundColor: isRunning ? theme.transition.stroke : theme.place.stroke,
                     color: theme.bg,
                 }}
             >
+                <img
+                    src={isRunning ? '/icons/system/sys_stop.svg' : '/icons/system/sys_start.svg'}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-8 w-8 object-contain"
+                    style={{ filter: iconFilter }}
+                />
                 {isRunning ? 'Stop' : 'Run'}
             </button>
 
