@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePetriStore } from '../../store/usePetriStore';
 import { THEMES } from '../../theme';
 
 export const CodeEditorPanel = () => {
     const activeThemeKey = usePetriStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
+    const [language, setLanguage] = useState('create');
 
     return (
         <div 
@@ -19,12 +20,24 @@ export const CodeEditorPanel = () => {
                 }}
             >
                 <span>CODE</span>
-                <span 
-                    className="text-[10px] uppercase"
-                    style={{ color: theme.disabled.text }}
-                >
-                    DROPDOWN {/* TODO: Dropdown for language selection */}
-                </span>
+                <div className="text-[10px] uppercase" style={{ color: theme.disabled.text }}>
+                    <label htmlFor="code-language" className="sr-only">Code language</label>
+                    <select
+                        id="code-language"
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="text-xs px-2 py-1 rounded"
+                        style={{
+                            backgroundColor: theme.sidebar.inputBg,
+                            color: theme.disabled.text,
+                            border: `1px solid ${theme.sidebar.border}`
+                        }}
+                    >
+                        <option value="dpn">DPN (Fast prototype)</option>
+                        <option value="pnml">PNML (XML)</option>
+                        <option value="plc">PLC</option>
+                    </select>
+                </div>
             </div>
             
             <div 

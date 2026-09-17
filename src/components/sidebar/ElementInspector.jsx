@@ -54,7 +54,7 @@ export const ElementInspector = () => {
                 style={{ borderColor: theme.sidebar.border }}
             >
                 <h3 className="text-xs uppercase tracking-wider font-semibold">
-                    Inspector — {isPlace ? 'Place' : isTransition ? 'Transition' : 'Arc'}
+                    {isPlace ? 'Place' : isTransition ? 'Transition' : 'Arc'}
                 </h3>
                 <span
                     className="text-[10px] font-mono px-1.5 py-0.5 rounded"
