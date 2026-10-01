@@ -1,92 +1,266 @@
+import { PUNCTUATION, KEYWORDS } from '../../constants/parsers/dpnParser.js';
+
 export function canParse(code) {
-    parse(code);
+    try {
+        const result = parse(code);
+        return !result.errors || result.errors.length === 0;
+    } catch (err) {
+        return false;
+    }
 }
+
+function normalizeError(err) {
+    const message = err?.message || String(err);
+    const match = message.match(/line\s+(\d+),\s*col\s+(\d+)/i);
+
+    const line = Number.isFinite(Number(err?.line)) ? Number(err.line) : match ? Number(match[1]) : undefined;
+    const col = Number.isFinite(Number(err?.col)) ? Number(err.col) : match ? Number(match[2]) : undefined;
+
+    return {
+        message,
+        line,
+        col,
+    };
+}
+
+export function parse(code) {
+    const { tokens, errors } = tokenize(code);
+
+    if (errors.length > 0) {
+        return {
+            model: null,
+            errors: errors.map(normalizeError)
+        };
+    }
+
+    try {
+        const model = parseTokens(tokens);
+        return { model, errors: [] };
+    } catch (err) {
+        return {
+            model: null,
+            errors: [normalizeError(err)]
+        };
+    }
+}
+
+export default { canParse, parse };
 
 // private
 
-const KEYWORDS = new Set(['place', 'transition', 'arc']);
+function handleNumbers(ctx, startLine, startCol) {
+    let num = '';
+    while (ctx.i < ctx.src.length && /[0-9]/.test(ctx.src[ctx.i])) {
+        num += ctx.src[ctx.i];
+        ctx.advance();
+    }
+    ctx.pushToken({ type: 'NUMBER', value: Number(num), line: startLine, col: startCol });
+}
+
+function handleLetters(ctx, startLine, startCol) {
+    let id = '';
+    while (ctx.i < ctx.src.length && /[a-zA-Z0-9_]/.test(ctx.src[ctx.i])) {
+        id += ctx.src[ctx.i];
+        ctx.advance();
+    }
+    ctx.pushToken({ type: KEYWORDS.has(id) ? 'KEYWORD' : 'IDENTIFICATOR', value: id, line: startLine, col: startCol });
+}
+
+function handleString(ctx, startLine, startCol, errors) {
+    const quote = ctx.src[ctx.i];
+    ctx.advance();
+    let str = '';
+
+    while (ctx.i < ctx.src.length && ctx.src[ctx.i] !== quote) {
+        if (ctx.src[ctx.i] === '\n') {
+            errors.push(new Error(`String not closed (line ${startLine}, col ${startCol})`));
+        }
+        str += ctx.src[ctx.i];
+        ctx.advance();
+    }
+
+    if (ctx.i >= ctx.src.length) {
+        errors.push(new Error(`String not closed (line ${startLine}, col ${startCol})`));
+        return;
+    }
+
+    ctx.advance();
+    ctx.pushToken({ type: 'STRING', value: str, line: startLine, col: startCol });
+}
 
 function tokenize(src) {
     const tokens = [];
-    let i = 0, line = 1, col = 1;
-    const punct = {
-        '(': 'LPAREN',
-        ')': 'RPAREN',
-        ':': 'COLON',
-        ',': 'COMMA',
-        ';': 'SEMI'
+    const errors = [];
+    const ctx = {
+        src,
+        i: 0,
+        line: 1,
+        col: 1,
+        advance() {
+            if (this.src[this.i] === '\n') { this.line++; this.col = 1; }
+            else this.col++;
+            this.i++;
+        },
+        pushToken(t) { tokens.push(t); }
     };
 
-    const advance = () => {
-        if (src[i] === '\n') { line++; col = 1; }
-        else col++;
-        i++;
-    };
+    while (ctx.i < ctx.src.length) {
+        const c = ctx.src[ctx.i];
+        const startLine = ctx.line, startCol = ctx.col;
 
-    while (i < src.length) {
-        const c = src[i];
-        const startLine = line, startCol = col;
+        if (/\s/.test(c)) { ctx.advance(); continue; }
 
-        if (/\s/.test(c)) { advance(); continue; }
-
-        if (c === '/' && src[i + 1] === '/') {
-            while (i < src.length && src[i] !== '\n') advance();
+        if (c === '/' && ctx.src[ctx.i + 1] === '/') {
+            while (ctx.i < ctx.src.length && ctx.src[ctx.i] !== '\n') ctx.advance();
             continue;
         }
 
-        if (punct[c]) {
-            tokens.push({ type: punct[c], value: c, line: startLine, col: startCol });
-            advance(); continue;
+        if (c === '-' && ctx.src[ctx.i + 1] === '>') {
+            ctx.pushToken({ type: 'ARROW', value: '->', line: startLine, col: startCol });
+            ctx.advance();
+            ctx.advance();
+            continue;
+        }
+
+        if (PUNCTUATION[c]) {
+            ctx.pushToken({ type: PUNCTUATION[c], value: c, line: startLine, col: startCol });
+            ctx.advance(); continue;
         }
 
         if (/[0-9]/.test(c)) {
-            let num = '';
-            while (i < src.length && /[0-9]/.test(src[i])) { num += src[i]; advance(); }
-            tokens.push({ type: 'NUMBER', value: Number(num), line: startLine, col: startCol });
+            handleNumbers(ctx, startLine, startCol);
             continue;
         }
 
         if (/[a-zA-Z_]/.test(c)) {
-            let id = '';
-            while (i < src.length && /[a-zA-Z0-9_]/.test(src[i])) { id += src[i]; advance(); }
-            tokens.push({ type: KEYWORDS.has(id) ? 'KEYWORD' : 'IDENTIFICATOR', value: id, line: startLine, col: startCol });
+            handleLetters(ctx, startLine, startCol);
             continue;
         }
 
         if (c === '"' || c === "'") {
-            const quote = c;
-            advance();
-            let str = '';
-            while (i < src.length && src[i] !== quote) {
-                if (src[i] === '\n') throw new Error(`String not closed (line ${startLine}, col ${startCol})`);
-                str += src[i]; advance();
-            }
-            if (i >= src.length) throw new Error(`String not closed (line ${startLine}, col ${startCol})`);
-            advance();
-            tokens.push({ type: 'STRING', value: str, line: startLine, col: startCol });
+            handleString(ctx, startLine, startCol, errors);
             continue;
         }
 
-        throw new Error(`Unknown character '${c}' (line ${line}, col ${col})`);
+        errors.push(new Error(`Unknown character '${c}' (line ${ctx.line}, col ${ctx.col})`));
+        ctx.advance();
     }
 
-    tokens.push({ type: 'EOF', value: null, line, col });
-    return tokens;
+    ctx.pushToken({ type: 'EOF', value: null, line: ctx.line, col: ctx.col });
+    return { tokens, errors };
 }
 
-function parse(code) {
-    const tokens = tokenize(code);
-        
-    const result = {
-        code: code,
-        tokens: tokens,
-        places: [],
-        transitions: [],
-        arcs: [],
+function parseTokens(tokens) {
+    let pos = 0;
+
+    const peek = () => tokens[pos] || { type: 'EOF', value: null, line: 0, col: 0 };
+    const advance = () => tokens[pos++];
+    const expect = (type) => {
+        const t = peek();
+        if (t.type !== type) {
+            const error = new Error(`Expected ${type} but got ${t.type} (line ${t.line}, col ${t.col})`);
+            error.line = t.line;
+            error.col = t.col;
+            throw error;
+        }
+        return advance();
     };
 
-    let currentSection = null;
+    // program = statement* EOF
+    function parseProgram() {
+        const statements = [];
+        while (peek().type !== 'EOF') {
+            statements.push(parseStatement());
+        }
+        return { type: 'program', statements };
+    }
 
-    console.log(result);
-    return result;
+    // statement = arc ";" | declaration ";"
+    function parseStatement() {
+        const t = peek();
+
+        if (t.type === 'IDENTIFICATOR' && tokens[pos + 1] && tokens[pos + 1].type === 'ARROW') {
+            const arc = parseArc();
+            expect('SEMI');
+            return arc;
+        }
+
+        const decl = parseDeclaration();
+        expect('SEMI');
+        return decl;
+    }
+
+    function parseArc() {
+        const from = expect('IDENTIFICATOR').value;
+        expect('ARROW');
+        const to = expect('IDENTIFICATOR').value;
+        let attributes = [];
+        if (peek().type === 'LPAREN') {
+            attributes = parseAttributes();
+        }
+        return { type: 'arc', from, to, attributes };
+    }
+
+    // declaration = KEYWORD IDENT attributes? | IDENT attributes
+    function parseDeclaration() {
+        const t = peek();
+
+        if (t.type === 'KEYWORD') {
+            advance();
+            const name = expect('IDENTIFICATOR').value;
+            let attributes = [];
+            if (peek().type === 'LPAREN') {
+                attributes = parseAttributes();
+            }
+            return { type: 'declaration', keyword: t.value, name, attributes };
+        }
+
+        if (t.type === 'IDENTIFICATOR') {
+            const name = advance().value;
+            const attributes = parseAttributes();
+            return { type: 'configuration', name, attributes };
+        }
+
+        const error = new Error(`Expected declaration but got ${t.type} (line ${t.line}, col ${t.col})`);
+        error.line = t.line;
+        error.col = t.col;
+        throw error;
+    }
+
+    // attributes = "(" attribute ("," attribute)* ")"
+    function parseAttributes() {
+        expect('LPAREN');
+        const attributes = [];
+
+        if (peek().type !== 'RPAREN') {
+            attributes.push(parseAttribute());
+            while (peek().type === 'COMMA') {
+                advance();
+                attributes.push(parseAttribute());
+            }
+        }
+
+        expect('RPAREN');
+        return attributes;
+    }
+
+    // attribute = IDENT ":" value
+    function parseAttribute() {
+        const key = expect('IDENTIFICATOR').value;
+        expect('COLON');
+        const value = parseValue();
+        return { key, value };
+    }
+
+    // value = STRING | NUMBER
+    function parseValue() {
+        const t = peek();
+        if (t.type === 'STRING' || t.type === 'NUMBER') return advance().value;
+        const error = new Error(`Expected value (STRING or NUMBER) but got ${t.type} (line ${t.line}, col ${t.col})`);
+        error.line = t.line;
+        error.col = t.col;
+        throw error;
+    }
+
+    return parseProgram();
 }
