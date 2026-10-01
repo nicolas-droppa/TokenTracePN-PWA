@@ -2,11 +2,12 @@ import React from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import { usePetriStore } from '../../store/usePetriStore';
 import { THEMES } from '../../theme';
-import { SIDEBAR_CONFIG } from '../../constants/layout';
-import { CodeEditorPanel } from './CodeEditorPanel';
-import { ElementInspector } from './ElementInspector';
+import { LAYOUT_CONFIG } from '../../constants/layout';
+import { PanelDivider } from './PanelDivider';
+import { CodeEditorPanel } from '../panels/CodeEditorPanel';
+import { ElementInspector } from '../panels/ElementInspector';
 
-export const Sidebar = () => {
+export const Sidebar = ({ code, setCode, language, setLanguage }) => {
     const activeThemeKey = usePetriStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
@@ -24,28 +25,35 @@ export const Sidebar = () => {
             >
                 {/* Code Editor */}
                 <Panel
-                    defaultSize={SIDEBAR_CONFIG.CODE_PANEL_DEFAULT_SIZE_PERCENT}
-                    minSize={SIDEBAR_CONFIG.MIN_PANEL_SIZE_PX}
+                    defaultSize={LAYOUT_CONFIG.CODE_PANEL_DEFAULT_SIZE_PERCENT}
+                    minSize={LAYOUT_CONFIG.MIN_PANEL_SIZE_PX}
                     style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                 >
-                    <CodeEditorPanel />
+                    <CodeEditorPanel code={code} setCode={setCode} language={language} setLanguage={setLanguage} />
                 </Panel>
 
                 {/* Separator */}
                 <Separator
-                    className="h-1.5 w-full transition-colors cursor-row-resize flex items-center justify-center shrink-0 group"
-                    style={{ backgroundColor: theme.sidebar.resizeHandle }}
+                    className="w-full transition-colors cursor-row-resize flex items-center justify-center shrink-0 group"
+                    style={{
+                        backgroundColor: theme.sidebar.resizeHandle,
+                        height: '0.375rem',
+                    }}
                 >
-                    <div
-                        className="w-8 h-0.5 rounded-full transition-colors group-hover:bg-sky-500"
-                        style={{ backgroundColor: theme.disabled.stroke }}
+                    <PanelDivider
+                        theme={theme}
+                        height="0.375rem"
+                        cursor="row-resize"
+                        innerBarWidth="2rem"
+                        innerBarHeight="0.125rem"
+                        style={{ backgroundColor: 'transparent' }}
                     />
                 </Separator>
 
                 {/* Inspector */}
                 <Panel
-                    defaultSize={SIDEBAR_CONFIG.INSPECTOR_PANEL_DEFAULT_SIZE_PERCENT}
-                    minSize={SIDEBAR_CONFIG.MIN_PANEL_SIZE_PX}
+                    defaultSize={LAYOUT_CONFIG.INSPECTOR_PANEL_DEFAULT_SIZE_PERCENT}
+                    minSize={LAYOUT_CONFIG.MIN_PANEL_SIZE_PX}
                     style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                 >
                     <ElementInspector />
