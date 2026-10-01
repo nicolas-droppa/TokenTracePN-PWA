@@ -1,9 +1,10 @@
 import { PUNCTUATION, KEYWORDS } from '../../constants/parsers/dpnParser.js';
+import { checkSemantics } from './dpnSemantics.js';
 
 export function canParse(code) {
     try {
         const result = parse(code);
-        return !result.errors || result.errors.length === 0;
+        return !(result.errors || []).some((err) => err.severity === 'error');
     } catch (err) {
         return false;
     }
@@ -17,6 +18,7 @@ function normalizeError(err) {
     const col = Number.isFinite(Number(err?.col)) ? Number(err.col) : match ? Number(match[2]) : undefined;
 
     return {
+        severity: 'error',
         message,
         line,
         col,
@@ -33,15 +35,17 @@ export function parse(code) {
         };
     }
 
+    let model;
     try {
-        const model = parseTokens(tokens);
-        return { model, errors: [] };
+        model = parseTokens(tokens);
     } catch (err) {
         return {
             model: null,
             errors: [normalizeError(err)]
         };
     }
+
+    return { model, errors: checkSemantics(model) };
 }
 
 export default { canParse, parse };
@@ -191,14 +195,23 @@ function parseTokens(tokens) {
     }
 
     function parseArc() {
-        const from = expect('IDENTIFICATOR').value;
+        const fromToken = expect('IDENTIFICATOR');
         expect('ARROW');
-        const to = expect('IDENTIFICATOR').value;
+        const toToken = expect('IDENTIFICATOR');
         let attributes = [];
         if (peek().type === 'LPAREN') {
             attributes = parseAttributes();
         }
-        return { type: 'arc', from, to, attributes };
+        return {
+            type: 'arc',
+            from: fromToken.value,
+            to: toToken.value,
+            attributes,
+            line: fromToken.line,
+            col: fromToken.col,
+            fromPos: { line: fromToken.line, col: fromToken.col },
+            toPos: { line: toToken.line, col: toToken.col },
+        };
     }
 
     // declaration = KEYWORD IDENT attributes? | IDENT attributes
@@ -207,18 +220,33 @@ function parseTokens(tokens) {
 
         if (t.type === 'KEYWORD') {
             advance();
-            const name = expect('IDENTIFICATOR').value;
+            const nameToken = expect('IDENTIFICATOR');
             let attributes = [];
             if (peek().type === 'LPAREN') {
                 attributes = parseAttributes();
             }
-            return { type: 'declaration', keyword: t.value, name, attributes };
+            return {
+                type: 'declaration',
+                keyword: t.value,
+                name: nameToken.value,
+                attributes,
+                line: t.line,
+                col: t.col,
+                namePos: { line: nameToken.line, col: nameToken.col },
+            };
         }
 
         if (t.type === 'IDENTIFICATOR') {
-            const name = advance().value;
+            const nameToken = advance();
             const attributes = parseAttributes();
-            return { type: 'configuration', name, attributes };
+            return {
+                type: 'configuration',
+                name: nameToken.value,
+                attributes,
+                line: t.line,
+                col: t.col,
+                namePos: { line: nameToken.line, col: nameToken.col },
+            };
         }
 
         const error = new Error(`Expected declaration but got ${t.type} (line ${t.line}, col ${t.col})`);
@@ -246,10 +274,10 @@ function parseTokens(tokens) {
 
     // attribute = IDENT ":" value
     function parseAttribute() {
-        const key = expect('IDENTIFICATOR').value;
+        const keyToken = expect('IDENTIFICATOR');
         expect('COLON');
         const value = parseValue();
-        return { key, value };
+        return { key: keyToken.value, value, line: keyToken.line, col: keyToken.col };
     }
 
     // value = STRING | NUMBER
