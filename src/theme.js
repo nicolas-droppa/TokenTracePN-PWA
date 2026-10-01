@@ -31,7 +31,7 @@ export const THEMES = {
             string: '#5cffc9',
             number: '#63ceff',
             operator: '#94a3b8',
-            bracket: '#ff4af0',
+            bracket: '#f187ff',
             punctuation: '#94a3b8',
             identifier: '#e2e8f0',
             attributeKey: '#c7d0dd',
