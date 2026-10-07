@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 import { CANVAS_CONFIG } from '../../constants/layout';
 import { MOUSE_BUTTON } from '../../constants/tools';
@@ -28,7 +29,7 @@ export const PetriCanvas = () => {
         fire,
     } = usePetriStore();
 
-    const activeThemeKey = usePetriStore((state) => state.activeTheme);
+    const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
     const isRunning = mode === 'run';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePetriStore } from '../../../store/usePetriStore';
+import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { THEMES } from '../../../theme';
 
@@ -12,7 +12,7 @@ import { THEMES } from '../../../theme';
  * @param {Function} props.onMouseDown - Drag start handler.
  */
 export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
-  const activeThemeKey = usePetriStore((state) => state.activeTheme);
+  const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
 
   const { isConnectingSource, isInvalidTarget, containerProps } = useNodeConnecting(place, onMouseDown);

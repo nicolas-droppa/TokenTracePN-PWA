@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore, useTheme } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 
 export const Header = () => {
-    const { activeTheme, setTheme } = usePetriStore();
-    const theme = THEMES[activeTheme] || THEMES.dark;
+    const activeTheme = useSettingsStore((s) => s.activeTheme);
+    const setTheme = useSettingsStore((s) => s.setTheme);
+    const theme = useTheme();   
     const [isThemeOpen, setIsThemeOpen] = useState(false);
     const dropdownRef = useRef(null);
 

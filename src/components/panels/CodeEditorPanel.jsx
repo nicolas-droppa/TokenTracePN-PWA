@@ -1,10 +1,10 @@
 import React from 'react';
-import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 import { useCodeEditor } from '../../hooks/editor/useCodeEditor';
 
 export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
-    const activeThemeKey = usePetriStore((state) => state.activeTheme);
+    const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
     const isDark = String(activeThemeKey || 'dark').toLowerCase().includes('dark');
 

@@ -1,9 +1,11 @@
 import React from 'react';
 import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 
 export const ElementInspector = () => {
-    const { selectedElement, updateElement, places, transitions, arcs, activeTheme, mode, marking } = usePetriStore();
+    const activeTheme = useSettingsStore((state) => state.activeTheme);
+    const { selectedElement, updateElement, places, transitions, arcs, mode, marking } = usePetriStore();
     const theme = THEMES[activeTheme] || THEMES.dark;
     const isRunning = mode === 'run';
 

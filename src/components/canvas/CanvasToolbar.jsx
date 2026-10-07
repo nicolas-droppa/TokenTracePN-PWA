@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePetriStore } from '../../store/usePetriStore.js';
+import { useSettingsStore } from '../../store/useSettingsStore.js';
 import { THEMES } from '../../theme.js';
 import { TOOLS } from '../../constants/tools.js';
 
@@ -18,7 +19,7 @@ export const CanvasToolbar = () => {
     const [selectedArcId, setSelectedArcId] = React.useState(TOOLS.ARC);
     const selectedTool      = usePetriStore((s) => s.selectedTool);
     const setSelectedTool   = usePetriStore((s) => s.setSelectedTool);
-    const activeTheme       = usePetriStore((s) => s.activeTheme);
+    const activeTheme       = useSettingsStore((s) => s.activeTheme);
     const mode              = usePetriStore((s) => s.mode);
     const startSimulation   = usePetriStore((s) => s.startSimulation);
     const stopSimulation    = usePetriStore((s) => s.stopSimulation);

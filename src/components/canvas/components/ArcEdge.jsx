@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePetriStore } from '../../../store/usePetriStore';
+import { useSettingsStore } from '../../../store/useSettingsStore';
 import { THEMES } from '../../../theme';
 
 /**
@@ -12,7 +13,7 @@ import { THEMES } from '../../../theme';
  * @returns {JSX.Element|null} SVG group element or null if nodes are missing.
  */
 export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
-  const activeThemeKey = usePetriStore((state) => state.activeTheme);
+  const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
   const setSelectedElement = usePetriStore((state) => state.setSelectedElement);
   const isSelected = usePetriStore((state) => state.selectedElement?.id === arc.id);

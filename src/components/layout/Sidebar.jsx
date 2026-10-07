@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';
-import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 import { LAYOUT_CONFIG } from '../../constants/layout';
 import { PanelDivider } from './PanelDivider';
@@ -8,7 +8,7 @@ import { CodeEditorPanel } from '../panels/CodeEditorPanel';
 import { ElementInspector } from '../panels/ElementInspector';
 
 export const Sidebar = ({ code, setCode, language, setLanguage }) => {
-    const activeThemeKey = usePetriStore((state) => state.activeTheme);
+    const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
     return (

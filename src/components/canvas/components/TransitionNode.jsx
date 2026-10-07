@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePetriStore } from '../../../store/usePetriStore';
+import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { THEMES } from '../../../theme';
 
@@ -21,7 +21,7 @@ export const TransitionNode = ({
   onFire,
   onMouseDown,
 }) => {
-  const activeThemeKey = usePetriStore((state) => state.activeTheme);
+  const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
 
   const [isFlashing, setIsFlashing] = React.useState(false);

@@ -1,10 +1,10 @@
 import React from 'react';
-import { usePetriStore } from '../../store/usePetriStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 import { CodeCheckerPanel } from '../panels/CodeCheckerPanel';
 
 export const BottomBar = ({ code = '', language = 'dpn' }) => {
-    const activeThemeKey = usePetriStore((state) => state.activeTheme);
+    const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
     return (

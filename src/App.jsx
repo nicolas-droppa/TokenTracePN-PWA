@@ -5,12 +5,12 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/header/Header';
 import { BottomBar } from './components/layout/BottomBar';
 import { PanelDivider } from './components/layout/PanelDivider';
-import { usePetriStore } from './store/usePetriStore';
+import { useSettingsStore } from './store/useSettingsStore';
 import { THEMES } from './theme';
 import { useBottomPanel } from './hooks/useBottomPanel';
 
 export default function App() {
-    const activeThemeKey = usePetriStore((state) => state.activeTheme);
+    const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
     const {
         code,
