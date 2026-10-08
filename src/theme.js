@@ -2,6 +2,11 @@ export const THEMES = {
     dark: {
         id: 'dark',
         label: 'VS Code Dark',
+        status: {
+            run: '#22c55e',
+            stop: '#ef4444',
+            muted: '#94a3b8',
+        },
         place: {
             fill: '#0f172a',
             stroke: '#38bdf8',
@@ -66,6 +71,11 @@ export const THEMES = {
     monokai: {
         id: 'monokai',
         label: 'Monokai Pro',
+        status: {
+            run: '#a9dc76',
+            stop: '#ff6188',
+            muted: '#c1c0c0',
+        },
         place: {
             fill: '#2d2a2e',
             stroke: '#a9dc76',
@@ -130,6 +140,11 @@ export const THEMES = {
     light: {
         id: 'light',
         label: 'Clean Light',
+        status: {
+            run: '#16a34a',
+            stop: '#dc2626',
+            muted: '#64748b',
+        },
         place: {
             fill: '#ffffff',
             stroke: '#0284c7',

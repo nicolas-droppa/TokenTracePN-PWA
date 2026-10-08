@@ -1,107 +1,109 @@
 import React from 'react';
-import { usePetriStore } from '../../store/usePetriStore.js';
-import { useSettingsStore } from '../../store/useSettingsStore.js';
-import { THEMES } from '../../theme.js';
-import { TOOLS } from '../../constants/tools.js';
+import { useTheme } from '../../store/useSettingsStore.js';
+import { TOOL_GROUPS } from '../../constants/toolbar.js';
+import { TOOL_SHORTCUTS, TOOLBAR_SHORTCUTS } from '../../constants/shortcuts.js';
+import { shortcutLabel, withShortcut } from '../../utils/keyboard.js';
+import { useToolbarControls } from '../../hooks/canvas/useToolbarControls.js';
+import { Collapsible } from '../ui/Collapsible.jsx';
+import { ToolButton } from './components/ToolButton.jsx';
+import { ToolbarButton } from './components/ToolbarButton.jsx';
+import { ToolbarDivider } from './components/ToolbarDivider.jsx';
 
-const TOOL_ITEMS = [
-    { id: TOOLS.SELECT, label: 'Select', icon: '/icons/tools/select.svg' },
-    { id: TOOLS.PAN, label: 'Pan', icon: '/icons/tools/pan.svg' },
-    { id: TOOLS.PLACE, label: 'Place', icon: '/icons/tools/place.svg' },
-    { id: TOOLS.TRANSITION, label: 'Transition', icon: '/icons/tools/transition.svg' },
-    { id: TOOLS.ARC, action: TOOLS.ARC, isArc: true, label: 'Arc', icon: '/icons/tools/arc_regular.svg' },
-    { id: 'arc-read', action: TOOLS.ARC, isArc: true, label: 'Read arc', icon: '/icons/tools/arc_read.svg' },
-    { id: 'arc-inhibitor', action: TOOLS.ARC, isArc: true, label: 'Inhibitor', icon: '/icons/tools/arc_inhibitor.svg' },
-    { id: 'arc-reset', action: TOOLS.ARC, isArc: true, label: 'Reset arc', icon: '/icons/tools/arc_reset.svg' },
-];
+const CollapseIcon = ({ isCollapsed }) => (
+    <svg
+        className={`h-3.5 w-3.5 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M7 11l5-5 5 5M7 18l5-5 5 5" />
+    </svg>
+);
 
 export const CanvasToolbar = () => {
-    const [selectedArcId, setSelectedArcId] = React.useState(TOOLS.ARC);
-    const selectedTool      = usePetriStore((s) => s.selectedTool);
-    const setSelectedTool   = usePetriStore((s) => s.setSelectedTool);
-    const activeTheme       = useSettingsStore((s) => s.activeTheme);
-    const mode              = usePetriStore((s) => s.mode);
-    const startSimulation   = usePetriStore((s) => s.startSimulation);
-    const stopSimulation    = usePetriStore((s) => s.stopSimulation);
-    const stepCount         = usePetriStore((s) => s.history.length);
-
-    const theme = THEMES[activeTheme] || THEMES.dark;
-    const isRunning = mode === 'run';
-    const iconFilter = activeTheme === 'light' ? 'none' : 'invert(1)';
+    const theme = useTheme();
+    const { selectedTool, currentId, isRunning, isCollapsed, selectTool, stepTool, toggleCollapsed } =
+        useToolbarControls();
 
     return (
         <div
-            className="absolute top-4 left-4 z-10 flex items-center gap-1 p-1.5 rounded-lg border shadow-lg backdrop-blur-md transition-colors duration-200 select-none"
+            className="absolute left-4 top-4 z-10 flex max-h-[calc(100%-2rem)] w-16 select-none flex-col overflow-y-auto rounded-lg border p-1.5 shadow-lg backdrop-blur-md transition-colors duration-200"
             style={{
                 backgroundColor: `${theme.sidebar.bg}cc`,
                 borderColor: theme.sidebar.border,
             }}
         >
-            {TOOL_ITEMS.map((tool) => {
-                const isActive = !isRunning
-                    && selectedTool === (tool.action || tool.id)
-                    && (!tool.isArc || selectedArcId === tool.id);
-                return (
-                    <button
-                        key={tool.id}
-                        onClick={() => {
-                            setSelectedArcId(tool.id);
-                            setSelectedTool(tool.action || tool.id);
-                        }}
+            {TOOL_GROUPS.map((group, groupIndex) => (
+                <React.Fragment key={group[0].id}>
+                    {groupIndex > 0 && (
+                        <Collapsible open={!isCollapsed}>
+                            <ToolbarDivider />
+                        </Collapsible>
+                    )}
+
+                    {group.map((tool) => {
+                        const isVisible = !isCollapsed || tool.id === currentId;
+
+                        return (
+                            <Collapsible key={tool.id} open={isVisible}>
+                                <div className="py-0.5">
+                                    <ToolButton
+                                        tool={tool}
+                                        shortcut={shortcutLabel(TOOL_SHORTCUTS[tool.id])}
+                                        isActive={!isRunning && selectedTool === tool.id}
+                                        disabled={isRunning}
+                                        focusable={isVisible}
+                                        onSelect={() => selectTool(tool.id)}
+                                    />
+                                </div>
+                            </Collapsible>
+                        );
+                    })}
+                </React.Fragment>
+            ))}
+
+            <Collapsible open={!isCollapsed}>
+                <ToolbarDivider />
+            </Collapsible>
+
+            <Collapsible open={isCollapsed}>
+                <div className="flex gap-1 py-0.5">
+                    <ToolbarButton
+                        className="flex-1"
+                        onClick={() => stepTool(-1)}
                         disabled={isRunning}
-                        title={isRunning ? 'Stop the simulation to edit' : tool.label}
-                        className={`flex h-14 w-16 flex-col items-center justify-center gap-0.5 rounded-none text-[10px] font-medium transition-all ${
-                            isRunning ? 'opacity-35 cursor-not-allowed' : 'cursor-pointer'
-                        }`}
-                        style={{
-                            backgroundColor: 'transparent',
-                            color: isActive ? theme.place.stroke : theme.text.label,
-                            borderBottom: isActive ? `2px solid ${theme.place.stroke}` : '2px solid transparent',
-                        }}
+                        tabIndex={isCollapsed ? 0 : -1}
+                        title={withShortcut('Previous tool', TOOLBAR_SHORTCUTS.previousTool)}
+                        aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.previousTool)}
                     >
-                        <img
-                            src={tool.icon}
-                            alt=""
-                            aria-hidden="true"
-                            className="h-8 w-8 object-contain"
-                            style={{ filter: iconFilter }}
-                        />
-                        {tool.label}
-                    </button>
-                );
-            })}
+                        ↑
+                    </ToolbarButton>
+                    <ToolbarButton
+                        className="flex-1"
+                        onClick={() => stepTool(1)}
+                        disabled={isRunning}
+                        tabIndex={isCollapsed ? 0 : -1}
+                        title={withShortcut('Next tool', TOOLBAR_SHORTCUTS.nextTool)}
+                        aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.nextTool)}
+                    >
+                        ↓
+                    </ToolbarButton>
+                </div>
+            </Collapsible>
 
-            <div
-                className="w-px h-10 mx-1"
-                style={{ backgroundColor: theme.sidebar.border }}
-            />
-
-            <button
-                onClick={isRunning ? stopSimulation : startSimulation}
-                className="flex h-14 w-16 flex-col items-center justify-center gap-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer"
-                style={{
-                    backgroundColor: isRunning ? theme.transition.stroke : theme.place.stroke,
-                    color: theme.bg,
-                }}
+            <ToolbarButton
+                className="mt-0.5 w-full shrink-0"
+                onClick={toggleCollapsed}
+                title={withShortcut(isCollapsed ? 'Expand toolbar' : 'Collapse toolbar', TOOLBAR_SHORTCUTS.toggleCollapse)}
+                aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.toggleCollapse)}
+                aria-expanded={!isCollapsed}
             >
-                <img
-                    src={isRunning ? '/icons/system/sys_stop.svg' : '/icons/system/sys_start.svg'}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-8 w-8 object-contain"
-                    style={{ filter: iconFilter }}
-                />
-                {isRunning ? 'Stop' : 'Run'}
-            </button>
-
-            {isRunning && (
-                <span
-                    className="px-2 text-xs font-mono"
-                    style={{ color: theme.text.label }}
-                >
-                    step {stepCount}
-                </span>
-            )}
+                <CollapseIcon isCollapsed={isCollapsed} />
+            </ToolbarButton>
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import { PUNCTUATION, KEYWORDS } from '../../constants/parsers/dpnParser.js';
+import { PUNCTUATION, KEYWORDS } from '../../constants/dpn.js';
 import { checkSemantics } from './dpnSemantics.js';
 
 export function canParse(code) {

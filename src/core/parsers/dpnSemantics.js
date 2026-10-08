@@ -1,4 +1,4 @@
-import { ATTRIBUTE_ALIASES, ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/parsers/dpnParser.js';
+import { ATTRIBUTE_ALIASES, ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/dpn.js';
 
 /**
  * Runs all semantic rules over the AST.
