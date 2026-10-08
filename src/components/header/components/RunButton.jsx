@@ -35,7 +35,7 @@ export const RunButton = ({ isRunning, onClick }) => {
             >
                 {isRunning ? <StopIcon /> : <PlayIcon />}
             </span>
-            <span>{isRunning ? 'Stop' : 'Run'}</span>
+            <span className="hidden md:inline">{isRunning ? 'Stop' : 'Run'}</span>
         </button>
     );
 };

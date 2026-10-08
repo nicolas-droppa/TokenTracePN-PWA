@@ -7,6 +7,9 @@ export const useSettingsStore = create(
         (set) => ({
             activeTheme: 'dark',
             setTheme: (activeTheme) => set({ activeTheme }),
+
+            workspaceLayout: null,
+            setWorkspaceLayout: (workspaceLayout) => set({ workspaceLayout }),
         }),
         { name: 'petri-settings' }
     )

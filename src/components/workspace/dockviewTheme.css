@@ -1,0 +1,36 @@
+/*
+ * Maps dockview's CSS variables to the app theme.
+ */
+.tt-dock [class*='dockview-theme-'] {
+    --dv-group-view-background-color: var(--tt-panel-bg);
+    --dv-tabs-and-actions-container-background-color: var(--tt-tabbar-bg);
+    --dv-tabs-and-actions-container-font-size: 12px;
+    --dv-tabs-and-actions-container-height: 32px;
+
+    --dv-activegroup-visiblepanel-tab-background-color: var(--tt-tab-active-bg);
+    --dv-activegroup-hiddenpanel-tab-background-color: var(--tt-tabbar-bg);
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(--tt-tab-active-bg);
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--tt-tabbar-bg);
+
+    --dv-activegroup-visiblepanel-tab-color: var(--tt-text-strong);
+    --dv-activegroup-hiddenpanel-tab-color: var(--tt-text);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--tt-text);
+    --dv-inactivegroup-hiddenpanel-tab-color: var(--tt-text-muted);
+
+    --dv-tab-divider-color: var(--tt-border);
+    --dv-separator-border: var(--tt-border);
+    --dv-paneview-header-border-color: var(--tt-border);
+
+    --dv-active-sash-color: var(--tt-accent);
+    --dv-paneview-active-outline-color: var(--tt-accent);
+    --dv-edge-dock-indicator-color: var(--tt-accent);
+    --dv-drag-over-background-color: var(--tt-accent-soft);
+}
+
+.tt-dock .dv-tabs-and-actions-container {
+    border-bottom: 1px solid var(--tt-border);
+}
+
+.tt-dock .dv-groupview.dv-active-group > .dv-tabs-and-actions-container .dv-tab.dv-active-tab {
+    box-shadow: inset 0 2px 0 var(--tt-accent);
+}

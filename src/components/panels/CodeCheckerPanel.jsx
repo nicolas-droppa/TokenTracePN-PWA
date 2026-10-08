@@ -34,8 +34,8 @@ export const CodeCheckerPanel = ({ errors = [], theme = {}, code = '', language 
     const displayErrors = errorsState || [];
     return (
         <div
-            className="border-t px-3 py-2 text-xs"
-            style={{ borderColor: (theme && theme.sidebar && theme.sidebar.border) || '#ddd', color: (theme && theme.text && theme.text.label) || '#111' }}
+            className="px-3 py-2 text-xs"
+            style={{ color: (theme && theme.text && theme.text.label) || '#111' }}
         >
             <div className="flex items-center justify-start gap-2 mb-2">
                 <strong>Code Checker</strong>

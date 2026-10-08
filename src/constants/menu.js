@@ -1,3 +1,5 @@
+import { PANELS } from './workspace.js';
+
 /**
  * Menu definitions for the header bar.
  */
@@ -18,6 +20,14 @@ export const MENUS = [
             { id: 'undo', label: 'Undo' },
             { id: 'redo', label: 'Redo' },
             { id: 'deleteSelected', label: 'Delete selected' },
+        ],
+    },
+    {
+        id: 'view',
+        label: 'View',
+        items: [
+            ...PANELS.map((panel) => ({ id: `show:${panel.id}`, label: panel.title })),
+            { id: 'resetLayout', label: 'Reset layout' },
         ],
     },
 ];

@@ -4,7 +4,7 @@ import { MenuBar } from './components/MenuBar';
 import { SimulationControls } from './components/SimulationControls';
 
 /**
- * Top bar: logo and menus on the left, simulation controls in the center.
+ * Top bar: logo and menus on the left, simulation controls in the center (phones - right).
  */
 export const Header = () => {
     const theme = useTheme();
@@ -24,7 +24,8 @@ export const Header = () => {
                 <MenuBar />
             </div>
 
-            <div className="absolute left-1/2 top-1/2 h-full -translate-x-1/2 -translate-y-1/2">
+            {/* Phone: right side */}
+            <div className="ml-auto h-full md:absolute md:left-1/2 md:top-1/2 md:ml-0 md:-translate-x-1/2 md:-translate-y-1/2">
                 <SimulationControls />
             </div>
         </header>
