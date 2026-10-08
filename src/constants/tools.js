@@ -1,9 +1,15 @@
+/**
+ * Tool identifiers for the canvas toolbar.
+ */
 export const TOOLS = {
     SELECT: 'select',
     PAN: 'pan',
     PLACE: 'place',
     TRANSITION: 'transition',
-    ARC: 'arc',
+    ARC: 'regular',
+    INHIBITOR: 'inhibitor',
+    RESET: 'reset',
+    READ: 'read',
 };
 
 export const MOUSE_BUTTON = {

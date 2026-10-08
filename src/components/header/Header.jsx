@@ -1,96 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useSettingsStore, useTheme } from '../../store/useSettingsStore';
-import { THEMES } from '../../theme';
+import React from 'react';
+import { useTheme } from '../../store/useSettingsStore';
+import { MenuBar } from './components/MenuBar';
+import { SimulationControls } from './components/SimulationControls';
 
+/**
+ * Top bar: logo and menus on the left, simulation controls in the center.
+ */
 export const Header = () => {
-    const activeTheme = useSettingsStore((s) => s.activeTheme);
-    const setTheme = useSettingsStore((s) => s.setTheme);
-    const theme = useTheme();   
-    const [isThemeOpen, setIsThemeOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsThemeOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const theme = useTheme();
 
     return (
         <header
-            className="h-12 w-full flex items-center justify-between px-4 border-b shrink-0 select-none transition-colors duration-200"
+            className="relative flex h-10 w-full shrink-0 select-none items-center justify-between border-b px-4 transition-colors duration-200"
             style={{
                 backgroundColor: theme.sidebar.bg,
                 borderColor: theme.sidebar.border,
             }}
         >
-            <div className="flex items-center space-x-3">
-                <span className="font-bold text-sm tracking-wide" style={{ color: theme.text.token }}>
-                    TokenTrace<span style={{ color: theme.place.stroke }}>PN</span>
+            <div className="flex items-center gap-2">
+                <span className="mr-2 text-sm font-bold tracking-wide" style={{ color: theme.text.token }}>
+                    TT<span style={{ color: theme.place.stroke }}>PN</span>
                 </span>
+                <MenuBar />
             </div>
 
-            <div className="flex items-center space-x-2">
-                <div className="relative" ref={dropdownRef}>
-                    <button
-                        onClick={() => setIsThemeOpen((prev) => !prev)}
-                        className="px-3 py-1.5 rounded-md text-xs font-medium flex items-center space-x-2 border transition-all cursor-pointer"
-                        style={{
-                            backgroundColor: theme.sidebar.inputBg,
-                            borderColor: theme.sidebar.inputBorder,
-                            color: theme.text.label,
-                        }}
-                    >
-                        <span>Theme: <strong style={{ color: theme.text.token }}>{theme.label}</strong></span>
-                        <svg
-                            className={`w-3.5 h-3.5 transition-transform duration-200 ${isThemeOpen ? 'rotate-180' : ''}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    {isThemeOpen && (
-                        <div
-                            className="absolute right-0 mt-1 w-44 rounded-md border shadow-xl z-50 py-1"
-                            style={{
-                                backgroundColor: theme.sidebar.bg,
-                                borderColor: theme.sidebar.border,
-                            }}
-                        >
-                            {Object.keys(THEMES).map((themeKey) => {
-                                const isSelected = activeTheme === themeKey;
-                                return (
-                                    <button
-                                        key={themeKey}
-                                        onClick={() => {
-                                            setTheme(themeKey);
-                                            setIsThemeOpen(false);
-                                        }}
-                                        className="w-full text-left px-3 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer"
-                                        style={{
-                                            color: isSelected ? theme.place.stroke : theme.text.label,
-                                            backgroundColor: isSelected ? `${theme.place.stroke}15` : 'transparent',
-                                        }}
-                                    >
-                                        <span>{THEMES[themeKey].label}</span>
-                                        {isSelected && (
-                                            <span 
-                                                className="w-1.5 h-1.5 rounded-full"
-                                                style={{ backgroundColor: theme.place.stroke }}
-                                            />
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+            <div className="absolute left-1/2 top-1/2 h-full -translate-x-1/2 -translate-y-1/2">
+                <SimulationControls />
             </div>
         </header>
     );

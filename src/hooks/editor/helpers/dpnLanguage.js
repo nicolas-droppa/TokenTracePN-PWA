@@ -1,5 +1,5 @@
 import { StreamLanguage } from '@codemirror/language';
-import { KEYWORDS } from '../../../constants/parsers/dpnParser.js';
+import { KEYWORDS } from '../../../constants/dpn.js';
 
 /** 
  * Defines the DPN language for CodeMirror using StreamLanguage.
