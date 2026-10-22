@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
+import { displayName } from '../../../core/models';
 import { THEMES } from '../../../theme';
 
 /**
@@ -106,7 +107,7 @@ export const TransitionNode = ({
         className="text-xs font-medium select-none"
         pointerEvents="none"
       >
-        {transition.label}
+        {displayName(transition)}
       </text>
     </g>
   );

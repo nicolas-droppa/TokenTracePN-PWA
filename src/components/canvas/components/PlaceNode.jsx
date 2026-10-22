@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
+import { displayName } from '../../../core/models';
 import { THEMES } from '../../../theme';
 
 /**
@@ -63,7 +64,7 @@ export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
         className="text-xs font-medium select-none"
         pointerEvents="none"
       >
-        {place.label}
+        {displayName(place)}
       </text>
     </g>
   );

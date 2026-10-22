@@ -19,3 +19,10 @@ export const CANVAS_CONFIG = {
     },
     PANEL_BOUNDS_PX: 20000,
 };
+
+export const AUTO_LAYOUT = {
+    ORIGIN_X: 120,
+    ORIGIN_Y: 120,
+    SPACING_PX: 120,
+    COLUMNS: 5,
+};

@@ -2,9 +2,11 @@ import React from 'react';
 import { Header } from './components/header/Header';
 import { Workspace } from './components/workspace/Workspace';
 import { useTheme } from './store/useSettingsStore';
+import { useCodeSync } from './hooks/useCodeSync';
 
 export default function App() {
     const theme = useTheme();
+    useCodeSync();
 
     return (
         <div

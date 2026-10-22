@@ -12,35 +12,27 @@ import { TransitionNode } from './components/TransitionNode';
 import { ArcEdge } from './components/ArcEdge';
 
 export const PetriCanvas = () => {
-    const {
-        places,
-        transitions,
-        arcs,
-        selectedTool,
-        setSelectedTool,
-        cancelConnecting,
-        addPlace,
-        addTransition,
-        updateNodePosition,
-        setSelectedElement,
-        deleteElement,
-        mode,
-        marking,
-        fire,
-    } = usePetriStore();
+    // One selector per value - the canvas re-renders only when one of these changes
+    const storedPlaces = usePetriStore((s) => s.places);
+    const storedTransitions = usePetriStore((s) => s.transitions);
+    const arcs = usePetriStore((s) => s.arcs);
+    const selectedTool = usePetriStore((s) => s.selectedTool);
+    const setSelectedTool = usePetriStore((s) => s.setSelectedTool);
+    const cancelConnecting = usePetriStore((s) => s.cancelConnecting);
+    const addPlace = usePetriStore((s) => s.addPlace);
+    const addTransition = usePetriStore((s) => s.addTransition);
+    const moveNode = usePetriStore((s) => s.moveNode);
+    const select = usePetriStore((s) => s.select);
+    const deleteElement = usePetriStore((s) => s.deleteElement);
+    const mode = usePetriStore((s) => s.mode);
+    const marking = usePetriStore((s) => s.marking);
+    const fire = usePetriStore((s) => s.fire);
 
     const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
 
     const isRunning = mode === 'run';
 
-    const enabledIds = React.useMemo(
-        () =>
-            isRunning
-                ? new Set(getEnabledTransitions({ transitions, arcs }, marking))
-                : null,
-        [isRunning, transitions, arcs, marking]
-    );
 
     const {
         svgRef,
@@ -54,12 +46,28 @@ export const PetriCanvas = () => {
     } = useCanvasPanZoom(selectedTool);
 
     const {
+        dragPosition,
         handleMouseDown,
         handleContextMenu,
         handleMouseMove,
         startDraggingNode,
         stopDraggingNode,
-    } = useCanvasInteractions({ mode, selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, updateNodePosition, getCanvasCoordinates, startPanning, setSelectedElement, deleteElement });
+    } = useCanvasInteractions({ selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, moveNode, getCanvasCoordinates, startPanning, select, deleteElement });
+
+    // While dragging, the dragged node is drawn at its preview position (not yet in the store)
+    const places = React.useMemo(() => withDragPosition(storedPlaces, dragPosition), [storedPlaces, dragPosition]);
+    const transitions = React.useMemo(
+        () => withDragPosition(storedTransitions, dragPosition),
+        [storedTransitions, dragPosition]
+    );
+
+    const enabledIds = React.useMemo(
+        () =>
+            isRunning
+                ? new Set(getEnabledTransitions({ transitions: storedTransitions, arcs }, marking))
+                : null,
+        [isRunning, storedTransitions, arcs, marking]
+    );
 
     const handleNodeMouseDown = (nodeId) => (e) => {
         if (isRunning) return;
@@ -138,7 +146,7 @@ export const PetriCanvas = () => {
                     <PlaceNode
                         key={place.id}
                         place={place}
-                        tokens={isRunning ? marking?.[place.id] ?? 0 : place.initialTokens}
+                        tokens={isRunning ? marking?.[place.id] ?? 0 : place.tokens}
                         onMouseDown={handleNodeMouseDown(place.id)}
                     />
                 ))}
@@ -157,3 +165,11 @@ export const PetriCanvas = () => {
         </svg>
     );
 };
+
+/** 
+ * Returns the nodes with the dragged one moved to its preview position. 
+ */
+const withDragPosition = (nodes, dragPosition) =>
+    dragPosition
+        ? nodes.map((node) => (node.id === dragPosition.id ? { ...node, x: dragPosition.x, y: dragPosition.y } : node))
+        : nodes;

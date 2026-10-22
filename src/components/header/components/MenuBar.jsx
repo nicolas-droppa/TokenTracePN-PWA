@@ -3,6 +3,7 @@ import { useClickOutside } from '../../../hooks/useClickOutside';
 import { MENUS } from '../../../constants/menu';
 import { PANELS } from '../../../constants/workspace';
 import { useWorkspaceStore } from '../../../store/useWorkspaceStore';
+import { usePetriStore } from '../../../store/usePetriStore';
 import { MenuDropdown } from './MenuDropdown';
 import { MenuItem } from './MenuItem';
 import { ThemeMenu } from './ThemeMenu';
@@ -20,11 +21,15 @@ export const MenuBar = () => {
 
     const showPanel = useWorkspaceStore((s) => s.showPanel);
     const resetLayout = useWorkspaceStore((s) => s.resetLayout);
+    const selectedId = usePetriStore((s) => s.selectedId);
+    const deleteElement = usePetriStore((s) => s.deleteElement);
+    const isRunning = usePetriStore((s) => s.mode === 'run');
 
     // Menu item id -> handler. An item without a handler is shown as disabled.
     const actions = {
         ...Object.fromEntries(PANELS.map((panel) => [`show:${panel.id}`, () => showPanel(panel.id)])),
         resetLayout,
+        ...(selectedId && !isRunning && { deleteSelected: () => deleteElement(selectedId) }),
     };
 
     return (

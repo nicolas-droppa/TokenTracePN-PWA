@@ -1,3 +1,5 @@
+import { findElement } from '../../core/models';
+
 /**
  * Editor UI state: active tool, selection and arc-connecting process.
  * @param {Function} set - Zustand set.
@@ -5,20 +7,20 @@
  */
 export const createEditorSlice = (set, get) => ({
     selectedTool: 'select',
-    selectedElement: null,
+    selectedId: null,
     connectingSourceId: null,
 
     /**
      * Sets the active editing tool.
-     * @param {string} tool - The tool identifier ('select', 'place', 'transition', 'arc').
+     * @param {string} tool - The tool identifier ('select', 'place', 'transition', 'regular', …).
      */
     setSelectedTool: (tool) => set({ selectedTool: tool }),
 
     /**
-     * Sets the currently selected element in the UI.
-     * @param {Object|null} element - The element object or null to deselect.
+     * Selects an element, or clears the selection.
+     * @param {string|null} id
      */
-    setSelectedElement: (element) => set({ selectedElement: element }),
+    select: (id) => set({ selectedId: id ?? null }),
 
     /**
      * Begins the process of connecting a source node to a target.
@@ -43,3 +45,5 @@ export const createEditorSlice = (set, get) => ({
         set({ connectingSourceId: null });
     },
 });
+
+export const selectSelectedElement = (state) => findElement(state, state.selectedId);

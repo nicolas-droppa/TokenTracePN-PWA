@@ -8,18 +8,22 @@ import {
     resolveContextMenuAction,
 } from './helpers/canvasInteractions';
 
+/**
+ * Mouse handling on the canvas: adding nodes, selection, deleting and dragging nodes.
+ */
 export const useCanvasInteractions = ({
     selectedTool,
     addPlace,
     addTransition,
-    updateNodePosition,
+    moveNode,
     getCanvasCoordinates,
     startPanning,
     setSelectedTool,
     cancelConnecting,
-    setSelectedElement,
+    select,
     deleteElement,
 }) => {
+    const [dragPosition, setDragPosition] = useState(null);
     const [draggingNodeId, setDraggingNodeId] = useState(null);
 
     const handleMouseDown = (e) => {
@@ -43,7 +47,7 @@ export const useCanvasInteractions = ({
                 addTransition(x, y);
                 break;
             case CANVAS_ACTION.CLEAR_SELECTION:
-                setSelectedElement(null);
+                select(null);
                 break;
             default:
                 break;
@@ -69,18 +73,29 @@ export const useCanvasInteractions = ({
         }
     };
 
+    const startDraggingNode = (nodeId) => {
+        if (selectedTool !== TOOLS.SELECT) return;
+        setDraggingNodeId(nodeId);
+    };
+
     const handleMouseMove = (clientX, clientY) => {
         if (!draggingNodeId) return;
         const { x, y } = getCanvasCoordinates(clientX, clientY);
-        updateNodePosition(draggingNodeId, x, y);
+        setDragPosition({ id: draggingNodeId, x, y });
+    };
+
+    const stopDraggingNode = () => {
+        if (dragPosition) moveNode(dragPosition.id, dragPosition.x, dragPosition.y);
+        setDraggingNodeId(null);
+        setDragPosition(null);
     };
 
     return {
-        draggingNodeId,
+        dragPosition,
         handleMouseDown,
         handleContextMenu,
         handleMouseMove,
-        startDraggingNode: setDraggingNodeId,
-        stopDraggingNode: () => setDraggingNodeId(null),
+        startDraggingNode,
+        stopDraggingNode,
     };
 };

@@ -45,13 +45,13 @@ export const getEnabledTransitions = (net, marking) =>
   net.transitions.filter((t) => isEnabled(net, marking, t.id)).map((t) => t.id);
 
 /**
- * Builds the initial marking from the places' initialTokens.
+ * Builds the initial marking from the places tokens.
  *
  * @param {Array<Object>} places - The list of places.
  * @returns {Object<string, number>} The initial marking.
  */
 export const buildInitialMarking = (places) =>
-  Object.fromEntries(places.map((p) => [p.id, p.initialTokens ?? 0]));
+  Object.fromEntries(places.map((p) => [p.id, p.tokens ?? 0]));
 
 /**
  * Validates whether an arc can be created between a source and a target node (bipartite graph).

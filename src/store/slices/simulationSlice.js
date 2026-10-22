@@ -11,23 +11,16 @@ export const createSimulationSlice = (set, get) => ({
     marking: null,
     history: [],
 
-    /**
-     * Enters simulation mode and initializes the marking and history.
-     * Resets the editor so nothing can be edited while running.
-     */
     startSimulation: () =>
         set((state) => ({
             mode: 'run',
             marking: buildInitialMarking(state.places),
             history: [],
             selectedTool: TOOLS.SELECT,
-            selectedElement: null,
+            selectedId: null,
             connectingSourceId: null,
         })),
 
-    /**
-     * Returns to edit mode, discarding the current marking and history.
-     */
     stopSimulation: () => set({ mode: 'edit', marking: null, history: [] }),
 
     /**

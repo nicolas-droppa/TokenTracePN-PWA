@@ -25,3 +25,7 @@ export const ATTRIBUTE_ALIASES = {
 };
 
 export const PLACE_TO_TRANSITION_ONLY = new Set(['inhibitor', 'reset', 'read']);
+
+export const ATTRIBUTE_FIELDS = {
+    arc: { type: 'arcType' },
+};

@@ -1,4 +1,5 @@
-import { ATTRIBUTE_ALIASES, ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/dpn.js';
+import { ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/dpn.js';
+import { canonicalKey, kindOf, matchesSchema, describeExpected } from './dpnSchema.js';
 
 /**
  * Runs all semantic rules over the AST.
@@ -85,27 +86,6 @@ function findDuplicates(items, getKey) {
 }
 
 /**
- * Resolves attribute shortcuts to their full name (m -> tokens).
- * @param {string} key - Attribute key as written in the source.
- * @returns {string} Canonical attribute key.
- */
-function canonicalKey(key) {
-    return ATTRIBUTE_ALIASES[key] ?? key;
-}
-
-/**
- * Resolves what kind of node a statement describes.
- * @param {Object} statement - AST node.
- * @param {Map<string, Object>} symbols - Declared nodes by name.
- * @returns {string|undefined} 'place' | 'transition' | 'arc', undefined if the name is not declared.
- */
-function kindOf(statement, symbols) {
-    if (statement.type === 'arc') return 'arc';
-    if (statement.type === 'declaration') return statement.keyword;
-    return symbols.get(statement.name)?.keyword;
-}
-
-/**
  * Label used in messages and duplicate keys: node name, or "from->to" for arcs.
  * @param {Object} statement - AST node.
  * @returns {string}
@@ -132,26 +112,6 @@ function schemaEntries({ statements, symbols }) {
             return { attr, kind, key, expected, schema };
         });
     });
-}
-
-/**
- * Value types usable in ATTRIBUTE_SCHEMA.
- */
-const VALUE_TYPES = {
-    number:         { test: (v) => typeof v === 'number',         label: 'a number' },
-    string:         { test: (v) => typeof v === 'string',         label: 'a string' },
-    nonNegativeInt: { test: (v) => Number.isInteger(v) && v >= 0, label: 'a whole number ≥ 0' },
-    positiveInt:    { test: (v) => Number.isInteger(v) && v >= 1, label: 'a whole number ≥ 1' },
-};
-
-function matchesSchema(value, expected) {
-    if (Array.isArray(expected)) return expected.includes(value);
-    return VALUE_TYPES[expected]?.test(value) ?? false;
-}
-
-function describeExpected(expected) {
-    if (Array.isArray(expected)) return `one of: ${expected.join(', ')}`;
-    return VALUE_TYPES[expected]?.label ?? expected;
 }
 
 /**

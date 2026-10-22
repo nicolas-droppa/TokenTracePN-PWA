@@ -64,15 +64,13 @@ export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
         };
     }, []);
 
-    // Listen for code changes from outside the editor
+    // Listen for code change from outside the editor.
     useEffect(() => {
         const view = viewRef.current;
         if (!view) return;
         const current = view.state.doc.toString();
         const next = code ?? '';
-        if (next !== current) {
-            view.dispatch({ changes: { from: 0, to: current.length, insert: next } });
-        }
+        if (next !== current) view.dispatch({ changes: minimalChange(current, next) });
     }, [code]);
 
     // Listen for language change
@@ -90,4 +88,22 @@ export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
     }, [theme, isDark]);
 
     return { hostRef, viewRef };
+};
+
+/**
+ * The smallest single replacement that turns before to after
+ * (skips the common start and end of both texts).
+ */
+const minimalChange = (before, after) => {
+    let start = 0;
+    while (start < before.length && start < after.length && before[start] === after[start]) start++;
+
+    let endBefore = before.length;
+    let endAfter = after.length;
+    while (endBefore > start && endAfter > start && before[endBefore - 1] === after[endAfter - 1]) {
+        endBefore--;
+        endAfter--;
+    }
+
+    return { from: start, to: endBefore, insert: after.slice(start, endAfter) };
 };

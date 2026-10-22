@@ -7,7 +7,7 @@ export const useNodeConnecting = (node, onMouseDown) => {
   const startConnecting     = usePetriStore((s) => s.startConnecting);
   const finishConnecting    = usePetriStore((s) => s.finishConnecting);
   const cancelConnecting    = usePetriStore((s) => s.cancelConnecting);
-  const setSelectedElement  = usePetriStore((s) => s.setSelectedElement);
+  const select              = usePetriStore((s) => s.select);
   const mode                = usePetriStore((s) => s.mode);
 
   const sourceType = usePetriStore((s) => {
@@ -35,7 +35,7 @@ export const useNodeConnecting = (node, onMouseDown) => {
       return;
     }
 
-    setSelectedElement(node);
+    select(node.id);
   };
 
   const handleMouseDown = (e) => {

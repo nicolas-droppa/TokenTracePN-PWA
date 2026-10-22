@@ -105,12 +105,15 @@ function tokenize(src) {
             else this.col++;
             this.i++;
         },
-        pushToken(t) { tokens.push(t); }
+        tokenStart: 0,
+        // start/end = offsets in the source, end = position right after token
+        pushToken(t) { tokens.push({ ...t, start: this.tokenStart, end: this.i }); }
     };
 
     while (ctx.i < ctx.src.length) {
         const c = ctx.src[ctx.i];
         const startLine = ctx.line, startCol = ctx.col;
+        ctx.tokenStart = ctx.i;
 
         if (/\s/.test(c)) { ctx.advance(); continue; }
 
@@ -120,15 +123,16 @@ function tokenize(src) {
         }
 
         if (c === '-' && ctx.src[ctx.i + 1] === '>') {
+            ctx.advance();
+            ctx.advance();
             ctx.pushToken({ type: 'ARROW', value: '->', line: startLine, col: startCol });
-            ctx.advance();
-            ctx.advance();
             continue;
         }
 
         if (PUNCTUATION[c]) {
+            ctx.advance();
             ctx.pushToken({ type: PUNCTUATION[c], value: c, line: startLine, col: startCol });
-            ctx.advance(); continue;
+            continue;
         }
 
         if (/[0-9]/.test(c)) {
@@ -150,6 +154,7 @@ function tokenize(src) {
         ctx.advance();
     }
 
+    ctx.tokenStart = ctx.i;
     ctx.pushToken({ type: 'EOF', value: null, line: ctx.line, col: ctx.col });
     return { tokens, errors };
 }
@@ -182,31 +187,25 @@ function parseTokens(tokens) {
     // statement = arc ";" | declaration ";"
     function parseStatement() {
         const t = peek();
+        const isArc = t.type === 'IDENTIFICATOR' && tokens[pos + 1] && tokens[pos + 1].type === 'ARROW';
 
-        if (t.type === 'IDENTIFICATOR' && tokens[pos + 1] && tokens[pos + 1].type === 'ARROW') {
-            const arc = parseArc();
-            expect('SEMI');
-            return arc;
-        }
-
-        const decl = parseDeclaration();
-        expect('SEMI');
-        return decl;
+        const statement = isArc ? parseArc() : parseDeclaration();
+        const semi = expect('SEMI');
+        return { ...statement, start: t.start, end: semi.end };
     }
 
     function parseArc() {
         const fromToken = expect('IDENTIFICATOR');
         expect('ARROW');
         const toToken = expect('IDENTIFICATOR');
-        let attributes = [];
-        if (peek().type === 'LPAREN') {
-            attributes = parseAttributes();
-        }
+        const list = peek().type === 'LPAREN' ? parseAttributes() : null;
         return {
             type: 'arc',
             from: fromToken.value,
             to: toToken.value,
-            attributes,
+            attributes: list?.attributes ?? [],
+            attributeList: list && { start: list.start, end: list.end },
+            headerEnd: toToken.end,
             line: fromToken.line,
             col: fromToken.col,
             fromPos: { line: fromToken.line, col: fromToken.col },
@@ -221,15 +220,14 @@ function parseTokens(tokens) {
         if (t.type === 'KEYWORD') {
             advance();
             const nameToken = expect('IDENTIFICATOR');
-            let attributes = [];
-            if (peek().type === 'LPAREN') {
-                attributes = parseAttributes();
-            }
+            const list = peek().type === 'LPAREN' ? parseAttributes() : null;
             return {
                 type: 'declaration',
                 keyword: t.value,
                 name: nameToken.value,
-                attributes,
+                attributes: list?.attributes ?? [],
+                attributeList: list && { start: list.start, end: list.end },
+                headerEnd: nameToken.end,
                 line: t.line,
                 col: t.col,
                 namePos: { line: nameToken.line, col: nameToken.col },
@@ -238,11 +236,13 @@ function parseTokens(tokens) {
 
         if (t.type === 'IDENTIFICATOR') {
             const nameToken = advance();
-            const attributes = parseAttributes();
+            const list = parseAttributes();
             return {
                 type: 'configuration',
                 name: nameToken.value,
-                attributes,
+                attributes: list.attributes,
+                attributeList: { start: list.start, end: list.end },
+                headerEnd: nameToken.end,
                 line: t.line,
                 col: t.col,
                 namePos: { line: nameToken.line, col: nameToken.col },
@@ -257,7 +257,7 @@ function parseTokens(tokens) {
 
     // attributes = "(" attribute ("," attribute)* ")"
     function parseAttributes() {
-        expect('LPAREN');
+        const lparen = expect('LPAREN');
         const attributes = [];
 
         if (peek().type !== 'RPAREN') {
@@ -268,22 +268,30 @@ function parseTokens(tokens) {
             }
         }
 
-        expect('RPAREN');
-        return attributes;
+        const rparen = expect('RPAREN');
+        return { attributes, start: lparen.start, end: rparen.end };
     }
 
     // attribute = IDENT ":" value
     function parseAttribute() {
         const keyToken = expect('IDENTIFICATOR');
         expect('COLON');
-        const value = parseValue();
-        return { key: keyToken.value, value, line: keyToken.line, col: keyToken.col };
+        const valueToken = parseValue();
+        return {
+            key: keyToken.value,
+            value: valueToken.value,
+            line: keyToken.line,
+            col: keyToken.col,
+            start: keyToken.start,
+            end: valueToken.end,
+            valueStart: valueToken.start,
+        };
     }
 
     // value = STRING | NUMBER
     function parseValue() {
         const t = peek();
-        if (t.type === 'STRING' || t.type === 'NUMBER') return advance().value;
+        if (t.type === 'STRING' || t.type === 'NUMBER') return advance();
         const error = new Error(`Expected value (STRING or NUMBER) but got ${t.type} (line ${t.line}, col ${t.col})`);
         error.line = t.line;
         error.col = t.col;

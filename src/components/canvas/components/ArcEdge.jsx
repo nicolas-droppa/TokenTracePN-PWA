@@ -15,8 +15,8 @@ import { THEMES } from '../../../theme';
 export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
-  const setSelectedElement = usePetriStore((state) => state.setSelectedElement);
-  const isSelected = usePetriStore((state) => state.selectedElement?.id === arc.id);
+  const select = usePetriStore((state) => state.select);
+  const isSelected = usePetriStore((state) => state.selectedId === arc.id);
 
   if (!sourceNode || !targetNode) return null;
 
@@ -29,7 +29,7 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
 
   const handleClick = (e) => {
     e.stopPropagation();
-    setSelectedElement(arc);
+    select(arc.id);
   };
 
   return (
@@ -106,7 +106,7 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   );
 };
 
-// PRIVATE
+// private
 
 /**
  * Calculates the center midpoint between source and target nodes.

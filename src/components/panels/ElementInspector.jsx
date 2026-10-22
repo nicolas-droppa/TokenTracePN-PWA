@@ -1,11 +1,18 @@
 import React from 'react';
 import { usePetriStore } from '../../store/usePetriStore';
+import { selectSelectedElement } from '../../store/slices/editorSlice';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 
 export const ElementInspector = () => {
     const activeTheme = useSettingsStore((state) => state.activeTheme);
-    const { selectedElement, updateElement, places, transitions, arcs, mode, marking } = usePetriStore();
+    const selectedElement = usePetriStore(selectSelectedElement);
+    const setAttribute = usePetriStore((s) => s.setAttribute);
+    const places = usePetriStore((s) => s.places);
+    const transitions = usePetriStore((s) => s.transitions);
+    const arcs = usePetriStore((s) => s.arcs);
+    const mode = usePetriStore((s) => s.mode);
+    const marking = usePetriStore((s) => s.marking);
     const theme = THEMES[activeTheme] || THEMES.dark;
     const isRunning = mode === 'run';
 
@@ -42,9 +49,9 @@ export const ElementInspector = () => {
         );
     }
 
-    const isPlace = places.some((p) => p.id === selectedElement.id);
-    const isTransition = transitions.some((t) => t.id === selectedElement.id);
-    const isArc = arcs.some((a) => a.id === selectedElement.id);
+    const isPlace = selectedElement.type === 'place';
+    const isTransition = selectedElement.type === 'transition';
+    const isArc = selectedElement.type === 'arc';
 
     return (
         <div
@@ -111,8 +118,9 @@ export const ElementInspector = () => {
                     <input
                         type="text"
                         value={selectedElement.label || ''}
+                        placeholder={selectedElement.id}
                         disabled={isRunning}
-                        onChange={(e) => updateElement(selectedElement.id, { label: e.target.value })}
+                        onChange={(e) => setAttribute(selectedElement.id, 'label', e.target.value)}
                         className={inputClass}
                         style={inputStyle}
                     />
@@ -128,12 +136,10 @@ export const ElementInspector = () => {
                     <input
                         type="number"
                         min="0"
-                        value={selectedElement.initialTokens ?? 0}
+                        value={selectedElement.tokens ?? 0}
                         disabled={isRunning}
                         onChange={(e) =>
-                            updateElement(selectedElement.id, {
-                                initialTokens: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            })
+                            setAttribute(selectedElement.id, 'tokens', Math.max(0, parseInt(e.target.value, 10) || 0))
                         }
                         className={inputClass}
                         style={inputStyle}
@@ -153,9 +159,7 @@ export const ElementInspector = () => {
                         value={selectedElement.weight ?? 1}
                         disabled={isRunning}
                         onChange={(e) =>
-                            updateElement(selectedElement.id, {
-                                weight: Math.max(1, parseInt(e.target.value, 10) || 1),
-                            })
+                            setAttribute(selectedElement.id, 'weight', Math.max(1, parseInt(e.target.value, 10) || 1))
                         }
                         className={inputClass}
                         style={inputStyle}

@@ -1,8 +1,24 @@
-import { createPlace, createTransition, createArc } from '../../core/models';
-import { isValidArc } from '../../core/petriEngine';
+import { findElement, nextNodeId } from '../../core/models';
+import { applyCommand } from '../../core/netCommands';
+import { applyCommandToCode } from '../../core/parsers/dpnEdits';
 
 /**
- * Petri net model: places, transitions, arcs and actions that edit them.
+ * The net part of the store state.
+ * @param {Object} state - The store state.
+ * @returns {Object} The net part of the store state.
+ */
+const netOf = (state) => ({ places: state.places, transitions: state.transitions, arcs: state.arcs });
+
+/**
+ * Editor references (selection, arc being drawn) that still point to an existing element.
+ */
+const editorRefs = (state, net) => ({
+    selectedId: findElement(net, state.selectedId) ? state.selectedId : null,
+    connectingSourceId: findElement(net, state.connectingSourceId) ? state.connectingSourceId : null,
+});
+
+/**
+ * Petri net model: places, transitions, arcs and the commands that change them.
  * @param {Function} set - Zustand set.
  * @param {Function} get - Zustand get.
  */
@@ -10,109 +26,48 @@ export const createNetSlice = (set, get) => ({
     places: [],
     transitions: [],
     arcs: [],
-    counters: { place: 0, transition: 0 },
 
     /**
-     * Creates and adds a new place to the store.
-     * @param {number} x - The x-coordinate on canvas.
-     * @param {number} y - The y-coordinate on canvas.
+     * Replaces the whole net at once (when the code is rebuilt into a net).
+     * @param {import('../../core/models').Net} net
      */
-    addPlace: (x, y) =>
+    setNet: (net) =>
         set((state) => {
-            const n = state.counters.place + 1;
-            return {
-                places: [...state.places, createPlace(x, y, `P${n}`)],
-                counters: { ...state.counters, place: n },
-            };
+            if (state.mode === 'run') return {};
+            return { ...net, ...editorRefs(state, net) };
         }),
 
     /**
-     * Creates and adds a new transition to the store.
-     * @param {number} x - The x-coordinate on canvas.
-     * @param {number} y - The y-coordinate on canvas.
+     * Single entry point for every change of petri net made from the UI.
+     * @param {import('../../core/netCommands').NetCommand} command
      */
-    addTransition: (x, y) =>
+    execute: (command) =>
         set((state) => {
-            const n = state.counters.transition + 1;
-            return {
-                transitions: [...state.transitions, createTransition(x, y, `T${n}`)],
-                counters: { ...state.counters, transition: n },
-            };
+            if (state.mode === 'run') return {};
+
+            const current = netOf(state);
+            const next = applyCommand(current, command);
+            if (next === current) return {};
+
+            if (state.language !== 'dpn') return { ...next, ...editorRefs(state, next) };
+
+            const code = applyCommandToCode(state.code, command);
+            if (code === null) return {};
+
+            return { ...next, ...editorRefs(state, next), code };
         }),
 
-    /**
-     * Creates and adds a new arc connecting two elements if valid.
-     * @param {string} sourceId - The source element ID.
-     * @param {string} targetId - The target element ID.
-     */
-    addArc: (sourceId, targetId) => {
-        const { places, transitions, arcs } = get();
+    // wrappers - each one builds a command and executes it.
 
-        if (!isValidArc(sourceId, targetId, places, transitions)) return;
+    addPlace: (x, y) => get().execute({ type: 'addPlace', id: nextNodeId('p', get()), x, y }),
 
-        const exists = arcs.some((a) => a.source === sourceId && a.target === targetId);
-        if (exists) return;
+    addTransition: (x, y) => get().execute({ type: 'addTransition', id: nextNodeId('t', get()), x, y }),
 
-        set((state) => ({ arcs: [...state.arcs, createArc(sourceId, targetId)] }));
-    },
+    addArc: (source, target, arcType = 'regular') => get().execute({ type: 'addArc', source, target, arcType }),
 
-    /**
-     * Updates the (x, y) coordinates of a specific place or transition.
-     * @param {string} id - The ID of the node being moved.
-     * @param {number} x - The new x-coordinate.
-     * @param {number} y - The new y-coordinate.
-     */
-    updateNodePosition: (id, x, y) =>
-        set((state) => ({
-            places: state.places.map((p) => (p.id === id ? { ...p, x, y } : p)),
-            transitions: state.transitions.map((t) => (t.id === id ? { ...t, x, y } : t)),
-        })),
+    moveNode: (id, x, y) => get().execute({ type: 'moveNode', id, x, y }),
 
-    /**
-     * Function for any store element update.
-     * @param {string} id - The ID of the element to update.
-     * @param {Object} updatedData - Partial object containing updated properties (e.g., { tokens: 3 }).
-     */
-    updateElement: (id, updatedData) =>
-        set((state) => {
-            const update = (el) => (el.id === id ? { ...el, ...updatedData } : el);
+    setAttribute: (id, key, value) => get().execute({ type: 'setAttribute', id, key, value }),
 
-            return {
-                places: state.places.map(update),
-                transitions: state.transitions.map(update),
-                arcs: state.arcs.map(update),
-                // editor slice – keep the selected copy in sync
-                selectedElement:
-                    state.selectedElement?.id === id
-                        ? { ...state.selectedElement, ...updatedData }
-                        : state.selectedElement,
-            };
-        }),
-
-    /**
-     * Removes a place, transition or arc. Deleting a node also removes
-     * every incident arc.
-     * @param {string} id - The ID of the element to delete.
-     */
-    deleteElement: (id) =>
-        set((state) => {
-            const isArc = state.arcs.some((a) => a.id === id);
-
-            // editor slice – drop references to the deleted element
-            const editor = {
-                selectedElement: state.selectedElement?.id === id ? null : state.selectedElement,
-                connectingSourceId: state.connectingSourceId === id ? null : state.connectingSourceId,
-            };
-
-            if (isArc) {
-                return { ...editor, arcs: state.arcs.filter((a) => a.id !== id) };
-            }
-
-            return {
-                ...editor,
-                places: state.places.filter((p) => p.id !== id),
-                transitions: state.transitions.filter((t) => t.id !== id),
-                arcs: state.arcs.filter((a) => a.source !== id && a.target !== id),
-            };
-        }),
+    deleteElement: (id) => get().execute({ type: 'deleteElement', id }),
 });
