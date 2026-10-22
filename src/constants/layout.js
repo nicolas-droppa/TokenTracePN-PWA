@@ -15,7 +15,7 @@ export const CANVAS_CONFIG = {
         DEFAULT: 1,
         MIN: 0.2,
         MAX: 4.0,
-        FACTOR: 1.1,
+        FACTOR: 1.2,
     },
     PANEL_BOUNDS_PX: 20000,
 };

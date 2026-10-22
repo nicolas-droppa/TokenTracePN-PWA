@@ -13,6 +13,11 @@ export const useCanvasPanZoom = () => {
     const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 
     const svgRef = useRef(null);
+    const zoomRef = useRef(zoom);
+    const panRef = useRef(pan);
+
+    useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+    useEffect(() => { panRef.current = pan; }, [pan]);
 
     useEffect(() => {
         const svgElement = svgRef.current;
@@ -24,23 +29,22 @@ export const useCanvasPanZoom = () => {
             const rect = svgElement.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
+            const currentZoom = zoomRef.current;
+            const currentPan = panRef.current;
+            const targetZoom = calculateTargetZoom(currentZoom, e.deltaY);
 
-            setZoom((prevZoom) => {
-                const targetZoom = calculateTargetZoom(prevZoom, e.deltaY);
-                if (targetZoom === prevZoom) return prevZoom;
+            if (targetZoom === currentZoom) return;
 
-                setPan((prevPan) => 
-                    calculateZoomPan({
-                        mouseX,
-                        mouseY,
-                        currentPan: prevPan,
-                        currentZoom: prevZoom,
-                        targetZoom,
-                    })
-                );
-
-                return targetZoom;
+            const nextPan = calculateZoomPan({
+                mouseX,
+                mouseY,
+                currentPan,
+                currentZoom,
+                targetZoom,
             });
+
+            setPan(nextPan);
+            setZoom(targetZoom);
         };
 
         svgElement.addEventListener('wheel', handleWheel, { passive: false });
