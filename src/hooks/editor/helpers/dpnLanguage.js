@@ -16,7 +16,7 @@ export const dpnLanguage = StreamLanguage.define({
         }
         if (stream.match('->')) return 'operator';
         if (stream.match(/^"(?:\\.|[^"])*"?/) || stream.match(/^'(?:\\.|[^'])*'?/)) return 'string';
-        if (stream.match(/^\d+/)) return 'number';
+        if (stream.match(/^-?\d+/)) return 'number';
         if (stream.match(/^[()]/)) return 'paren';
         if (stream.match(/^[:,;]/)) return 'punctuation';
 

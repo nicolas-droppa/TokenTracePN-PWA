@@ -53,12 +53,19 @@ export default { canParse, parse };
 // private
 
 function handleNumbers(ctx, startLine, startCol) {
+    let sign = '';
+    if (ctx.src[ctx.i] === '-' && /[0-9]/.test(ctx.src[ctx.i + 1])) {
+        sign = '-';
+        ctx.advance();
+    }
+
     let num = '';
     while (ctx.i < ctx.src.length && /[0-9]/.test(ctx.src[ctx.i])) {
         num += ctx.src[ctx.i];
         ctx.advance();
     }
-    ctx.pushToken({ type: 'NUMBER', value: Number(num), line: startLine, col: startCol });
+
+    ctx.pushToken({ type: 'NUMBER', value: Number(sign + num), line: startLine, col: startCol });
 }
 
 function handleLetters(ctx, startLine, startCol) {
@@ -132,6 +139,11 @@ function tokenize(src) {
         if (PUNCTUATION[c]) {
             ctx.advance();
             ctx.pushToken({ type: PUNCTUATION[c], value: c, line: startLine, col: startCol });
+            continue;
+        }
+
+        if (c === '-' && /[0-9]/.test(ctx.src[ctx.i + 1])) {
+            handleNumbers(ctx, startLine, startCol);
             continue;
         }
 
