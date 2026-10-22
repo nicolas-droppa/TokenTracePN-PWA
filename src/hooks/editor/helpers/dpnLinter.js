@@ -26,7 +26,7 @@ export const dpnLinter = linter(
             return {
                 from,
                 to: Math.max(to, from),
-                severity: 'error',
+                severity: err.severity,
                 message: err.message || String(err),
             };
         });

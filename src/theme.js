@@ -51,6 +51,12 @@ export const THEMES = {
             activeText: '#bae6fd',
             activeBg: 'rgba(56, 189, 248, 0.12)',
             activeLineBorder: '#38bdf8',
+            filter: {
+                all: { tone: '#cbd5e1', border: '#94a3b8', background: 'rgba(148, 163, 184, 0.08)', activeText: '#e2e8f0' },
+                error: { tone: '#f87171', border: '#ef4444', background: 'rgba(239, 68, 68, 0.12)', activeText: '#fca5a5' },
+                warning: { tone: '#fbbf24', border: '#f59e0b', background: 'rgba(245, 158, 11, 0.12)', activeText: '#fcd34d' },
+                info: { tone: '#60a5fa', border: '#3b82f6', background: 'rgba(59, 130, 246, 0.12)', activeText: '#93c5fd' },
+            },
         },
         disabled: {
             stroke: '#334155',
@@ -120,6 +126,12 @@ export const THEMES = {
             activeText: '#b4f2ff',
             activeBg: 'rgba(120, 220, 232, 0.12)',
             activeLineBorder: '#78dce8',
+            filter: {
+                all: { tone: '#d4d4d8', border: '#a1a1aa', background: 'rgba(161, 161, 170, 0.12)', activeText: '#f5f5f5' },
+                error: { tone: '#ff6188', border: '#ff456a', background: 'rgba(255, 69, 106, 0.14)', activeText: '#ffbacd' },
+                warning: { tone: '#ffd866', border: '#f5c542', background: 'rgba(245, 197, 66, 0.12)', activeText: '#ffe7a3' },
+                info: { tone: '#78dce8', border: '#4ec9d2', background: 'rgba(78, 201, 210, 0.14)', activeText: '#b4f2ff' },
+            },
         },
         disabled: {
             stroke: '#49454c',
@@ -189,6 +201,12 @@ export const THEMES = {
             activeText: '#93c5fd',
             activeBg: 'rgba(59, 130, 246, 0.12)',
             activeLineBorder: '#3b82f6',
+            filter: {
+                all: { tone: '#94a3b8', border: '#64748b', background: 'rgba(148, 163, 184, 0.12)', activeText: '#1e293b' },
+                error: { tone: '#ef4444', border: '#dc2626', background: 'rgba(239, 68, 68, 0.12)', activeText: '#b91c1c' },
+                warning: { tone: '#f59e0b', border: '#d97706', background: 'rgba(217, 119, 6, 0.12)', activeText: '#92400e' },
+                info: { tone: '#3b82f6', border: '#2563eb', background: 'rgba(37, 99, 235, 0.12)', activeText: '#1d4ed8' },
+            },
         },
         disabled: {
             stroke: '#cbd5e1',
