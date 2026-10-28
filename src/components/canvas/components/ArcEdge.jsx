@@ -2,6 +2,7 @@ import React from 'react';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { THEMES } from '../../../theme';
+import { ARC_CONFIG } from '../../../constants/layout';
 
 /**
  * ArcEdge component for rendering an arc connection between nodes with optional weight display.
@@ -25,7 +26,7 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const { midX, midY } = calculateMidpoint(sourceNode, targetNode);
 
   const strokeColor = isSelected ? theme.place.stroke : theme.arc.stroke;
-  const strokeWidth = isSelected ? theme.arc.strokeWidth + 1 : theme.arc.strokeWidth;
+  const strokeWidth = isSelected ? ARC_CONFIG.STROKE_WIDTH_PX + 1 : ARC_CONFIG.STROKE_WIDTH_PX;
 
   const handleClick = (e) => {
     e.stopPropagation();

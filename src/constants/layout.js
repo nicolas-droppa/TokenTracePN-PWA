@@ -10,19 +10,31 @@ export const LAYOUT_CONFIG = {
 };
 
 export const CANVAS_CONFIG = {
-    GRID_SIZE_PX: 40,
+    GRID_SIZE_PX: 60,
     ZOOM: {
         DEFAULT: 1,
         MIN: 0.2,
-        MAX: 4.0,
+        MAX: 1.5,
         FACTOR: 1.2,
     },
     PANEL_BOUNDS_PX: 20000,
+    ORIGIN_MARGIN_PX: 30,
 };
 
 export const AUTO_LAYOUT = {
-    ORIGIN_X: 120,
-    ORIGIN_Y: 120,
-    SPACING_PX: 120,
+    ORIGIN_X: 1,
+    ORIGIN_Y: 1,
+    SPACING: 2,
     COLUMNS: 5,
+};
+
+export const NODE_CONFIG = {
+    PLACE_RADIUS_PX: 24,
+    TRANSITION_SIZE_PX: 48,
+    STROKE_WIDTH_PX: 2.5,
+    TRANSITION_CORNER_RADIUS_PX: 6,
+};
+
+export const ARC_CONFIG = {
+    STROKE_WIDTH_PX: 2,
 };

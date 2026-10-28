@@ -3,6 +3,7 @@ import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { displayName } from '../../../core/models';
 import { THEMES } from '../../../theme';
+import { NODE_CONFIG } from '../../../constants/layout';
 
 /**
  * Renders a single place.
@@ -26,7 +27,7 @@ export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
       {/* Connecting Indicator */}
       {isConnectingSource && (
         <circle
-          r={theme.place.radius + 6}
+          r={NODE_CONFIG.PLACE_RADIUS_PX + 6}
           fill="none"
           stroke={theme.arc.stroke}
           strokeWidth="2"
@@ -37,10 +38,10 @@ export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
 
       {/* Shape */}
       <circle
-        r={theme.place.radius}
+        r={NODE_CONFIG.PLACE_RADIUS_PX}
         fill={theme.place.fill}
         stroke={strokeColor}
-        strokeWidth={theme.place.strokeWidth}
+        strokeWidth={NODE_CONFIG.STROKE_WIDTH_PX}
       />
 
       {/* Tokens */}
@@ -59,7 +60,7 @@ export const PlaceNode = ({ place, tokens = 0, onMouseDown }) => {
       {/* Label */}
       <text
         textAnchor="middle"
-        y={theme.place.radius + 17}
+        y={NODE_CONFIG.PLACE_RADIUS_PX + 17}
         fill={labelColor}
         className="text-xs font-medium select-none"
         pointerEvents="none"

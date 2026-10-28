@@ -3,6 +3,7 @@ import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { displayName } from '../../../core/models';
 import { THEMES } from '../../../theme';
+import { NODE_CONFIG } from '../../../constants/layout';
 
 /**
  * Renders a single transition. In run mode an enabled transition is filled
@@ -29,7 +30,7 @@ export const TransitionNode = ({
 
   const { isConnectingSource, isInvalidTarget, containerProps } = useNodeConnecting(transition, onMouseDown);
 
-  const { width, height } = theme.transition;
+  const size = NODE_CONFIG.TRANSITION_SIZE_PX;
 
   const isFireable = isRunning && isEnabled;
   const isDisabled = isInvalidTarget || (isRunning && !isEnabled);
@@ -66,29 +67,29 @@ export const TransitionNode = ({
       {/* Connecting Indicator */}
       {isConnectingSource && (
         <rect
-          x={-width / 2 - 6}
-          y={-height / 2 - 6}
-          width={width + 12}
-          height={height + 12}
+          x={-size / 2 - 6}
+          y={-size / 2 - 6}
+          width={size + 12}
+          height={size + 12}
           fill="none"
           stroke={theme.arc.stroke}
           strokeWidth="2"
           strokeDasharray="4 4"
-          rx={theme.transition.rx + 2}
+          rx={NODE_CONFIG.TRANSITION_CORNER_RADIUS_PX + 2}
           pointerEvents="none"
         />
       )}
 
       {/* Shape */}
       <rect
-        x={-width / 2}
-        y={-height / 2}
-        width={width}
-        height={height}
+        x={-size / 2}
+        y={-size / 2}
+        width={size}
+        height={size}
         fill={theme.transition.fill}
         stroke={isFlashing ? theme.text.token : strokeColor}
-        strokeWidth={theme.transition.strokeWidth}
-        rx={theme.transition.rx}
+        strokeWidth={NODE_CONFIG.STROKE_WIDTH_PX}
+        rx={NODE_CONFIG.TRANSITION_CORNER_RADIUS_PX}
         transform={`scale(${isFlashing ? 0.9 : 1})`}
         style={{
           transformOrigin: 'center',
@@ -102,7 +103,7 @@ export const TransitionNode = ({
       {/* Label */}
       <text
         textAnchor="middle"
-        y={height / 2 + 18}
+        y={size / 2 + 18}
         fill={labelColor}
         className="text-xs font-medium select-none"
         pointerEvents="none"
