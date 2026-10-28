@@ -10,6 +10,7 @@ import { useCanvasInteractions } from '../../hooks/canvas/useCanvasInteractions'
 import { PlaceNode } from './components/PlaceNode';
 import { TransitionNode } from './components/TransitionNode';
 import { ArcEdge } from './components/ArcEdge';
+import { cellToCanvas } from '../../utils/grid';
 
 export const PetriCanvas = () => {
     // One selector per value - the canvas re-renders only when one of these changes
@@ -55,9 +56,12 @@ export const PetriCanvas = () => {
     } = useCanvasInteractions({ selectedTool, setSelectedTool, cancelConnecting, addPlace, addTransition, moveNode, getCanvasCoordinates, startPanning, select, deleteElement });
 
     // While dragging, the dragged node is drawn at its preview position (not yet in the store)
-    const places = React.useMemo(() => withDragPosition(storedPlaces, dragPosition), [storedPlaces, dragPosition]);
+    const places = React.useMemo(
+        () => toCanvasPositions(withDragPosition(storedPlaces, dragPosition)),
+        [storedPlaces, dragPosition]
+    );
     const transitions = React.useMemo(
-        () => withDragPosition(storedTransitions, dragPosition),
+        () => toCanvasPositions(withDragPosition(storedTransitions, dragPosition)),
         [storedTransitions, dragPosition]
     );
 
@@ -173,3 +177,9 @@ const withDragPosition = (nodes, dragPosition) =>
     dragPosition
         ? nodes.map((node) => (node.id === dragPosition.id ? { ...node, x: dragPosition.x, y: dragPosition.y } : node))
         : nodes;
+
+/**
+ * Converts the nodes to canvas coords from cell coords to canvas px coords.
+ */
+const toCanvasPositions = (nodes) => nodes.map((node) => ({ ...node, ...cellToCanvas(node) }));
+

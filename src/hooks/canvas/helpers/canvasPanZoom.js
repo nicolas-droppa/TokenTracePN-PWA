@@ -52,3 +52,15 @@ export const screenToCanvasCoordinates = (clientX, clientY, svgElement, pan, zoo
         y: (clientY - rect.top - pan.y) / zoom,
     };
 };
+
+/**
+ * Calculates the initial pan position based on height of the SVG element.
+ * @param {number} height - The height of the SVG element.
+ * @returns {Object} - Calculated initial pan position.
+ */
+export const calculateInitialPan = (height) => {
+    return {
+        x: CANVAS_CONFIG.ORIGIN_MARGIN_PX,
+        y: height / 2 + CANVAS_CONFIG.ORIGIN_MARGIN_PX,
+    };
+};

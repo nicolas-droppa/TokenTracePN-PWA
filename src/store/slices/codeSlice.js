@@ -1,8 +1,8 @@
 const DEFAULT_CODE = `// Lone worker
-place idle (l: "Idle", m: 1, x: 120, y: 200);
-place busy (l: "Busy", x: 400, y: 200);
-transition start (x: 260, y: 110);
-transition finish (x: 260, y: 290);
+place idle (l: "Idle", m: 1, x: 1, y: 2);
+place busy (l: "Busy", x: 5, y: 2);
+transition start (x: 3, y: 3);
+transition finish (x: 3, y: 1);
 
 idle -> start;
 start -> busy;

@@ -7,6 +7,7 @@ import {
     resolveBackgroundClickAction,
     resolveContextMenuAction,
 } from './helpers/canvasInteractions';
+import { canvasToCell } from '../../utils/grid';
 
 /**
  * Mouse handling on the canvas: adding nodes, selection, deleting and dragging nodes.
@@ -36,7 +37,7 @@ export const useCanvasInteractions = ({
 
         if (!isCanvasBackgroundClick(e.target)) return;
 
-        const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
+        const { x, y } = canvasToCell(getCanvasCoordinates(e.clientX, e.clientY));
         const action = resolveBackgroundClickAction(selectedTool);
 
         switch (action.type) {
@@ -80,7 +81,7 @@ export const useCanvasInteractions = ({
 
     const handleMouseMove = (clientX, clientY) => {
         if (!draggingNodeId) return;
-        const { x, y } = getCanvasCoordinates(clientX, clientY);
+        const { x, y } = canvasToCell(getCanvasCoordinates(clientX, clientY));
         setDragPosition({ id: draggingNodeId, x, y });
     };
 

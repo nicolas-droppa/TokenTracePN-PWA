@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { CANVAS_CONFIG } from '../../constants/layout';
 import {
+    calculateInitialPan,
     calculateTargetZoom,
     calculateZoomPan,
     screenToCanvasCoordinates,
@@ -18,6 +19,16 @@ export const useCanvasPanZoom = () => {
 
     useEffect(() => { zoomRef.current = zoom; }, [zoom]);
     useEffect(() => { panRef.current = pan; }, [pan]);
+
+    useLayoutEffect(() => {
+        const svgElement = svgRef.current;
+        if (!svgElement) return;
+
+        const height = svgElement.getBoundingClientRect().height;
+        if (height <= 0) return;
+
+        setPan(calculateInitialPan(height));
+    }, []);
 
     useEffect(() => {
         const svgElement = svgRef.current;

@@ -126,7 +126,7 @@ function addAttributes(fields, attributes, kind) {
 /** Grid position of the n-th declared node (used only when it has no x/y in the code). */
 function autoPosition(index) {
     return {
-        x: AUTO_LAYOUT.ORIGIN_X + (index % AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING_PX,
-        y: AUTO_LAYOUT.ORIGIN_Y + Math.floor(index / AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING_PX,
+        x: AUTO_LAYOUT.ORIGIN_X + (index % AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
+        y: AUTO_LAYOUT.ORIGIN_Y - Math.floor(index / AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
     };
 }
