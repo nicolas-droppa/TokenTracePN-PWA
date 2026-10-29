@@ -65,6 +65,12 @@ export const THEMES = {
         },
         bg: '#020617',
         grid: '#1e293b',
+        rulers: {
+            bg: '#111827',
+            tick: '#7688a0',
+            accent: '#f59e0b',
+            text: '#cbd5e1',
+        },
     },
 
     monokai: {
@@ -133,6 +139,12 @@ export const THEMES = {
         },
         bg: '#19181a',
         grid: '#222124',
+        rulers: {
+            bg: '#2d2a2e',
+            tick: '#837e86',
+            accent: '#ff6188',
+            text: '#c1c0c0',
+        },
     },
 
     light: {
@@ -201,5 +213,11 @@ export const THEMES = {
         },
         bg: '#f8fafc',
         grid: '#e2e8f0',
+        rulers: {
+            bg: '#f1f5f9',
+            tick: '#94a3b8',
+            accent: '#0284c7',
+            text: '#475569',
+        },
     },
 };

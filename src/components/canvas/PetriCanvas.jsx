@@ -11,6 +11,8 @@ import { PlaceNode } from './components/PlaceNode';
 import { TransitionNode } from './components/TransitionNode';
 import { ArcEdge } from './components/ArcEdge';
 import { cellToCanvas } from '../../utils/grid';
+import { useElementSize } from '../../hooks/useElementSize';
+import { CanvasRulers } from './components/CanvasRulers';
 
 export const PetriCanvas = () => {
     // One selector per value - the canvas re-renders only when one of these changes
@@ -45,6 +47,8 @@ export const PetriCanvas = () => {
         updatePanning,
         stopPanning,
     } = useCanvasPanZoom(selectedTool);
+
+    const { width, height } = useElementSize(svgRef);
 
     const {
         dragPosition,
@@ -166,6 +170,7 @@ export const PetriCanvas = () => {
                     />
                 ))}
             </g>
+            <CanvasRulers width={width} height={height} pan={pan} zoom={zoom} />
         </svg>
     );
 };
@@ -180,6 +185,8 @@ const withDragPosition = (nodes, dragPosition) =>
 
 /**
  * Converts the nodes to canvas coords from cell coords to canvas px coords.
+ * @param {Array} nodes - The list of nodes.
+ * @returns {Array} - The list of nodes with canvas coordinates.
  */
 const toCanvasPositions = (nodes) => nodes.map((node) => ({ ...node, ...cellToCanvas(node) }));
 

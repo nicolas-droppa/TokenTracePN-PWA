@@ -11,6 +11,7 @@ export const LAYOUT_CONFIG = {
 
 export const CANVAS_CONFIG = {
     GRID_SIZE_PX: 60,
+    GRID_MAJOR_SPACING_TILE: 5,
     ZOOM: {
         DEFAULT: 1,
         MIN: 0.2,
@@ -19,6 +20,9 @@ export const CANVAS_CONFIG = {
     },
     PANEL_BOUNDS_PX: 20000,
     ORIGIN_MARGIN_PX: 30,
+    RULER_THICKNESS_PX: 20,
+    RULER_MINIMAL_SPACING_PX: 32,
+    RULER_STEPS: [1, 2, 5, 10, 20, 50, 100],
 };
 
 export const AUTO_LAYOUT = {
