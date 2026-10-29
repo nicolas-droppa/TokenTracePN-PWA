@@ -22,6 +22,7 @@ export const THEMES = {
             label: '#94a3b8',
             token: '#ffffff',
             code: '#e2e8f0',
+            muted: '#424a57',
         },
         syntax: {
             keyword: '#ffdc43',
@@ -96,6 +97,7 @@ export const THEMES = {
             label: '#c1c0c0',
             token: '#ffd866',
             code: '#f8f8f2',
+            muted: '#474747',
         },
         syntax: {
             keyword: '#a9dc76',
@@ -170,6 +172,7 @@ export const THEMES = {
             label: '#475569',
             token: '#0f172a',
             code: '#1e293b',
+            muted: '#cccccc',
         },
         syntax: {
             keyword: '#0284c7',

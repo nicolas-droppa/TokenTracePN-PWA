@@ -13,3 +13,23 @@ export function range(from, to) {
 
     return result;
 }
+
+/**
+ * Creates a matrix filled with 0s.
+ * @param {number} rows 
+ * @param {number} cols 
+ * @returns {number[][]} - Matrix filled with 0s.
+ */
+export const zeros = (rows, cols) => {
+    const matrix = [];
+
+    for (let r = 0; r < rows; r++) {
+        const row = [];
+        for (let c = 0; c < cols; c++) {
+            row.push(0);
+        }
+        matrix.push(row);
+    }
+
+    return matrix;
+};
