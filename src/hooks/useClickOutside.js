@@ -7,11 +7,18 @@ import { useEffect } from 'react';
  */
 export const useClickOutside = (ref, onOutside) => {
     useEffect(() => {
-        const handleMouseDown = (event) => {
-            if (ref.current && !ref.current.contains(event.target)) onOutside();
+        const handlePointerDown = (event) => {
+            if (!ref.current || ref.current.contains(event.target)) return;
+
+            const activeElement = document.activeElement;
+            if (activeElement && ref.current.contains(activeElement)) {
+                activeElement.blur();
+            }
+
+            onOutside();
         };
 
-        document.addEventListener('mousedown', handleMouseDown);
-        return () => document.removeEventListener('mousedown', handleMouseDown);
+        document.addEventListener('pointerdown', handlePointerDown);
+        return () => document.removeEventListener('pointerdown', handlePointerDown);
     }, [ref, onOutside]);
 };

@@ -19,3 +19,7 @@ export const TOOLBAR_SHORTCUTS = {
     nextTool: ['KeyE'],
     toggleCollapse: ['KeyC'],
 };
+
+export const POPUP_SHORTCUTS = {
+    close: ['Escape'],
+};

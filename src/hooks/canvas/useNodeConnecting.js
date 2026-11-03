@@ -1,9 +1,11 @@
 import { usePetriStore } from '../../store/usePetriStore';
 import { TOOLS, MOUSE_BUTTON } from '../../constants/tools';
+import { useLongPress } from '../useLongPress';
 
 export const useNodeConnecting = (node, onMouseDown) => {
   const selectedTool        = usePetriStore((s) => s.selectedTool);
   const connectingSourceId  = usePetriStore((s) => s.connectingSourceId);
+  const openInspector       = usePetriStore((s) => s.openInspector);
   const startConnecting     = usePetriStore((s) => s.startConnecting);
   const finishConnecting    = usePetriStore((s) => s.finishConnecting);
   const cancelConnecting    = usePetriStore((s) => s.cancelConnecting);
@@ -44,6 +46,8 @@ export const useNodeConnecting = (node, onMouseDown) => {
     onMouseDown?.(e);
   };
 
+  const longPress = useLongPress(() => openInspector(node.id));
+
   const cursorClass =
     mode === 'run'
       ? 'cursor-default'
@@ -55,8 +59,14 @@ export const useNodeConnecting = (node, onMouseDown) => {
     className: `transition-colors duration-200 ${cursorClass}`,
     onMouseDown: handleMouseDown,
     onClick: handleNodeClick,
+    onDoubleClick: (e) => {
+      e.stopPropagation();
+      if (mode === 'run' && node.type === 'transition') return;
+      openInspector(node.id);
+    },
     'data-element-id': node.id,
     'data-element-type': node.type,
+    ...longPress,
   };
 
   return { isConnectingSource, isInvalidTarget, containerProps };

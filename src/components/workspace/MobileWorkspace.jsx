@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTheme } from '../../store/useSettingsStore';
 import { useWorkspaceStore } from '../../store/useWorkspaceStore';
 import { PANELS } from '../../constants/workspace';
 import { PANEL_COMPONENTS } from './panelComponents';
+import { usePetriStore } from '../../store/usePetriStore';
 
 /**
  * Phone workspace - one panel at a time, switched by bottombar.
@@ -11,6 +12,11 @@ export const MobileWorkspace = () => {
     const theme = useTheme();
     const activeId = useWorkspaceStore((s) => s.mobilePanel);
     const showPanel = useWorkspaceStore((s) => s.showPanel);
+    const closeInspector = usePetriStore((s) => s.closeInspector);
+
+    useEffect(() => {
+       closeInspector();
+   }, [activeId, closeInspector]);
 
     return (
         <div className="flex h-full w-full flex-col">

@@ -17,7 +17,7 @@ export const createSimulationSlice = (set, get) => ({
             marking: buildInitialMarking(state.places),
             history: [],
             selectedTool: TOOLS.SELECT,
-            selectedId: null,
+            selectedId: state.selectedId === state.inspectedId ? state.selectedId : null,
             connectingSourceId: null,
         })),
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { TOOLS, MOUSE_BUTTON, CANVAS_ACTION } from '../../constants/tools';
 import {
     shouldStartPanning,
@@ -26,6 +26,11 @@ export const useCanvasInteractions = ({
 }) => {
     const [dragPosition, setDragPosition] = useState(null);
     const [draggingNodeId, setDraggingNodeId] = useState(null);
+    const lastPointerTypeRef = useRef('mouse');
+
+    const handlePointerDown = (e) => {
+        lastPointerTypeRef.current = e.pointerType || 'mouse';
+    };
 
     const handleMouseDown = (e) => {
         if (e.button === MOUSE_BUTTON.RIGHT) return;
@@ -57,6 +62,8 @@ export const useCanvasInteractions = ({
 
     const handleContextMenu = (e) => {
         e.preventDefault();
+
+        if (lastPointerTypeRef.current === 'touch') return;
 
         const element = getElementFromEvent(e.target);
         const action = resolveContextMenuAction(selectedTool, element);
@@ -94,6 +101,7 @@ export const useCanvasInteractions = ({
     return {
         dragPosition,
         handleMouseDown,
+        handlePointerDown,
         handleContextMenu,
         handleMouseMove,
         startDraggingNode,
