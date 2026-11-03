@@ -1,3 +1,4 @@
+import { ARC_TYPE } from '../../constants/net';
 import { zeros } from '../../utils/array';
 
 /**
@@ -25,7 +26,7 @@ export function buildIOMatrices(net) {
     }
 
     for (const arc of net.arcs) {
-        if (arc.arcType !== "regular") continue;
+        if (arc.arcType !== ARC_TYPE.REGULAR) continue;
 
         // place -> transition
         const inputRow = mapPlaceToRowIndex.get(arc.source);

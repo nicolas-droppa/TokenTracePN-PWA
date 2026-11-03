@@ -43,7 +43,6 @@ export const useCodeChecker = ({ code = '', language = 'dpn', delayMs = DEFAULT_
         return () => clearTimeout(timer);
     }, [code, language, delayMs]);
 
-    console.log('useCodeChecker errors:', errors);
     return errors;
 };
 

@@ -30,7 +30,7 @@
  * @property {Arc[]} arcs
  */
 
-export const ARC_TYPES = ['regular', 'read', 'inhibitor', 'reset'];
+import { ARC_TYPE, ARC_TYPES } from '../constants/net';
 
 export const createPlace = ({ id, x = 0, y = 0, label = '', tokens = 0 }) => ({
     id,
@@ -49,13 +49,13 @@ export const createTransition = ({ id, x = 0, y = 0, label = '' }) => ({
     label,
 });
 
-export const createArc = ({ source, target, weight = 1, arcType = 'regular' }) => ({
+export const createArc = ({ source, target, weight = 1, arcType = ARC_TYPE.REGULAR }) => ({
     id: arcId(source, target),
     type: 'arc',
     source,
     target,
     weight: Math.max(1, Math.floor(Number(weight) || 1)),
-    arcType: ARC_TYPES.includes(arcType) ? arcType : 'regular',
+    arcType: ARC_TYPES.includes(arcType) ? arcType : ARC_TYPE.REGULAR,
 });
 
 export const arcId = (source, target) => `${source}->${target}`;
