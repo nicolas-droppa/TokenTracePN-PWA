@@ -8,11 +8,20 @@ import { findElement } from '../../core/models';
 export const createEditorSlice = (set, get) => ({
     selectedTool: 'select',
     selectedId: null,
+    inspectedId: null,
     connectingSourceId: null,
 
     setSelectedTool: (tool) => set({ selectedTool: tool }),
 
     select: (id) => set({ selectedId: id ?? null }),
+
+    /**
+     * Opens the inspector for a given element and selects it.
+     * @param {string} id - ID of the element to inspect.
+     */
+    openInspector: (id) => set({ inspectedId: id, selectedId: id }),
+
+    closeInspector: () => set({ inspectedId: null }),
 
     startConnecting: (sourceId) => set({ connectingSourceId: sourceId }),
 
@@ -28,3 +37,5 @@ export const createEditorSlice = (set, get) => ({
 });
 
 export const selectSelectedElement = (state) => findElement(state, state.selectedId);
+
+export const selectInspectedElement = (state) => findElement(state, state.inspectedId);

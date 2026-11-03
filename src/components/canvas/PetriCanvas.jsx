@@ -13,6 +13,7 @@ import { ArcEdge } from './components/ArcEdge';
 import { cellToCanvas } from '../../utils/grid';
 import { useElementSize } from '../../hooks/useElementSize';
 import { CanvasRulers } from './components/CanvasRulers';
+import { ElementPopup } from './components/ElementPopup';
 
 export const PetriCanvas = () => {
     // One selector per value - the canvas re-renders only when one of these changes
@@ -53,6 +54,7 @@ export const PetriCanvas = () => {
     const {
         dragPosition,
         handleMouseDown,
+        handlePointerDown,
         handleContextMenu,
         handleMouseMove,
         startDraggingNode,
@@ -85,93 +87,98 @@ export const PetriCanvas = () => {
     };
 
     return (
-        <svg
-            ref={svgRef}
-            style={{ width: '100%', height: '100%', display: 'block', backgroundColor: theme.bg }}
-            className={`select-none overflow-hidden ${
-                isPanning ? 'cursor-grabbing' : isRunning ? 'cursor-default' : 'cursor-crosshair'
-            }`}
-            onMouseDown={handleMouseDown}
-            onContextMenu={handleContextMenu}
-            onMouseMove={(e) => {
-                updatePanning(e.clientX, e.clientY);
-                handleMouseMove(e.clientX, e.clientY);
-            }}
-            onMouseUp={() => {
-                stopPanning();
-                stopDraggingNode();
-            }}
-            onMouseLeave={() => {
-                stopPanning();
-                stopDraggingNode();
-            }}
-        >
-            <defs>
-                <pattern
-                    id="grid"
-                    width={CANVAS_CONFIG.GRID_SIZE_PX}
-                    height={CANVAS_CONFIG.GRID_SIZE_PX}
-                    patternUnits="userSpaceOnUse"
-                >
-                    <path
-                        d={`M ${CANVAS_CONFIG.GRID_SIZE_PX} 0 L 0 0 0 ${CANVAS_CONFIG.GRID_SIZE_PX}`}
-                        fill="none"
-                        stroke={theme.grid}
-                        strokeWidth="1"
-                    />
-                </pattern>
-            </defs>
-
-            <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-                <rect
-                    id="grid-bg"
-                    data-canvas-background
-                    x={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2}
-                    y={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2}
-                    width={CANVAS_CONFIG.PANEL_BOUNDS_PX}
-                    height={CANVAS_CONFIG.PANEL_BOUNDS_PX}
-                    fill="url(#grid)"
-                />
-
-                {arcs.map((arc) => {
-                    const sourceNode =
-                        places.find((p) => p.id === arc.source) ||
-                        transitions.find((t) => t.id === arc.source);
-                    const targetNode =
-                        places.find((p) => p.id === arc.target) ||
-                        transitions.find((t) => t.id === arc.target);
-                    return (
-                        <ArcEdge
-                            key={arc.id}
-                            arc={arc}
-                            sourceNode={sourceNode}
-                            targetNode={targetNode}
+        <div className="relative h-full w-full">
+            <svg
+                ref={svgRef}
+                style={{ width: '100%', height: '100%', display: 'block', backgroundColor: theme.bg }}
+                className={`select-none overflow-hidden ${
+                    isPanning ? 'cursor-grabbing' : isRunning ? 'cursor-default' : 'cursor-crosshair'
+                }`}
+                onPointerDown={handlePointerDown}
+                onMouseDown={handleMouseDown}
+                onContextMenu={handleContextMenu}
+                onMouseMove={(e) => {
+                    updatePanning(e.clientX, e.clientY);
+                    handleMouseMove(e.clientX, e.clientY);
+                }}
+                onMouseUp={() => {
+                    stopPanning();
+                    stopDraggingNode();
+                }}
+                onMouseLeave={() => {
+                    stopPanning();
+                    stopDraggingNode();
+                }}
+            >
+                <defs>
+                    <pattern
+                        id="grid"
+                        width={CANVAS_CONFIG.GRID_SIZE_PX}
+                        height={CANVAS_CONFIG.GRID_SIZE_PX}
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <path
+                            d={`M ${CANVAS_CONFIG.GRID_SIZE_PX} 0 L 0 0 0 ${CANVAS_CONFIG.GRID_SIZE_PX}`}
+                            fill="none"
+                            stroke={theme.grid}
+                            strokeWidth="1"
                         />
-                    );
-                })}
+                    </pattern>
+                </defs>
 
-                {places.map((place) => (
-                    <PlaceNode
-                        key={place.id}
-                        place={place}
-                        tokens={isRunning ? marking?.[place.id] ?? 0 : place.tokens}
-                        onMouseDown={handleNodeMouseDown(place.id)}
+                <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+                    <rect
+                        id="grid-bg"
+                        data-canvas-background
+                        x={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2}
+                        y={-CANVAS_CONFIG.PANEL_BOUNDS_PX / 2}
+                        width={CANVAS_CONFIG.PANEL_BOUNDS_PX}
+                        height={CANVAS_CONFIG.PANEL_BOUNDS_PX}
+                        fill="url(#grid)"
                     />
-                ))}
 
-                {transitions.map((trans) => (
-                    <TransitionNode
-                        key={trans.id}
-                        transition={trans}
-                        isRunning={isRunning}
-                        isEnabled={enabledIds?.has(trans.id) ?? false}
-                        onFire={() => fire(trans.id)}
-                        onMouseDown={handleNodeMouseDown(trans.id)}
-                    />
-                ))}
-            </g>
-            <CanvasRulers width={width} height={height} pan={pan} zoom={zoom} />
-        </svg>
+                    {arcs.map((arc) => {
+                        const sourceNode =
+                            places.find((p) => p.id === arc.source) ||
+                            transitions.find((t) => t.id === arc.source);
+                        const targetNode =
+                            places.find((p) => p.id === arc.target) ||
+                            transitions.find((t) => t.id === arc.target);
+                        return (
+                            <ArcEdge
+                                key={arc.id}
+                                arc={arc}
+                                sourceNode={sourceNode}
+                                targetNode={targetNode}
+                            />
+                        );
+                    })}
+
+                    {places.map((place) => (
+                        <PlaceNode
+                            key={place.id}
+                            place={place}
+                            tokens={isRunning ? marking?.[place.id] ?? 0 : place.tokens}
+                            onMouseDown={handleNodeMouseDown(place.id)}
+                        />
+                    ))}
+
+                    {transitions.map((trans) => (
+                        <TransitionNode
+                            key={trans.id}
+                            transition={trans}
+                            isRunning={isRunning}
+                            isEnabled={enabledIds?.has(trans.id) ?? false}
+                            onFire={() => fire(trans.id)}
+                            onMouseDown={handleNodeMouseDown(trans.id)}
+                        />
+                    ))}
+                </g>
+                <CanvasRulers width={width} height={height} pan={pan} zoom={zoom} />
+            </svg>
+            
+            <ElementPopup width={width} height={height} pan={pan} zoom={zoom} />
+        </div>
     );
 };
 

@@ -5,7 +5,6 @@
 export const PANELS = [
     { id: 'canvas', title: 'Canvas' },
     { id: 'code', title: 'Code' },
-    { id: 'inspector', title: 'Inspector' },
     { id: 'problems', title: 'Problems' },
     { id: 'matrices', title: 'Matrices' }
 ];
@@ -17,6 +16,6 @@ export const DEFAULT_LAYOUT = [
     { id: 'matrices', position: { referencePanel: 'canvas', direction: 'below' } },
 ];
 
-export const LAYOUT_VERSION = 2;
+export const LAYOUT_VERSION = 3;
 
 export const MOBILE_MEDIA_QUERY = '(max-width: 767px)';

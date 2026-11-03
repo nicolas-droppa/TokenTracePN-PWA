@@ -5,9 +5,9 @@ import { TOOL_SHORTCUTS, TOOLBAR_SHORTCUTS } from '../../constants/shortcuts.js'
 import { shortcutLabel, withShortcut } from '../../utils/keyboard.js';
 import { useToolbarControls } from '../../hooks/canvas/useToolbarControls.js';
 import { Collapsible } from '../ui/Collapsible.jsx';
+import { Divider } from '../ui/Divider.jsx';
 import { ToolButton } from './components/ToolButton.jsx';
 import { ToolbarButton } from './components/ToolbarButton.jsx';
-import { ToolbarDivider } from './components/ToolbarDivider.jsx';
 
 const CollapseIcon = ({ isCollapsed }) => (
     <svg
@@ -41,7 +41,7 @@ export const CanvasToolbar = () => {
                 <React.Fragment key={group[0].id}>
                     {groupIndex > 0 && (
                         <Collapsible open={!isCollapsed}>
-                            <ToolbarDivider />
+                            <Divider />
                         </Collapsible>
                     )}
 
@@ -67,7 +67,7 @@ export const CanvasToolbar = () => {
             ))}
 
             <Collapsible open={!isCollapsed}>
-                <ToolbarDivider />
+                <Divider />
             </Collapsible>
 
             <Collapsible open={isCollapsed}>

@@ -14,6 +14,7 @@ const netOf = (state) => ({ places: state.places, transitions: state.transitions
  */
 const editorRefs = (state, net) => ({
     selectedId: findElement(net, state.selectedId) ? state.selectedId : null,
+    inspectedId: findElement(net, state.inspectedId) ? state.inspectedId : null,
     connectingSourceId: findElement(net, state.connectingSourceId) ? state.connectingSourceId : null,
 });
 

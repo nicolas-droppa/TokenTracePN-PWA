@@ -5,7 +5,6 @@ import { THEMES } from '../../theme';
 import { LAYOUT_CONFIG } from '../../constants/layout';
 import { PanelDivider } from './PanelDivider';
 import { CodeEditorPanel } from '../panels/CodeEditorPanel';
-import { ElementInspector } from '../panels/ElementInspector';
 
 export const Sidebar = ({ code, setCode, language, setLanguage }) => {
     const activeThemeKey = useSettingsStore((state) => state.activeTheme);
@@ -50,14 +49,6 @@ export const Sidebar = ({ code, setCode, language, setLanguage }) => {
                     />
                 </Separator>
 
-                {/* Inspector */}
-                <Panel
-                    defaultSize={LAYOUT_CONFIG.INSPECTOR_PANEL_DEFAULT_SIZE_PERCENT}
-                    minSize={LAYOUT_CONFIG.MIN_PANEL_SIZE_PX}
-                    style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-                >
-                    <ElementInspector />
-                </Panel>
             </Group>
         </aside>
     );

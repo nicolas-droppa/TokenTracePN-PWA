@@ -3,6 +3,7 @@ import { usePetriStore } from '../../../store/usePetriStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { THEMES } from '../../../theme';
 import { ARC_CONFIG } from '../../../constants/layout';
+import { useLongPress } from '../../../hooks/useLongPress';
 
 /**
  * ArcEdge component for rendering an arc connection between nodes with optional weight display.
@@ -17,7 +18,10 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
   const select = usePetriStore((state) => state.select);
+  const openInspector = usePetriStore((s) => s.openInspector);
   const isSelected = usePetriStore((state) => state.selectedId === arc.id);
+
+  const longPress = useLongPress(() => openInspector(arc.id));
 
   if (!sourceNode || !targetNode) return null;
 
@@ -31,6 +35,11 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
   const handleClick = (e) => {
     e.stopPropagation();
     select(arc.id);
+  };
+
+  const handleDoubleClick = (e) => {
+    e.stopPropagation();
+    openInspector(arc.id);
   };
 
   return (
@@ -65,6 +74,8 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
         pointerEvents="stroke"
         className="cursor-pointer"
         onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        {...longPress}
       />
 
       {/* Connection Line */}
