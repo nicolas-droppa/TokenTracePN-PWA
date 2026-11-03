@@ -1,3 +1,5 @@
+import { ARC_TYPE } from './net.js';
+
 /**
  * Tool identifiers for the canvas toolbar.
  */
@@ -25,4 +27,11 @@ export const CANVAS_ACTION = {
     DELETE_ELEMENT: 'DELETE_ELEMENT',
     RESET_TOOL: 'RESET_TOOL',
     NONE: 'NONE',
+};
+
+export const TOOL_ARC_TYPE = {
+    [TOOLS.ARC]: ARC_TYPE.REGULAR,
+    [TOOLS.READ]: ARC_TYPE.READ,
+    [TOOLS.INHIBITOR]: ARC_TYPE.INHIBITOR,
+    [TOOLS.RESET]: ARC_TYPE.RESET,
 };

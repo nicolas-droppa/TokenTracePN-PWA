@@ -1,4 +1,5 @@
 import { ATTRIBUTE_ALIASES } from '../../constants/dpn.js';
+import { ARC_TYPE } from '../../constants/net';
 import { arcId } from '../models.js';
 import { parse } from './dpnParser.js';
 import { canonicalKey } from './dpnSchema.js';
@@ -37,7 +38,7 @@ function changesFor(code, statements, command) {
             return [appendLine(code, statements, line, (s) => s.type !== 'arc')];
         }
         case 'addArc': {
-            const type = command.arcType && command.arcType !== 'regular' ? ` (${writeAttribute('type', command.arcType)})` : '';
+            const type = command.arcType && command.arcType !== ARC_TYPE.REGULAR ? ` (${writeAttribute('type', command.arcType)})` : '';
             return [appendLine(code, statements, `${command.source} -> ${command.target}${type};`, (s) => s.type === 'arc')];
         }
         case 'moveNode':

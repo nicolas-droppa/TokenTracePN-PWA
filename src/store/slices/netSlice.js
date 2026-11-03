@@ -1,3 +1,4 @@
+import { ARC_TYPE } from '../../constants/net';
 import { findElement, nextNodeId } from '../../core/models';
 import { applyCommand } from '../../core/netCommands';
 import { applyCommandToCode } from '../../core/parsers/dpnEdits';
@@ -64,7 +65,7 @@ export const createNetSlice = (set, get) => ({
 
     addTransition: (x, y) => get().execute({ type: 'addTransition', id: nextNodeId('t', get()), x, y }),
 
-    addArc: (source, target, arcType = 'regular') => get().execute({ type: 'addArc', source, target, arcType }),
+    addArc: (source, target, arcType = ARC_TYPE.REGULAR) => get().execute({ type: 'addArc', source, target, arcType }),
 
     moveNode: (id, x, y) => get().execute({ type: 'moveNode', id, x, y }),
 

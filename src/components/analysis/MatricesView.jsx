@@ -1,4 +1,5 @@
 import React from 'react';
+import { ARC_TYPE } from '../../constants/net';
 import { usePetriStore } from '../../store/usePetriStore';
 import { useTheme } from '../../store/useSettingsStore';
 import { buildIOMatrices } from '../../core/analysis/matrices';
@@ -24,7 +25,7 @@ export const MatricesView = () => {
     const rows = React.useMemo(() => places.map(toHeader), [places]);
     const columns = React.useMemo(() => transitions.map(toHeader), [transitions]);
 
-    const hasIgnoredArcs = arcs.some((arc) => arc.arcType !== 'regular');
+    const hasIgnoredArcs = arcs.some((arc) => arc.arcType !== ARC_TYPE.REGULAR);
 
     if (places.length === 0 || transitions.length === 0) {
         return (

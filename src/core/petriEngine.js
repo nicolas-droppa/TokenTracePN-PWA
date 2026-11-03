@@ -1,7 +1,9 @@
+import { ARC_TYPE } from '../constants/net.js';
+
 /**
  * Checks whether a transition is enabled under a given marking.
  * A transition with no input places is always enabled (source transition).
- *
+ * Each input arc is checked by its type (regular, read, inhibitor, reset).
  * @param {Object} net - The network structure ({ arcs }).
  * @param {Object<string, number>} marking - Token count per place ID.
  * @param {string} transitionId - The ID of the transition to check.
@@ -10,12 +12,12 @@
 export const isEnabled = (net, marking, transitionId) =>
   net.arcs
     .filter((arc) => arc.target === transitionId)
-    .every((arc) => (marking[arc.source] ?? 0) >= arc.weight);
+    .every((arc) => isInputArcSatisfied(arc, marking[arc.source] ?? 0));
 
 /**
  * Fires a transition, returning the resulting marking.
  * Returns null if the transition is not enabled.
- *
+ * Input arcs are applied by their type before output arcs add tokens.
  * @param {Object} net - The network structure ({ arcs }).
  * @param {Object<string, number>} marking - The current marking.
  * @param {string} transitionId - The ID of the transition to fire.
@@ -26,9 +28,13 @@ export const fire = (net, marking, transitionId) => {
 
   const next = { ...marking };
 
+  // Inputs first cause reset arc must not wipe tokens this firing produces
   for (const arc of net.arcs) {
-    if (arc.target === transitionId) next[arc.source] -= arc.weight;
-    if (arc.source === transitionId) next[arc.target] += arc.weight;
+    if (arc.target === transitionId) next[arc.source] = tokensAfterFiring(arc, next[arc.source] ?? 0);
+  }
+
+  for (const arc of net.arcs) {
+    if (arc.source === transitionId) next[arc.target] = (next[arc.target] ?? 0) + arc.weight;
   }
 
   return next;
@@ -73,3 +79,41 @@ export const isValidArc = (sourceId, targetId, places, transitions) => {
 
   return (isSourcePlace && isTargetTransition) || (isSourceTransition && isTargetPlace);
 };
+
+function isInputArcSatisfied(arc, tokens) {
+  switch (arc.arcType) {
+    case ARC_TYPE.REGULAR:
+      return tokens >= arc.weight;
+
+    case ARC_TYPE.READ:
+      return tokens >= arc.weight;
+
+    case ARC_TYPE.INHIBITOR:
+      return tokens < arc.weight;
+
+    case ARC_TYPE.RESET:
+      return true;
+      
+    default:
+      return tokens >= arc.weight;
+  }
+}
+
+function tokensAfterFiring(arc, tokens) {
+  switch (arc.arcType) {
+    case ARC_TYPE.REGULAR:
+      return tokens - arc.weight;
+
+    case ARC_TYPE.READ:
+      return tokens;
+
+    case ARC_TYPE.INHIBITOR:
+      return tokens;
+
+    case ARC_TYPE.RESET:
+      return 0;
+
+    default:
+      return tokens - arc.weight;
+  }
+}
