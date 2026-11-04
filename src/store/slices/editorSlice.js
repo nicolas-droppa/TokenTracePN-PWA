@@ -27,11 +27,11 @@ export const createEditorSlice = (set, get) => ({
 
     cancelConnecting: () => set({ connectingSourceId: null }),
 
-    finishConnecting: (targetId) => {
+    finishConnecting: (targetId, arcType) => {
         const { connectingSourceId, addArc } = get();
         if (!connectingSourceId) return;
 
-        addArc(connectingSourceId, targetId);
+        addArc(connectingSourceId, targetId, arcType);
         set({ connectingSourceId: null });
     },
 });

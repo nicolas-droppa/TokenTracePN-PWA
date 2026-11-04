@@ -28,12 +28,12 @@ export const TransitionNode = ({
 
   const [isFlashing, setIsFlashing] = React.useState(false);
 
-  const { isConnectingSource, isInvalidTarget, containerProps } = useNodeConnecting(transition, onMouseDown);
+  const { isConnectingSource, isInvalidTarget, isInvalidSource, containerProps } = useNodeConnecting(transition, onMouseDown);
 
   const size = NODE_CONFIG.TRANSITION_SIZE_PX;
 
   const isFireable = isRunning && isEnabled;
-  const isDisabled = isInvalidTarget || (isRunning && !isEnabled);
+  const isDisabled = isInvalidTarget || isInvalidSource || (isRunning && !isEnabled);
 
   const strokeColor = isDisabled ? theme.disabled.stroke : theme.transition.stroke;
   const labelColor = isDisabled ? theme.disabled.text : theme.text.label;
@@ -64,6 +64,10 @@ export const TransitionNode = ({
       onClick={handleClick}
       className={cursorClass ?? containerProps.className}
     >
+      {isInvalidSource && (
+        <title>Read, inhibitor and reset arcs must start at a place.</title>
+      )}
+      
       {/* Connecting Indicator */}
       {isConnectingSource && (
         <rect
