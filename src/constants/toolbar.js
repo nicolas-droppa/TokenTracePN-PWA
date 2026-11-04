@@ -16,8 +16,8 @@ export const TOOL_GROUPS = [
     ],
     [
         { id: TOOLS.ARC, label: 'Regular arc', icon: `${TOOL_ICONS}arc_regular.svg` },
-        { id: TOOLS.READ, label: 'Read arc', icon: `${TOOL_ICONS}arc_read.svg` },
         { id: TOOLS.INHIBITOR, label: 'Inhibitor arc', icon: `${TOOL_ICONS}arc_inhibitor.svg` },
+        { id: TOOLS.READ, label: 'Read arc', icon: `${TOOL_ICONS}arc_read.svg` },
         { id: TOOLS.RESET, label: 'Reset arc', icon: `${TOOL_ICONS}arc_reset.svg` },
     ],
 ];

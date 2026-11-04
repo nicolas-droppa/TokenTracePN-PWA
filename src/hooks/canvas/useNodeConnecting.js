@@ -1,6 +1,7 @@
 import { usePetriStore } from '../../store/usePetriStore';
-import { TOOLS, MOUSE_BUTTON } from '../../constants/tools';
+import { TOOLS, MOUSE_BUTTON, TOOL_ARC_TYPE } from '../../constants/tools';
 import { useLongPress } from '../useLongPress';
+import { ARC_TYPE } from '../../constants/net.js';
 
 export const useNodeConnecting = (node, onMouseDown) => {
   const selectedTool        = usePetriStore((s) => s.selectedTool);
@@ -11,6 +12,8 @@ export const useNodeConnecting = (node, onMouseDown) => {
   const cancelConnecting    = usePetriStore((s) => s.cancelConnecting);
   const select              = usePetriStore((s) => s.select);
   const mode                = usePetriStore((s) => s.mode);
+
+  const arcType = TOOL_ARC_TYPE[selectedTool];
 
   const sourceType = usePetriStore((s) => {
     if (!s.connectingSourceId) return null;
@@ -23,16 +26,22 @@ export const useNodeConnecting = (node, onMouseDown) => {
   const isInvalidTarget =
     Boolean(sourceType) && !isConnectingSource && sourceType === node.type;
 
+  const isInvalidSource =
+    !connectingSourceId && Boolean(arcType) && arcType !== ARC_TYPE.REGULAR && node.type === 'transition';
+
   const handleNodeClick = (e) => {
     e.stopPropagation();
 
-    if (selectedTool === TOOLS.ARC) {
+    if (selectedTool === TOOL_ARC_TYPE[selectedTool]) {
       if (!connectingSourceId) {
+        if ((arcType !== ARC_TYPE.REGULAR) && (node.type === 'transition')) return;
         startConnecting(node.id);
+
       } else if (isConnectingSource) {
         cancelConnecting();
+
       } else {
-        finishConnecting(node.id);
+        finishConnecting(node.id, TOOL_ARC_TYPE[selectedTool]);
       }
       return;
     }
@@ -51,7 +60,7 @@ export const useNodeConnecting = (node, onMouseDown) => {
   const cursorClass =
     mode === 'run'
       ? 'cursor-default'
-      : isInvalidTarget
+      : isInvalidTarget || isInvalidSource
         ? 'cursor-not-allowed'
         : 'cursor-grab active:cursor-grabbing';
 
@@ -69,5 +78,5 @@ export const useNodeConnecting = (node, onMouseDown) => {
     ...longPress,
   };
 
-  return { isConnectingSource, isInvalidTarget, containerProps };
+  return { isConnectingSource, isInvalidTarget, containerProps, isInvalidSource };
 };
