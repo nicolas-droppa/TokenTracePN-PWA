@@ -14,6 +14,7 @@ import { cellToCanvas } from '../../utils/grid';
 import { useElementSize } from '../../hooks/useElementSize';
 import { CanvasRulers } from './components/CanvasRulers';
 import { ElementPopup } from './components/ElementPopup';
+import { arcId } from '../../core/models';
 
 export const PetriCanvas = () => {
     // One selector per value - the canvas re-renders only when one of these changes
@@ -69,6 +70,10 @@ export const PetriCanvas = () => {
     const transitions = React.useMemo(
         () => toCanvasPositions(withDragPosition(storedTransitions, dragPosition)),
         [storedTransitions, dragPosition]
+    );
+    const arcIds = React.useMemo(
+        () => new Set(arcs.map((arc) => arc.id)), 
+        [arcs]
     );
 
     const enabledIds = React.useMemo(
@@ -137,19 +142,22 @@ export const PetriCanvas = () => {
                         fill="url(#grid)"
                     />
 
-                    {arcs.map((arc) => {
+                    {arcs.map((arc) => {        
                         const sourceNode =
                             places.find((p) => p.id === arc.source) ||
                             transitions.find((t) => t.id === arc.source);
                         const targetNode =
                             places.find((p) => p.id === arc.target) ||
                             transitions.find((t) => t.id === arc.target);
+                        const isCurved = arcIds.has(arcId(arc.target, arc.source));
+
                         return (
                             <ArcEdge
                                 key={arc.id}
                                 arc={arc}
                                 sourceNode={sourceNode}
                                 targetNode={targetNode}
+                                isCurved={isCurved}
                             />
                         );
                     })}

@@ -44,4 +44,6 @@ export const NODE_CONFIG = {
 
 export const ARC_CONFIG = {
     STROKE_WIDTH_PX: 2,
+    CURVE_OFFSET_PX: 20,
+    WEIGHT_LABEL_OFFSET_PX: 12,
 };
