@@ -4,6 +4,8 @@ import { useSettingsStore } from '../../../store/useSettingsStore';
 import { THEMES } from '../../../theme';
 import { ARC_CONFIG } from '../../../constants/layout';
 import { useLongPress } from '../../../hooks/useLongPress';
+import { edgePoint, controlPoint, curvePoint, normal } from '../../../utils/geometry';
+import { ARC_MARKERS } from './ArcMarkers';
 
 /**
  * ArcEdge component for rendering an arc connection between nodes with optional weight display.
@@ -14,7 +16,7 @@ import { useLongPress } from '../../../hooks/useLongPress';
  * @param {Object} props.targetNode - The target node object (Place or Transition).
  * @returns {JSX.Element|null} SVG group element or null if nodes are missing.
  */
-export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
+export const ArcEdge = ({ arc, sourceNode, targetNode, isCurved }) => {
   const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
   const select = usePetriStore((state) => state.select);
@@ -42,6 +44,21 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
     openInspector(arc.id);
   };
 
+  const control = controlPoint(sourceNode, targetNode, isCurved ? ARC_CONFIG.CURVE_OFFSET_PX : 0)
+
+  const start = edgePoint(sourceNode, control);
+  const end = edgePoint(targetNode, control);
+  
+  const Marker = ARC_MARKERS[arc.arcType];
+
+  const pathData = `M ${start.x} ${start.y} Q ${control.x} ${control.y} ${end.x} ${end.y}`;
+  const curveMid = curvePoint(start, control, end);
+  const unitVector = normal(sourceNode, targetNode);
+  const labelPos = {
+      x: curveMid.x + unitVector.x * ARC_CONFIG.WEIGHT_LABEL_OFFSET_PX,
+      y: curveMid.y + unitVector.y * ARC_CONFIG.WEIGHT_LABEL_OFFSET_PX,
+  };
+
   return (
     <g
       className="arc-edge"
@@ -50,25 +67,13 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
     >
       <defs>
         {/* Arrowhead Marker */}
-        <marker
-          id={markerId}
-          viewBox="0 0 10 10"
-          refX="28"
-          refY="5"
-          markerWidth="6"
-          markerHeight="6"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill={strokeColor} />
-        </marker>
+        <Marker id={markerId} color={strokeColor} backgroundColor={theme.bg} />
       </defs>
 
       {/* Hit Area (widens area) */}
-      <line
-        x1={sourceNode.x}
-        y1={sourceNode.y}
-        x2={targetNode.x}
-        y2={targetNode.y}
+      <path
+        d={pathData}
+        fill="none"
         stroke="transparent"
         strokeWidth={14}
         pointerEvents="stroke"
@@ -79,11 +84,9 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
       />
 
       {/* Connection Line */}
-      <line
-        x1={sourceNode.x}
-        y1={sourceNode.y}
-        x2={targetNode.x}
-        y2={targetNode.y}
+      <path
+        d={pathData}
+        fill="none"
         stroke={strokeColor}
         strokeWidth={strokeWidth}
         markerEnd={`url(#${markerId})`}
@@ -94,15 +97,16 @@ export const ArcEdge = ({ arc, sourceNode, targetNode }) => {
       {arc.weight > 1 && (
         <>
           <circle
-            cx={midX}
-            cy={midY - 10}
+            cx={labelPos.x}
+            cy={labelPos.y}
             r="9"
             fill={theme.bg}
             pointerEvents="none"
           />
           <text
-            x={midX}
-            y={midY - 6}
+            x={labelPos.x}
+            y={labelPos.y}
+            dominantBaseline="middle"
             fill={strokeColor}
             fontSize="13"
             fontWeight="bold"
