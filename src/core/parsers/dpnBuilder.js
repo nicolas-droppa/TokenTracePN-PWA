@@ -1,5 +1,6 @@
 import { ATTRIBUTE_SCHEMA } from '../../constants/dpn.js';
 import { AUTO_LAYOUT } from '../../constants/layout.js';
+import { ARC_TYPE } from '../../constants/net.js';
 import { createPlace, createTransition, createArc, arcId } from '../models.js';
 import { canonicalKey, kindOf, matchesSchema, modelField } from './dpnSchema.js';
 
@@ -76,11 +77,11 @@ function collectNodeFields(statements, symbols) {
 
 /**
  * Arcs between existing nodes of different kinds, one per pair of nodes.
+ * Duplicate arcs of the same type sum their weights; conflicting arc types keep the first one.
  * @returns {import('../models.js').Arc[]}
  */
 function buildArcs(statements, symbols) {
-    const arcs = [];
-    const seen = new Set();
+    const arcsById = new Map();
 
     for (const statement of statements) {
         if (statement.type !== 'arc') continue;
@@ -90,14 +91,22 @@ function buildArcs(statements, symbols) {
         if (!from || !to || from.keyword === to.keyword) continue;
 
         const id = arcId(statement.from, statement.to);
-        if (seen.has(id)) continue;
-        seen.add(id);
-
         const fields = addAttributes({}, statement.attributes, 'arc');
-        arcs.push(createArc({ ...fields, source: statement.from, target: statement.to }));
+        const arcType = fields.arcType ?? ARC_TYPE.REGULAR;
+        const arc = createArc({ ...fields, source: statement.from, target: statement.to, arcType });
+        const existing = arcsById.get(id);
+
+        if (!existing) {
+            arcsById.set(id, arc);
+            continue;
+        }
+
+        if (existing.arcType === arcType) {
+            existing.weight += arc.weight;
+        }
     }
 
-    return arcs;
+    return [...arcsById.values()];
 }
 
 /**

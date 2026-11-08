@@ -1,4 +1,5 @@
 import { ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/dpn.js';
+import { ARC_TYPE } from '../../constants/net.js';
 import { canonicalKey, kindOf, matchesSchema, describeExpected } from './dpnSchema.js';
 
 /**
@@ -92,6 +93,16 @@ function findDuplicates(items, getKey) {
  */
 function labelOf(statement) {
     return statement.type === 'arc' ? `${statement.from}->${statement.to}` : statement.name;
+}
+
+/**
+ * Returns the effective arc type for a statement.
+ * @param {Object} statement - Arc statement.
+ * @returns {'regular'|'read'|'inhibitor'|'reset'}
+ */
+function arcTypeOf(statement) {
+    const typeAttr = statement?.attributes?.find((attr) => canonicalKey(attr.key) === 'type');
+    return typeAttr?.value ?? ARC_TYPE.REGULAR;
 }
 
 /**
@@ -214,9 +225,16 @@ function checkSpecialArcDirection({ arcs, symbols }) {
  * p1 -> t1; p1 -> t1;
  */
 function checkUniqueArcs({ arcs }) {
-    return findDuplicates(arcs, (arc) => labelOf(arc)).map(({ item, first, key }) =>
-        diagnostic('warning', `Arc '${key}' is already declared on line ${first.line}, ignoring this one`, item)
-    );
+    return findDuplicates(arcs, (arc) => labelOf(arc)).map(({ item, first, key }) => {
+        const itemType = arcTypeOf(item);
+        const firstType = arcTypeOf(first);
+
+        if (itemType === firstType) {
+            return diagnostic('info', `Arc '${key}' is already declared on line ${first.line}, their weights will be combined`, item);
+        }
+
+        return diagnostic('error', `Arc '${key}' is already a ${firstType} arc on line ${first.line}, it cannot also be a ${itemType} arc`, item);
+    });
 }
 
 /**

@@ -44,7 +44,9 @@ function changesFor(code, statements, command) {
         case 'moveNode':
             return setAttributes(statements, command.id, { x: Math.round(command.x), y: Math.round(command.y) });
         case 'setAttribute':
-            return setAttributes(statements, command.id, { [command.key]: command.value });
+            return command.id.includes('->')
+                ? setArcAttributes(code, statements, command.id, { [command.key]: command.value })
+                : setAttributes(statements, command.id, { [command.key]: command.value });
         case 'deleteElement':
             return deleteElement(code, statements, command.id);
         default:
@@ -60,6 +62,28 @@ function changesFor(code, statements, command) {
  */
 function statementsOf(statements, id) {
     return statements.filter((s) => (s.type === 'arc' ? arcId(s.from, s.to) === id : s.name === id));
+}
+
+/**
+ * Sets attributes of one arc while collapsing duplicated rows into a single statement.
+ */
+function setArcAttributes(code, statements, id, values) {
+    const owned = statementsOf(statements, id);
+    if (owned.length === 0) return [];
+
+    const [first, ...rest] = owned;
+    if (rest.length === 0) return setAttributes(statements, id, values);
+
+    const totalWeight = owned.reduce((sum, statement) => {
+        const weightAttr = statement.attributes?.find((attr) => canonicalKey(attr.key) === 'weight');
+        const current = Number(weightAttr?.value ?? 1);
+        return sum + (Number.isFinite(current) ? current : 1);
+    }, 0);
+
+    const merged = { weight: totalWeight, ...values };
+    const firstChanges = setAttributes([first], id, merged);
+    const deletions = mergeRanges(rest.map((statement) => removalRange(code, statement)));
+    return [...firstChanges, ...deletions];
 }
 
 /**
