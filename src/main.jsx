@@ -6,11 +6,11 @@ import App from './App.jsx'
 
 // DEV TESTING
 
-import { buildIOMatrices } from './core/analysis/matrices';
+import { buildMatrices } from './core/analysis/matrices';
 import { usePetriStore } from './store/usePetriStore';
 
 if (import.meta.env.DEV) {
-    window.debug = { buildIOMatrices, store: usePetriStore };
+    window.debug = { buildMatrices, store: usePetriStore };
 }
 
 // ===========
