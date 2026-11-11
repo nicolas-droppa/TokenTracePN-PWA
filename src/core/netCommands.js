@@ -2,6 +2,7 @@ import { ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../constants/dpn.js'
 import { createPlace, createTransition, createArc, arcId, findElement } from './models.js';
 import { matchesSchema, modelField } from './parsers/dpnSchema.js';
 import { isValidArc } from './petriEngine.js';
+import { ARC_TYPE } from '../constants/net';
 
 /**
  * Commands made from users in UI, or from code in the editor.
@@ -77,10 +78,22 @@ function setAttribute(net, { id, key, value }) {
         if (findElement(net, element.source)?.type !== 'place') return net;
     }
 
-    const changes = { [modelField(element.type, key)]: value };
+    if (element.type !== 'arc') return updateNode(net, id, { [modelField(element.type, key)]: value });
 
-    if (element.type !== 'arc') return updateNode(net, id, changes);
-    return { ...net, arcs: net.arcs.map((arc) => (arc.id === id ? { ...arc, ...changes } : arc)) };
+    return {
+        ...net,
+        arcs: net.arcs.map((arc) => {
+            if (arc.id !== id) return arc;
+
+            const nextArc = { ...arc, [modelField(element.type, key)]: value };
+
+            if (key === 'type' && value === ARC_TYPE.RESET) {
+                nextArc.weight = 1;
+            }
+
+            return nextArc;
+        }),
+    };
 }
 
 function deleteElement(net, id) {

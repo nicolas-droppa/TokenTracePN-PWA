@@ -72,18 +72,48 @@ function setArcAttributes(code, statements, id, values) {
     if (owned.length === 0) return [];
 
     const [first, ...rest] = owned;
-    if (rest.length === 0) return setAttributes(statements, id, values);
+    const dropWeight = values.type === ARC_TYPE.RESET;
+    const firstAttributes = collectAttributes(first);
+    const wasReset = firstAttributes.type === ARC_TYPE.RESET;
 
-    const totalWeight = owned.reduce((sum, statement) => {
-        const weightAttr = statement.attributes?.find((attr) => canonicalKey(attr.key) === 'weight');
-        const current = Number(weightAttr?.value ?? 1);
-        return sum + (Number.isFinite(current) ? current : 1);
-    }, 0);
+    if (rest.length === 0 && !dropWeight) return setAttributes(statements, id, values);
 
-    const merged = { weight: totalWeight, ...values };
-    const firstChanges = setAttributes([first], id, merged);
+    const merged = {
+        ...firstAttributes,
+        ...(dropWeight || wasReset ? {} : { weight: totalWeight(owned) }),
+        ...values,
+    };
+
+    if (dropWeight || wasReset) delete merged.weight;
+
+    const firstChanges = replaceAttributeList(first, renderAttributes(merged));
     const deletions = mergeRanges(rest.map((statement) => removalRange(code, statement)));
     return [...firstChanges, ...deletions];
+}
+
+/**
+ * Collects the effective attributes of a single statement in canonical form.
+ */
+function collectAttributes(statement) {
+    const attrs = {};
+
+    for (const attr of statement.attributes) {
+        const key = canonicalKey(attr.key);
+        if (!Object.hasOwn(attrs, key)) attrs[key] = attr.value;
+    }
+
+    return attrs;
+}
+
+/**
+ * Sums the explicit weight of every arc statement, defaulting missing weights to 1.
+ */
+function totalWeight(statements) {
+    return statements.reduce((sum, statement) => {
+        const weightAttr = statement.attributes.find((attr) => canonicalKey(attr.key) === 'weight');
+        const value = Number(weightAttr?.value ?? 1);
+        return sum + (Number.isFinite(value) ? value : 1);
+    }, 0);
 }
 
 /**
@@ -163,6 +193,35 @@ function removalRange(code, statement) {
 
     const spaces = code.slice(statement.end).match(/^[ \t]*/)[0].length;
     return { from: statement.start, to: statement.end + spaces, insert: '' };
+}
+
+/**
+ * Replaces the attribute list of a statement, or adds one if it was empty in source code.
+ * @param {Object} statement - AST node.
+ * @param {string} attrsText - Text to insert, or empty string to remove them.
+ * @returns {Array<{from: number, to: number, insert: string}>}
+ */
+function replaceAttributeList(statement, attrsText) {
+    if (!statement.attributeList) {
+        return attrsText ? [{ from: statement.headerEnd, to: statement.headerEnd, insert: ` (${attrsText})` }] : [];
+    }
+
+    if (!attrsText) {
+        return [{ from: statement.headerEnd, to: statement.attributeList.end, insert: '' }];
+    }
+
+    return [{ from: statement.attributeList.start, to: statement.attributeList.end, insert: `(${attrsText})` }];
+}
+
+/**
+ * Renders attributes as a string.
+ * @param {Object} values - Attribute values.
+ * @returns {string} - Rendered attributes.
+ */
+function renderAttributes(values) {
+    return Object.entries(values)
+        .map(([key, value]) => writeAttribute(canonicalKey(key), value))
+        .join(', ');
 }
 
 /** 

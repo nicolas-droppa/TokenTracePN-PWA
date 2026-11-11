@@ -102,7 +102,7 @@ function buildArcs(statements, symbols) {
         }
 
         if (existing.arcType === arcType) {
-            existing.weight += arc.weight;
+            if (arcType !== ARC_TYPE.RESET) existing.weight += arc.weight;
         }
     }
 

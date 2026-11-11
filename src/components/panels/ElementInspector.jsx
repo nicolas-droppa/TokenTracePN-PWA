@@ -1,8 +1,10 @@
 import React from 'react';
+import { ARC_TYPE } from '../../constants/net';
 import { usePetriStore } from '../../store/usePetriStore';
 import { selectSelectedElement } from '../../store/slices/editorSlice';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
+import { InputField } from '../inspector/components/InputField';
 
 export const ElementInspector = () => {
     const activeTheme = useSettingsStore((state) => state.activeTheme);
@@ -147,22 +149,41 @@ export const ElementInspector = () => {
                 </div>
             )}
 
-            {/* Arc Specifics: Weight */}
+            {/* Arc Specifics */}
             {isArc && (
-                <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: theme.text.label }}>
-                        Weight
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        value={selectedElement.weight ?? 1}
+                <div className="space-y-2.5">
+                    {!selectedElement.arcType || selectedElement.arcType !== ARC_TYPE.RESET ? (
+                        <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: theme.text.label }}>
+                                Weight
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={selectedElement.weight ?? 1}
+                                disabled={isRunning}
+                                onChange={(e) =>
+                                    setAttribute(selectedElement.id, 'weight', Math.max(1, parseInt(e.target.value, 10) || 1))
+                                }
+                                className={inputClass}
+                                style={inputStyle}
+                            />
+                        </div>
+                    ) : null}
+
+                    <InputField
+                        label="Type"
+                        select
+                        value={selectedElement.arcType || ARC_TYPE.REGULAR}
                         disabled={isRunning}
-                        onChange={(e) =>
-                            setAttribute(selectedElement.id, 'weight', Math.max(1, parseInt(e.target.value, 10) || 1))
-                        }
-                        className={inputClass}
-                        style={inputStyle}
+                        onChange={(nextValue) => setAttribute(selectedElement.id, 'type', nextValue)}
+                        options={[
+                            { value: ARC_TYPE.REGULAR, label: 'Regular' },
+                            { value: ARC_TYPE.READ, label: 'Read' },
+                            { value: ARC_TYPE.INHIBITOR, label: 'Inhibitor' },
+                            { value: ARC_TYPE.RESET, label: 'Reset' },
+                        ]}
+                        theme={theme}
                     />
                 </div>
             )}

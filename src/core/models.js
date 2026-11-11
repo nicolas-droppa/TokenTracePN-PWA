@@ -49,14 +49,18 @@ export const createTransition = ({ id, x = 0, y = 0, label = '' }) => ({
     label,
 });
 
-export const createArc = ({ source, target, weight = 1, arcType = ARC_TYPE.REGULAR }) => ({
-    id: arcId(source, target),
-    type: 'arc',
-    source,
-    target,
-    weight: Math.max(1, Math.floor(Number(weight) || 1)),
-    arcType: ARC_TYPES.includes(arcType) ? arcType : ARC_TYPE.REGULAR,
-});
+export const createArc = ({ source, target, weight = 1, arcType = ARC_TYPE.REGULAR }) => {
+    const normalizedType = ARC_TYPES.includes(arcType) ? arcType : ARC_TYPE.REGULAR;
+
+    return {
+        id: arcId(source, target),
+        type: 'arc',
+        source,
+        target,
+        weight: normalizedType === ARC_TYPE.RESET ? 1 : Math.max(1, Math.floor(Number(weight) || 1)),
+        arcType: normalizedType,
+    };
+};
 
 export const arcId = (source, target) => `${source}->${target}`;
 

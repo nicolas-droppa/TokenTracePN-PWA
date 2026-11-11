@@ -20,6 +20,7 @@ export function checkSemantics(model) {
         ...checkArcEndpoints(ctx),
         ...checkSpecialArcDirection(ctx),
         ...checkUniqueArcs(ctx),
+        ...checkArcWeights(ctx),
         // attributes
         ...checkUniqueAttributes(ctx),
         ...checkUnknownAttributes(ctx),
@@ -96,12 +97,19 @@ function labelOf(statement) {
 }
 
 /**
+ * Arcs are grouped per statement (duplicates are separate arcs), nodes per name.
+ */
+function groupOf(statement) {
+    return statement.type === 'arc' ? `${labelOf(statement)}@${statement.start}` : labelOf(statement);
+}
+
+/**
  * Returns the effective arc type for a statement.
  * @param {Object} statement - Arc statement.
  * @returns {'regular'|'read'|'inhibitor'|'reset'}
  */
 function arcTypeOf(statement) {
-    const typeAttr = statement?.attributes?.find((attr) => canonicalKey(attr.key) === 'type');
+    const typeAttr = statement.attributes.find((attr) => canonicalKey(attr.key) === 'type');
     return typeAttr?.value ?? ARC_TYPE.REGULAR;
 }
 
@@ -230,10 +238,30 @@ function checkUniqueArcs({ arcs }) {
         const firstType = arcTypeOf(first);
 
         if (itemType === firstType) {
-            return diagnostic('info', `Arc '${key}' is already declared on line ${first.line}, their weights will be combined`, item);
+            const summary = itemType === ARC_TYPE.RESET
+                ? 'this duplicate reset arc has no effect'
+                : 'their weights will be combined';
+
+            return diagnostic('info', `Arc '${key}' is already declared on line ${first.line}, ${summary}`, item);
         }
 
         return diagnostic('error', `Arc '${key}' is already a ${firstType} arc on line ${first.line}, it cannot also be a ${itemType} arc`, item);
+    });
+}
+
+/**
+ * p1 -> t1 (type: "reset", w: 2);
+ */
+function checkArcWeights({ arcs }) {
+    return arcs.flatMap((arc) => {
+        const type = arcTypeOf(arc);
+        const weightAttr = arc.attributes.find((attr) => canonicalKey(attr.key) === 'weight');
+
+        if (type === ARC_TYPE.RESET && weightAttr) {
+            return [diagnostic('error', `Reset arc '${labelOf(arc)}' cannot have a weight`, weightAttr)];
+        }
+
+        return [];
     });
 }
 
@@ -242,10 +270,10 @@ function checkUniqueArcs({ arcs }) {
  */
 function checkUniqueAttributes({ statements }) {
     const entries = statements.flatMap((statement) =>
-        statement.attributes.map((attr) => ({ owner: labelOf(statement), attr }))
+        statement.attributes.map((attr) => ({ owner: labelOf(statement), group: groupOf(statement), attr }))
     );
 
-    return findDuplicates(entries, (entry) => `${entry.owner}.${canonicalKey(entry.attr.key)}`).map(({ item, first }) =>
+    return findDuplicates(entries, (entry) => `${entry.group}.${canonicalKey(entry.attr.key)}`).map(({ item, first }) =>
         diagnostic(
             'warning',
             `'${item.attr.key}' on '${item.owner}' is already set as '${first.attr.key}' on line ${first.attr.line}, ignoring this one`,

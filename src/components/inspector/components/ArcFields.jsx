@@ -13,20 +13,23 @@ export const ArcFields = ({ element, isRunning, theme }) => {
         transitions.some((transition) => transition.id === element.target);
 
     const selectedArcType = isPlaceToTransition ? (element.arcType || ARC_TYPE.REGULAR) : ARC_TYPE.REGULAR;
+    const isResetArc = selectedArcType === ARC_TYPE.RESET;
 
     return (
         <div className="space-y-2.5">
-            <InputField
-                label="Weight"
-                type="number"
-                min={1}
-                value={element.weight ?? 1}
-                disabled={isRunning}
-                onChange={(nextValue) =>
-                    setAttribute(element.id, 'weight', Math.max(1, parseInt(nextValue, 10) || 1))
-                }
-                theme={theme}
-            />
+            {!isResetArc && (
+                <InputField
+                    label="Weight"
+                    type="number"
+                    min={1}
+                    value={element.weight ?? 1}
+                    disabled={isRunning}
+                    onChange={(nextValue) =>
+                        setAttribute(element.id, 'weight', Math.max(1, parseInt(nextValue, 10) || 1))
+                    }
+                    theme={theme}
+                />
+            )}
 
             <InputField
                 label="Type"

@@ -3,6 +3,7 @@ import { usePetriStore } from '../../../store/usePetriStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { THEMES } from '../../../theme';
 import { ARC_CONFIG } from '../../../constants/layout';
+import { ARC_TYPE } from '../../../constants/net';
 import { useLongPress } from '../../../hooks/useLongPress';
 import { edgePoint, controlPoint, curvePoint, normal } from '../../../utils/geometry';
 import { ARC_MARKERS } from './ArcMarkers';
@@ -93,8 +94,8 @@ export const ArcEdge = ({ arc, sourceNode, targetNode, isCurved }) => {
         pointerEvents="none"
       />
 
-      {/* Arc Weight Label (renders only if weight > 1) */}
-      {arc.weight > 1 && (
+      {/* Arc Weight Label (renders only for non-reset arcs with weight > 1) */}
+      {arc.arcType !== ARC_TYPE.RESET && arc.weight > 1 && (
         <>
           <circle
             cx={labelPos.x}
