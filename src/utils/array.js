@@ -15,18 +15,19 @@ export function range(from, to) {
 }
 
 /**
- * Creates a matrix filled with 0s.
- * @param {number} rows 
- * @param {number} cols 
- * @returns {number[][]} - Matrix filled with 0s.
+ * Creates a matrix filled with a default value.
+ * @param {number} rows
+ * @param {number} cols
+ * @param {any} fillValue
+ * @returns {any[][]} - Matrix filled with the requested value.
  */
-export const zeros = (rows, cols) => {
+export const zeros = (rows, cols, fillValue = 0) => {
     const matrix = [];
 
     for (let r = 0; r < rows; r++) {
         const row = [];
         for (let c = 0; c < cols; c++) {
-            row.push(0);
+            row.push(fillValue);
         }
         matrix.push(row);
     }

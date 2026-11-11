@@ -1,4 +1,5 @@
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
 import { Header } from './components/header/Header';
 import { Workspace } from './components/workspace/Workspace';
 import { useTheme } from './store/useSettingsStore';
@@ -17,6 +18,8 @@ export default function App() {
             <main className="relative min-h-0 flex-1">
                 <Workspace />
             </main>
+
+            <Toaster position="bottom-right" />
         </div>
     );
 }
