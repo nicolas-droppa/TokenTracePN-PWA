@@ -7,6 +7,7 @@ import { displayName } from '../../core/models';
 import { useSyncedScroll } from '../../hooks/useSyncedScroll';
 import { MatrixTable } from './components/MatrixTable';
 import { MATRIX_VIEWS } from '../../constants/matrices';
+import { cellCommand } from '../../core/matrixEdits';
 import { selectIsRunning } from '../../store/slices/simulationSlice';
 
 /**
@@ -20,6 +21,7 @@ export const MatricesView = () => {
     const isRunning = usePetriStore(selectIsRunning);
     const isMatrixEditable = usePetriStore((s) => s.isMatrixEditable);
     const toggleMatrixEditable = usePetriStore((s) => s.toggleMatrixEditable);
+    const execute = usePetriStore((s) => s.execute);
     const bindScroll = useSyncedScroll();
     const editable = isMatrixEditable && !isRunning;
 
@@ -146,7 +148,13 @@ export const MatricesView = () => {
                         rows={rows}
                         columns={columns}
                         matrix={matrices[view.key]}
+                        view={view}
                         editable={editable}
+                        onCellCommit={(placeId, transitionId, value) => {
+                            const command = cellCommand({ places, transitions, arcs }, view, placeId, transitionId, value);
+                            if (!command) return;
+                            execute(command);
+                        }}
                         scroll={bindScroll(index)}
                     />
                 ))}
