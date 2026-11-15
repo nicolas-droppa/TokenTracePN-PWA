@@ -3,7 +3,7 @@ import { ARC_TYPE } from '../../constants/net';
 import { usePetriStore } from '../../store/usePetriStore';
 import { useTheme } from '../../store/useSettingsStore';
 import { buildMatrices } from '../../core/analysis/matrices';
-import { displayName } from '../../core/models';
+import { displayName, nextFreeCell, nextNodeId, arcId } from '../../core/models';
 import { useSyncedScroll } from '../../hooks/useSyncedScroll';
 import { MatrixTable } from './components/MatrixTable';
 import { MATRIX_VIEWS } from '../../constants/matrices';
@@ -11,7 +11,6 @@ import { cellCommand } from '../../core/matrixEdits';
 import { selectIsRunning } from '../../store/slices/simulationSlice';
 import { notify } from '../notifications/notify.jsx';
 import { NOTIFY_STATUS, NOTIFY_TOPIC } from '../../constants/notifications';
-import { arcId } from '../../core/models';
 
 /**
  * Input and output matrices of the current net, recomputed only on change.
@@ -63,6 +62,26 @@ export const MatricesView = () => {
     };
 
     const visible = availableViews.filter((view) => visibleKeys.has(view.key));
+
+    const addNode = (kind) => {
+        const net = { places, transitions, arcs };
+        const id = nextNodeId(kind === 'place' ? 'p' : 't', net);
+        const { x, y } = nextFreeCell(net);
+        execute({ type: kind === 'place' ? 'addPlace' : 'addTransition', id, x, y });
+    };
+
+    const deleteNode = (id, kind) => {
+        const count = arcs.filter((arc) => arc.source === id || arc.target === id).length;
+        const label = kind === 'place' ? 'Place' : 'Transition';
+
+        execute({ type: 'deleteElement', id });
+        notify({
+            status: NOTIFY_STATUS.INFO,
+            topic: NOTIFY_TOPIC.EDIT,
+            title: `${label} ${id} deleted`,
+            message: count > 0 ? `Removed with ${count} ${count === 1 ? 'arc' : 'arcs'}.` : 'No arcs were attached.',
+        });
+    };
 
     const hasMatrixPresence = (viewKey, matrix) => {
         if (!matrix || matrix.length === 0) return false;
@@ -126,13 +145,42 @@ export const MatricesView = () => {
                     })}
                 </div>
 
+                {editable && (
+                    <div className="ml-auto flex items-center gap-1.5">
+                        <button
+                            type="button"
+                            onClick={() => addNode('place')}
+                            className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
+                            style={{
+                                borderColor: theme.sidebar.border,
+                                backgroundColor: `${theme.place.stroke}18`,
+                                color: theme.text.code,
+                            }}
+                        >
+                            + Place
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => addNode('transition')}
+                            className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
+                            style={{
+                                borderColor: theme.sidebar.border,
+                                backgroundColor: `${theme.transition.stroke}18`,
+                                color: theme.text.code,
+                            }}
+                        >
+                            + Transition
+                        </button>
+                    </div>
+                )}
+
                 <button
                     type="button"
                     onClick={toggleMatrixEditable}
                     disabled={isRunning}
                     aria-pressed={isMatrixEditable}
                     title={isRunning ? 'Stop the simulation to edit matrices' : isMatrixEditable ? 'Lock matrix editing' : 'Unlock to edit matrices'}
-                    className="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
                     style={{
                         backgroundColor: isMatrixEditable ? `${theme.place.stroke}18` : 'transparent',
                         color: isMatrixEditable ? theme.text.code : theme.text.label,
@@ -153,8 +201,7 @@ export const MatricesView = () => {
                         matrix={matrices[view.key]}
                         view={view}
                         editable={editable}
-                        matrixIndex={index}
-                        matrixCount={visible.length}
+                        onDeleteNode={deleteNode}
                         onCellCommit={(placeId, transitionId, value) => {
                             const command = cellCommand({ places, transitions, arcs }, view, placeId, transitionId, value);
                             if (!command) return;
@@ -169,7 +216,7 @@ export const MatricesView = () => {
 
                                 notify({
                                     status: NOTIFY_STATUS.INFO,
-                                    topic: NOTIFY_TOPIC.NETWORK,
+                                    topic: NOTIFY_TOPIC.EDIT,
                                     title: 'Arc type changed',
                                     message: `${source}->${target} changed from ${previousType} to ${nextType}`,
                                 });

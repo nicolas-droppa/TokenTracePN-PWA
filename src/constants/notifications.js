@@ -9,6 +9,7 @@ export const NOTIFY_TOPIC = {
     COPY: 'copy',
     LOCK: 'lock',
     NETWORK: 'network',
+    EDIT: 'edit',
 };
 
 export const NOTIFY_DURATION = {

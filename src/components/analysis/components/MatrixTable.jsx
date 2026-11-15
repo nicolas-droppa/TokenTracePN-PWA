@@ -9,6 +9,21 @@ const STICKY_TOP = 'sticky top-0 z-10';
 const STICKY_LEFT = 'sticky left-0 z-10';
 const STICKY_CORNER = 'sticky left-0 top-0 z-20';
 
+const DeleteNodeButton = ({ label, onClick, theme }) => (
+    <button
+        type="button"
+        aria-label={label}
+        onClick={onClick}
+        className="absolute right-1 top-1 inline-flex h-4 w-4 items-center justify-center rounded-sm text-[10px] font-bold leading-none opacity-40 transition-opacity hover:opacity-100"
+        style={{
+            color: theme.text.label,
+            backgroundColor: 'transparent',
+        }}
+    >
+        ×
+    </button>
+);
+
 /**
  * Matrix with sticky headers.
  * @param {Object} props
@@ -21,7 +36,7 @@ const STICKY_CORNER = 'sticky left-0 top-0 z-20';
  * @param {Function} props.onCellCommit - Called with (placeId, transitionId, value).
  * @param {{ ref: Function, onScroll: Function }} [props.scroll] - Optional synced scrolling.
  */
-export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCellCommit, scroll }) => {
+export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCellCommit, onDeleteNode, scroll }) => {
     const theme = useTheme();
     const headerStyle = { backgroundColor: theme.sidebar.bg, color: theme.text.label };
     const isReset = view.arcType === ARC_TYPE.RESET;
@@ -48,10 +63,17 @@ export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCe
                                     key={column.id}
                                     scope="col"
                                     title={column.id}
-                                    className={`${CELL} ${STICKY_TOP}`}
+                                    className={`${CELL} ${STICKY_TOP} relative pr-6`}
                                     style={headerStyle}
                                 >
-                                    {column.label}
+                                    <span className="block text-center">{column.label}</span>
+                                    {editable && (
+                                        <DeleteNodeButton
+                                            label={`Delete transition ${column.id}`}
+                                            onClick={() => onDeleteNode?.(column.id, 'transition')}
+                                            theme={theme}
+                                        />
+                                    )}
                                 </th>
                             ))}
                         </tr>
@@ -66,10 +88,17 @@ export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCe
                                     <th
                                         scope="row"
                                         title={row.id}
-                                        className={`${CELL} ${STICKY_LEFT} text-left`}
+                                        className={`${CELL} ${STICKY_LEFT} relative pr-6 text-left`}
                                         style={headerStyle}
                                     >
-                                        {row.label}
+                                        <span className="block">{row.label}</span>
+                                        {editable && (
+                                            <DeleteNodeButton
+                                                label={`Delete place ${row.id}`}
+                                                onClick={() => onDeleteNode?.(row.id, 'place')}
+                                                theme={theme}
+                                            />
+                                        )}
                                     </th>
                                     {values.map((value, columnIndex) => (
                                         <MatrixCell
