@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { usePetriStore } from '../store/usePetriStore';
-import { parse } from '../core/parsers/dpnParser';
-import { buildNet } from '../core/parsers/dpnBuilder';
+import { netFromCode } from '../core/parsers/dpn';
 
 const SYNC_DELAY_MS = 400;
 
@@ -24,11 +23,11 @@ export const useCodeSync = () => {
         if (isRunning) return undefined;
 
         const timer = setTimeout(() => {
-            const { model, errors } = parse(code);
-            const hasErrors = !model || errors.some((err) => err.severity === 'error');
+            const { net, diagnostics } = netFromCode(code);
+            const hasErrors = !net || diagnostics.some((err) => err.severity === 'error');
 
             setCodeHasErrors(hasErrors);
-            if (!hasErrors) setNet(buildNet(model));
+            if (net) setNet(net);
         }, SYNC_DELAY_MS);
 
         return () => clearTimeout(timer);

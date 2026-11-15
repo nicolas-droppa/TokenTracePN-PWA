@@ -1,9 +1,9 @@
 import React from 'react';
 import { ARC_TYPE } from '../../constants/net';
 import { usePetriStore } from '../../store/usePetriStore';
-import { useTheme } from '../../store/useSettingsStore';
+import { useSettingsStore, useTheme } from '../../store/useSettingsStore';
 import { buildMatrices } from '../../core/analysis/matrices';
-import { displayName, nextFreeCell, nextNodeId, arcId } from '../../core/models';
+import { displayName, nextFreeCell, nextNodeId } from '../../core/models';
 import { useSyncedScroll } from '../../hooks/useSyncedScroll';
 import { MatrixTable } from './components/MatrixTable';
 import { MATRIX_VIEWS } from '../../constants/matrices';
@@ -34,34 +34,10 @@ export const MatricesView = () => {
 
     const rows = React.useMemo(() => places.map(toHeader), [places]);
     const columns = React.useMemo(() => transitions.map(toHeader), [transitions]);
-    const availableViews = React.useMemo(() => MATRIX_VIEWS, []);
-    const [visibleKeys, setVisibleKeys] = React.useState(() => new Set(availableViews.map((view) => view.key)));
+    const hiddenMatrices = useSettingsStore((s) => s.hiddenMatrices);
+    const toggleMatrix = useSettingsStore((s) => s.toggleMatrix);
 
-    React.useEffect(() => {
-        setVisibleKeys((current) => {
-            const next = new Set(availableViews.map((view) => view.key));
-            const filtered = [...current].filter((key) => next.has(key));
-            return filtered.length > 0 ? new Set(filtered) : next;
-        });
-    }, [availableViews]);
-
-    const toggleView = (key) => {
-        setVisibleKeys((current) => {
-            const next = new Set(current);
-            if (next.has(key) && next.size === 1) {
-                return next;
-            }
-
-            if (next.has(key)) {
-                next.delete(key);
-            } else {
-                next.add(key);
-            }
-            return next;
-        });
-    };
-
-    const visible = availableViews.filter((view) => visibleKeys.has(view.key));
+    const visible = MATRIX_VIEWS.filter((view) => !hiddenMatrices.includes(view.key));
 
     const addNode = (kind) => {
         const net = { places, transitions, arcs };
@@ -97,6 +73,23 @@ export const MatricesView = () => {
         return matrix.some((row) => row.some((value) => value !== 0));
     };
 
+    const handleCellCommit = (view, placeId, transitionId, value) => {
+        const command = cellCommand({ places, transitions, arcs }, view, placeId, transitionId, value);
+        if (!command) return;
+
+        if (command.type === 'updateArc') {
+            const previousType = arcs.find((arc) => arc.id === command.id)?.arcType ?? ARC_TYPE.REGULAR;
+            notify({
+                status: NOTIFY_STATUS.INFO,
+                topic: NOTIFY_TOPIC.EDIT,
+                title: 'Arc type changed',
+                message: `${command.id} changed from ${previousType} to ${command.values.type}`,
+            });
+        }
+
+        execute(command);
+    };
+
     if (places.length === 0 || transitions.length === 0) {
         return (
             <p className="p-3 text-xs" style={{ color: theme.disabled.text }}>
@@ -115,8 +108,8 @@ export const MatricesView = () => {
                 }}
             >
                 <div className="flex flex-1 flex-wrap items-center gap-2">
-                    {availableViews.map((view) => {
-                        const isVisible = visibleKeys.has(view.key);
+                    {MATRIX_VIEWS.map((view) => {
+                        const isVisible = !hiddenMatrices.includes(view.key);
                         const hasArc = hasMatrixPresence(view.key, matrices[view.key]);
 
                         return (
@@ -124,7 +117,7 @@ export const MatricesView = () => {
                                 key={view.key}
                                 type="button"
                                 aria-pressed={isVisible}
-                                onClick={() => toggleView(view.key)}
+                                onClick={() => toggleMatrix(view.key)}
                                 className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
                                 style={{
                                     backgroundColor: isVisible ? `${theme.place.stroke}18` : 'transparent',
@@ -192,41 +185,26 @@ export const MatricesView = () => {
             </div>
 
             <div className="flex min-h-0 flex-1 gap-2 p-2">
-                {visible.map((view, index) => (
-                    <MatrixTable
-                        key={view.key}
-                        title={view.title}
-                        rows={rows}
-                        columns={columns}
-                        matrix={matrices[view.key]}
-                        view={view}
-                        editable={editable}
-                        onDeleteNode={deleteNode}
-                        onCellCommit={(placeId, transitionId, value) => {
-                            const command = cellCommand({ places, transitions, arcs }, view, placeId, transitionId, value);
-                            if (!command) return;
-
-                            if (command.type === 'updateArc' && command.values?.type) {
-                                const [source, target] = view.direction === 'placeToTransition'
-                                    ? [placeId, transitionId]
-                                    : [transitionId, placeId];
-                                const existing = arcs.find((arc) => arc.id === arcId(source, target));
-                                const previousType = existing?.arcType ?? 'regular';
-                                const nextType = command.values.type;
-
-                                notify({
-                                    status: NOTIFY_STATUS.INFO,
-                                    topic: NOTIFY_TOPIC.EDIT,
-                                    title: 'Arc type changed',
-                                    message: `${source}->${target} changed from ${previousType} to ${nextType}`,
-                                });
-                            }
-
-                            execute(command);
-                        }}
-                        scroll={bindScroll(index)}
-                    />
-                ))}
+                {visible.length === 0 ? (
+                    <div className="flex w-full items-center justify-center text-xs" style={{ color: theme.text.label }}>
+                        All matrices hidden
+                    </div>
+                ) : (
+                    visible.map((view, index) => (
+                        <MatrixTable
+                            key={view.key}
+                            title={view.title}
+                            rows={rows}
+                            columns={columns}
+                            matrix={matrices[view.key]}
+                            view={view}
+                            editable={editable}
+                            onDeleteNode={deleteNode}
+                            onCellCommit={(placeId, transitionId, value) => handleCellCommit(view, placeId, transitionId, value)}
+                            scroll={bindScroll(index)}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );
