@@ -31,6 +31,7 @@
  */
 
 import { ARC_TYPE, ARC_TYPES } from '../constants/net';
+import { AUTO_LAYOUT } from '../constants/layout';
 
 export const createPlace = ({ id, x = 0, y = 0, label = '', tokens = 0 }) => ({
     id,
@@ -75,6 +76,29 @@ export const nextNodeId = (prefix, { places, transitions }) => {
     let n = 1;
     while (used.has(`${prefix}${n}`)) n++;
     return `${prefix}${n}`;
+};
+
+/** Grid cell = order of the declaration, so moving another node never shifts this one. */
+export const autoPosition = (index) => {
+    return {
+        x: AUTO_LAYOUT.ORIGIN_X + (index % AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
+        y: AUTO_LAYOUT.ORIGIN_Y - Math.floor(index / AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
+    };
+};
+
+/**
+ * First free auto-layout cell after the existing nodes.
+ * @param {{ places: Place[], transitions: Transition[] }} net
+ * @returns {{ x: number, y: number }}
+ */
+export const nextFreeCell = ({ places = [], transitions = [] }) => {
+    const nodes = [...places, ...transitions];
+    const used = new Set(nodes.map((node) => `${node.x},${node.y}`));
+
+    for (let index = nodes.length; ; index++) {
+        const position = autoPosition(index);
+        if (!used.has(`${position.x},${position.y}`)) return position;
+    }
 };
 
 export const displayName = (node) => node.label || node.id;

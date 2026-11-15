@@ -7,10 +7,11 @@ import App from './App.jsx'
 // DEV TESTING
 
 import { buildMatrices } from './core/analysis/matrices';
+import { cellCommand } from './core/matrixEdits';
 import { usePetriStore } from './store/usePetriStore';
 
 if (import.meta.env.DEV) {
-    window.debug = { buildMatrices, store: usePetriStore };
+    window.debug = { buildMatrices, cellCommand, store: usePetriStore };
 }
 
 // ===========

@@ -10,7 +10,8 @@ import { ARC_TYPE } from '../constants/net';
  * @typedef {(
  *   | { type: 'addPlace', id: string, x: number, y: number }
  *   | { type: 'addTransition', id: string, x: number, y: number }
- *   | { type: 'addArc', source: string, target: string, arcType?: string }
+ *   | { type: 'addArc', source: string, target: string, arcType?: string, weight?: number }
+ *   | { type: 'updateArc', id: string, values: Object }
  *   | { type: 'moveNode', id: string, x: number, y: number }
  *   | { type: 'setAttribute', id: string, key: string, value: * }
  *   | { type: 'deleteElement', id: string }
@@ -31,6 +32,8 @@ export function applyCommand(net, command) {
             return addNode(net, 'transitions', createTransition({ ...command, x: round(command.x), y: round(command.y) }));
         case 'addArc':
             return addArc(net, command);
+        case 'updateArc':
+            return updateArc(net, command);
         case 'moveNode':
             return updateNode(net, command.id, { x: round(command.x), y: round(command.y) });
         case 'setAttribute':
@@ -51,11 +54,30 @@ function addNode(net, listName, node) {
     return { ...net, [listName]: [...net[listName], node] };
 }
 
-function addArc(net, { source, target, arcType }) {
+function addArc(net, { source, target, arcType, weight }) {
     if (!isValidArc(source, target, net.places, net.transitions)) return net;
     if (findElement(net, arcId(source, target))) return net; // one arc per pair of nodes
 
-    return { ...net, arcs: [...net.arcs, createArc({ source, target, arcType })] };
+    return { ...net, arcs: [...net.arcs, createArc({ source, target, arcType, weight })] };
+}
+
+function updateArc(net, { id, values }) {
+    const arc = findElement(net, id);
+    if (arc?.type !== 'arc') return net;
+
+    if (PLACE_TO_TRANSITION_ONLY.has(values.type) && findElement(net, arc.source)?.type !== 'place') return net;
+
+    const nextArc = { ...arc };
+    for (const [key, value] of Object.entries(values)) {
+        const expected = ATTRIBUTE_SCHEMA.arc?.[key];
+        if (expected === undefined || !matchesSchema(value, expected)) return net;
+
+        nextArc[modelField('arc', key)] = value;
+    }
+
+    if (nextArc.arcType === ARC_TYPE.RESET) nextArc.weight = 1;
+
+    return { ...net, arcs: net.arcs.map((item) => (item.id === id ? nextArc : item)) };
 }
 
 function updateNode(net, id, changes) {
@@ -70,30 +92,12 @@ function setAttribute(net, { id, key, value }) {
     const element = findElement(net, id);
     if (!element) return net;
 
+    if (element.type === 'arc') return updateArc(net, { id, values: { [key]: value } });
+
     const expected = ATTRIBUTE_SCHEMA[element.type]?.[key];
     if (expected === undefined || !matchesSchema(value, expected)) return net;
 
-    // inhibitor / read / reset goes only from place to transition
-    if (element.type === 'arc' && key === 'type' && PLACE_TO_TRANSITION_ONLY.has(value)) {
-        if (findElement(net, element.source)?.type !== 'place') return net;
-    }
-
-    if (element.type !== 'arc') return updateNode(net, id, { [modelField(element.type, key)]: value });
-
-    return {
-        ...net,
-        arcs: net.arcs.map((arc) => {
-            if (arc.id !== id) return arc;
-
-            const nextArc = { ...arc, [modelField(element.type, key)]: value };
-
-            if (key === 'type' && value === ARC_TYPE.RESET) {
-                nextArc.weight = 1;
-            }
-
-            return nextArc;
-        }),
-    };
+    return updateNode(net, id, { [modelField(element.type, key)]: value });
 }
 
 function deleteElement(net, id) {

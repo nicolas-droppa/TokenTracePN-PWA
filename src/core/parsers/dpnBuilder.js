@@ -1,7 +1,6 @@
 import { ATTRIBUTE_SCHEMA } from '../../constants/dpn.js';
-import { AUTO_LAYOUT } from '../../constants/layout.js';
 import { ARC_TYPE } from '../../constants/net.js';
-import { createPlace, createTransition, createArc, arcId } from '../models.js';
+import { createPlace, createTransition, createArc, arcId, autoPosition } from '../models.js';
 import { canonicalKey, kindOf, matchesSchema, modelField } from './dpnSchema.js';
 
 /**
@@ -25,7 +24,6 @@ export function buildNet(ast) {
 
     for (const [name, declaration] of symbols) {
         const fields = nodeFields.get(name);
-        // Grid cell = order of the declaration, so moving another node never shifts this one
         const auto = autoPosition(declarationIndex++);
         const node = { ...fields, id: name, x: fields.x ?? auto.x, y: fields.y ?? auto.y };
 
@@ -132,10 +130,3 @@ function addAttributes(fields, attributes, kind) {
     return fields;
 }
 
-/** Grid position of the n-th declared node (used only when it has no x/y in the code). */
-function autoPosition(index) {
-    return {
-        x: AUTO_LAYOUT.ORIGIN_X + (index % AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
-        y: AUTO_LAYOUT.ORIGIN_Y - Math.floor(index / AUTO_LAYOUT.COLUMNS) * AUTO_LAYOUT.SPACING,
-    };
-}

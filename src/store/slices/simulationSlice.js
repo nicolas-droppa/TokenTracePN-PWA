@@ -6,6 +6,8 @@ import { TOOLS } from '../../constants/tools';
  * @param {Function} set - Zustand set.
  * @param {Function} get - Zustand get.
  */
+export const selectIsRunning = (state) => state.mode === 'run';
+
 export const createSimulationSlice = (set, get) => ({
     mode: 'edit',
     marking: null,
