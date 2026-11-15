@@ -1,3 +1,5 @@
+import { ARC_TYPE } from './net';
+
 export const MATRIX_COPY_FORMATS = [
     { id: 'bmatrix', symbol: '[ ]', label: 'bmatrix' },
     { id: 'pmatrix', symbol: '( )', label: 'pmatrix' },
@@ -19,10 +21,15 @@ export const PLACE_SIDE = {
     TARGET: 'target',
 };
 
+export const ARC_DIRECTION = {
+    PLACE_TO_TRANSITION: 'placeToTransition',
+    TRANSITION_TO_PLACE: 'transitionToPlace',
+};
+
 export const MATRIX_VIEWS = [
-    { key: 'input',     title: 'Input (I)' },
-    { key: 'output',    title: 'Output (O)' },
-    { key: 'read',      title: 'Read (R)' },
-    { key: 'inhibitor', title: 'Inhibitor (H)' },
-    { key: 'reset',     title: 'Reset (Rst)' },
+    { key: 'input',     title: 'Input (I)',     arcType: ARC_TYPE.REGULAR,   direction: ARC_DIRECTION.PLACE_TO_TRANSITION },
+    { key: 'output',    title: 'Output (O)',    arcType: ARC_TYPE.REGULAR,   direction: ARC_DIRECTION.TRANSITION_TO_PLACE },
+    { key: 'read',      title: 'Read (R)',      arcType: ARC_TYPE.READ,      direction: ARC_DIRECTION.PLACE_TO_TRANSITION },
+    { key: 'inhibitor', title: 'Inhibitor (H)', arcType: ARC_TYPE.INHIBITOR, direction: ARC_DIRECTION.PLACE_TO_TRANSITION },
+    { key: 'reset',     title: 'Reset (Rst)',   arcType: ARC_TYPE.RESET,     direction: ARC_DIRECTION.PLACE_TO_TRANSITION },
 ];

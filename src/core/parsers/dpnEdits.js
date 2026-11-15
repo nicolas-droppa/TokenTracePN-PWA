@@ -38,8 +38,13 @@ function changesFor(code, statements, command) {
             return [appendLine(code, statements, line, (s) => s.type !== 'arc')];
         }
         case 'addArc': {
-            const type = command.arcType && command.arcType !== ARC_TYPE.REGULAR ? ` (${writeAttribute('type', command.arcType)})` : '';
-            return [appendLine(code, statements, `${command.source} -> ${command.target}${type};`, (s) => s.type === 'arc')];
+            const attrs = {};
+            if (command.arcType && command.arcType !== ARC_TYPE.REGULAR) attrs.type = command.arcType;
+            if (command.weight > 1 && command.arcType !== ARC_TYPE.RESET) attrs.weight = command.weight;
+
+            const text = renderAttributes(attrs);
+            const suffix = text ? ` (${text})` : '';
+            return [appendLine(code, statements, `${command.source} -> ${command.target}${suffix};`, (s) => s.type === 'arc')];
         }
         case 'moveNode':
             return setAttributes(statements, command.id, { x: Math.round(command.x), y: Math.round(command.y) });
@@ -47,6 +52,8 @@ function changesFor(code, statements, command) {
             return command.id.includes('->')
                 ? setArcAttributes(code, statements, command.id, { [command.key]: command.value })
                 : setAttributes(statements, command.id, { [command.key]: command.value });
+        case 'updateArc':
+            return setArcAttributes(code, statements, command.id, command.values);
         case 'deleteElement':
             return deleteElement(code, statements, command.id);
         default:
