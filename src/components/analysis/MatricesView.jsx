@@ -7,6 +7,7 @@ import { displayName } from '../../core/models';
 import { useSyncedScroll } from '../../hooks/useSyncedScroll';
 import { MatrixTable } from './components/MatrixTable';
 import { MATRIX_VIEWS } from '../../constants/matrices';
+import { selectIsRunning } from '../../store/slices/simulationSlice';
 
 /**
  * Input and output matrices of the current net, recomputed only on change.
@@ -16,7 +17,11 @@ export const MatricesView = () => {
     const places = usePetriStore((s) => s.places);
     const transitions = usePetriStore((s) => s.transitions);
     const arcs = usePetriStore((s) => s.arcs);
+    const isRunning = usePetriStore(selectIsRunning);
+    const isMatrixEditable = usePetriStore((s) => s.isMatrixEditable);
+    const toggleMatrixEditable = usePetriStore((s) => s.toggleMatrixEditable);
     const bindScroll = useSyncedScroll();
+    const editable = isMatrixEditable && !isRunning;
 
     const matrices = React.useMemo(
         () => buildMatrices({ places, transitions, arcs }),
@@ -85,34 +90,52 @@ export const MatricesView = () => {
                     borderColor: theme.sidebar.border,
                 }}
             >
-                {availableViews.map((view) => {
-                    const isVisible = visibleKeys.has(view.key);
-                    const hasArc = hasMatrixPresence(view.key, matrices[view.key]);
+                <div className="flex flex-1 flex-wrap items-center gap-2">
+                    {availableViews.map((view) => {
+                        const isVisible = visibleKeys.has(view.key);
+                        const hasArc = hasMatrixPresence(view.key, matrices[view.key]);
 
-                    return (
-                        <button
-                            key={view.key}
-                            type="button"
-                            aria-pressed={isVisible}
-                            onClick={() => toggleView(view.key)}
-                            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
-                            style={{
-                                backgroundColor: isVisible ? `${theme.place.stroke}18` : 'transparent',
-                                color: isVisible ? theme.text.code : theme.text.label,
-                                opacity: isVisible || (hasArc ? 1 : 0.7),
-                            }}
-                        >
-                            <span
-                                className="inline-block h-2 w-2 rounded-full"
+                        return (
+                            <button
+                                key={view.key}
+                                type="button"
+                                aria-pressed={isVisible}
+                                onClick={() => toggleView(view.key)}
+                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
                                 style={{
-                                    backgroundColor: hasArc ? theme.place.stroke : theme.disabled.text,
-                                    opacity: isVisible || (hasArc ? 1 : 0.45),
+                                    backgroundColor: isVisible ? `${theme.place.stroke}18` : 'transparent',
+                                    color: isVisible ? theme.text.code : theme.text.label,
+                                    opacity: isVisible || (hasArc ? 1 : 0.7),
                                 }}
-                            />
-                            {view.title}
-                        </button>
-                    );
-                })}
+                            >
+                                <span
+                                    className="inline-block h-2 w-2 rounded-full"
+                                    style={{
+                                        backgroundColor: hasArc ? theme.place.stroke : theme.disabled.text,
+                                        opacity: isVisible || (hasArc ? 1 : 0.45),
+                                    }}
+                                />
+                                {view.title}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <button
+                    type="button"
+                    onClick={toggleMatrixEditable}
+                    disabled={isRunning}
+                    aria-pressed={isMatrixEditable}
+                    title={isRunning ? 'Stop the simulation to edit matrices' : isMatrixEditable ? 'Lock matrix editing' : 'Unlock to edit matrices'}
+                    className="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
+                    style={{
+                        backgroundColor: isMatrixEditable ? `${theme.place.stroke}18` : 'transparent',
+                        color: isMatrixEditable ? theme.text.code : theme.text.label,
+                    }}
+                >
+                    <span aria-hidden="true">{isMatrixEditable ? 'Y' : 'N'}</span>
+                    <span>{isMatrixEditable ? 'Editing' : 'Edit'}</span>
+                </button>
             </div>
 
             <div className="flex min-h-0 flex-1 gap-2 p-2">
@@ -123,6 +146,7 @@ export const MatricesView = () => {
                         rows={rows}
                         columns={columns}
                         matrix={matrices[view.key]}
+                        editable={editable}
                         scroll={bindScroll(index)}
                     />
                 ))}

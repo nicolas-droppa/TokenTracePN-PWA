@@ -10,8 +10,11 @@ export const createEditorSlice = (set, get) => ({
     selectedId: null,
     inspectedId: null,
     connectingSourceId: null,
+    isMatrixEditable: false,
 
     setSelectedTool: (tool) => set({ selectedTool: tool }),
+
+    toggleMatrixEditable: () => set((state) => ({ isMatrixEditable: !state.isMatrixEditable })),
 
     select: (id) => set({ selectedId: id ?? null }),
 

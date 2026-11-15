@@ -21,9 +21,10 @@ const STICKY_CORNER = 'sticky left-0 top-0 z-20';
  * @param {{ id: string, label: string }[]} props.rows - Row headers, in matrix order.
  * @param {{ id: string, label: string }[]} props.columns - Column headers, in matrix order.
  * @param {number[][]} props.matrix
+ * @param {boolean} props.editable - Is matrix editable?
  * @param {{ ref: Function, onScroll: Function }} [props.scroll] - Optional synced scrolling.
  */
-export const MatrixTable = ({ title, rows, columns, matrix, scroll }) => {
+export const MatrixTable = ({ title, rows, columns, matrix, editable, scroll }) => {
     const theme = useTheme();
     const headerStyle = { backgroundColor: theme.sidebar.bg, color: theme.text.label };
 
