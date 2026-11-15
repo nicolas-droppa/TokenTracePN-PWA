@@ -9,6 +9,9 @@ import { MatrixTable } from './components/MatrixTable';
 import { MATRIX_VIEWS } from '../../constants/matrices';
 import { cellCommand } from '../../core/matrixEdits';
 import { selectIsRunning } from '../../store/slices/simulationSlice';
+import { notify } from '../notifications/notify.jsx';
+import { NOTIFY_STATUS, NOTIFY_TOPIC } from '../../constants/notifications';
+import { arcId } from '../../core/models';
 
 /**
  * Input and output matrices of the current net, recomputed only on change.
@@ -150,9 +153,28 @@ export const MatricesView = () => {
                         matrix={matrices[view.key]}
                         view={view}
                         editable={editable}
+                        matrixIndex={index}
+                        matrixCount={visible.length}
                         onCellCommit={(placeId, transitionId, value) => {
                             const command = cellCommand({ places, transitions, arcs }, view, placeId, transitionId, value);
                             if (!command) return;
+
+                            if (command.type === 'updateArc' && command.values?.type) {
+                                const [source, target] = view.direction === 'placeToTransition'
+                                    ? [placeId, transitionId]
+                                    : [transitionId, placeId];
+                                const existing = arcs.find((arc) => arc.id === arcId(source, target));
+                                const previousType = existing?.arcType ?? 'regular';
+                                const nextType = command.values.type;
+
+                                notify({
+                                    status: NOTIFY_STATUS.INFO,
+                                    topic: NOTIFY_TOPIC.NETWORK,
+                                    title: 'Arc type changed',
+                                    message: `${source}->${target} changed from ${previousType} to ${nextType}`,
+                                });
+                            }
+
                             execute(command);
                         }}
                         scroll={bindScroll(index)}
