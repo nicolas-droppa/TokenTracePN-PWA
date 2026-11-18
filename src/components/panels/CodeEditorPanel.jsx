@@ -34,8 +34,7 @@ export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
                         }}
                     >
                         <option value="dpn">DPN (Fast prototype)</option>
-                        <option value="pnml">PNML (XML)</option>
-                        <option value="plc">PLC</option>
+                        <option value="dot">DOT (Graphviz)</option>
                     </select>
                 </div>
             </div>

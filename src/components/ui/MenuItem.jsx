@@ -29,7 +29,7 @@ export const MenuItem = ({ label, symbol = '', onSelect, disabled = false, selec
             }}
         >
             {symbol ? (
-                <span className="w-6 shrink-0 text-center font-mono bg-[var(--bg)] enabled:hover:bg-[var(--hover)] disabled:cursor-not-allowed" style={{ color: symbolColor }}>
+                <span className="w-6 shrink-0 text-center font-mono disabled:cursor-not-allowed" style={{ color: symbolColor }}>
                     {symbol}
                 </span>
             ) : null}
