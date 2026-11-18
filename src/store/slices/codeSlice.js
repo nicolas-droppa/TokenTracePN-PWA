@@ -18,10 +18,13 @@ export const createCodeSlice = (set) => ({
     code: DEFAULT_CODE,
     language: 'dpn',
     codeHasErrors: false,
+    diagnostics: [],
 
     setCode: (code) => set({ code }),
 
     setLanguage: (language) => set({ language }),
 
     setCodeHasErrors: (codeHasErrors) => set({ codeHasErrors }),
+
+    setDiagnostics: (diagnostics) => set({ diagnostics }),
 });
