@@ -18,6 +18,9 @@ export const useSettingsStore = create(
                         ? state.hiddenMatrices.filter((k) => k !== key)
                         : [...state.hiddenMatrices, key],
                 })),
+
+            matrixCopyFormat: 'array',
+            setMatrixCopyFormat: (matrixCopyFormat) => set({ matrixCopyFormat }),
         }),
         {
             name: 'petri-settings',
@@ -25,6 +28,7 @@ export const useSettingsStore = create(
                 activeTheme: state.activeTheme,
                 workspaceLayout: state.workspaceLayout,
                 hiddenMatrices: state.hiddenMatrices,
+                matrixCopyFormat: state.matrixCopyFormat,
             }),
         }
     )
