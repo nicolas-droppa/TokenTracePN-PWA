@@ -4,6 +4,8 @@ import { Header } from './components/header/Header';
 import { Workspace } from './components/workspace/Workspace';
 import { useTheme } from './store/useSettingsStore';
 import { useCodeSync } from './hooks/useCodeSync';
+import { StatusBar } from './components/statusbar/StatusBar';
+import { APP_LAYOUT } from './constants/layout';
 
 export default function App() {
     const theme = useTheme();
@@ -18,8 +20,12 @@ export default function App() {
             <main className="relative min-h-0 flex-1">
                 <Workspace />
             </main>
+            <StatusBar />
 
-            <Toaster position="bottom-right" />
+            <Toaster
+                position="bottom-right"
+                containerStyle={{ bottom: APP_LAYOUT.STATUS_BAR_HEIGHT_PX + 8 }}
+            />
         </div>
     );
 }
