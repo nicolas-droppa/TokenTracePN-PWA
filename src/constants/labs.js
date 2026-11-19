@@ -1,4 +1,4 @@
-export const ANALYSIS_TASK_STATUS = {
+export const LAB_STATUS = {
     LOCKED: 'locked',           // still has prerequisites
     TODO: 'todo',               // available but not started
     IN_PROGRESS: 'in-progress', // code differs from template
