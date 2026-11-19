@@ -4,8 +4,9 @@ import { Header } from './components/header/Header';
 import { Workspace } from './components/workspace/Workspace';
 import { useTheme } from './store/useSettingsStore';
 import { useCodeSync } from './hooks/useCodeSync';
-import { StatusBar } from './components/statusbar/StatusBar';
+import { StatusBar } from './components/status-bar/StatusBar';
 import { APP_LAYOUT } from './constants/layout';
+import { AnalysisBar } from './components/analysis-bar/AnalysisBar';
 
 export default function App() {
     const theme = useTheme();
@@ -17,8 +18,11 @@ export default function App() {
             style={{ backgroundColor: theme.bg }}
         >
             <Header />
-            <main className="relative min-h-0 flex-1">
-                <Workspace />
+            <main className="relative flex min-h-0 flex-1">
+                <div className="relative min-w-0 flex-1">
+                    <Workspace />
+                </div>
+                <AnalysisBar />
             </main>
             <StatusBar />
 

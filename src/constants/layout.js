@@ -11,7 +11,7 @@ export const LAYOUT_CONFIG = {
 
 export const APP_LAYOUT = {
     STATUS_BAR_HEIGHT_PX: 28,
-    ACTIVITY_BAR_WIDTH_PX: 44,
+    ANALYSIS_BAR_WIDTH_PX: 60,
 };
 
 export const CANVAS_CONFIG = {
