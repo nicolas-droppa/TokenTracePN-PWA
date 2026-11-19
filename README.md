@@ -8,6 +8,7 @@ https://nicolas-droppa.github.io/TokenTracePN-PWA/
 - [ ] **Dynamic Theme Engine Extensions:** Možnosť vytvárať vlastné používateľské témy alebo exportovať/importovať farebné schémy.
 - [ ] **Mini-mapa plátna:** Navigation overview v rohu obrazovky pre rýchly posun v rozsiahlych sieťach.
 - [ ] **Fit to view:** Aj s klávesovou skratkou, pri načítaní proste prisposobiť pohľad v plátne pre aktuálnu sieť
+- [ ] **Mapa zavislosti taskov** Nejaky graf so sipkami zobrazujuci navaznost a requirements pre tasky...
 
 ### ⚡ Funkcionalita Editora & Engine
 - [ ] **Vytváranie hrán (Arcs):** Prepojenie uzlov potiahnutím z uzla na uzol alebo interaktívnym výberom.
