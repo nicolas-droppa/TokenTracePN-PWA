@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import * as dpnParser from '../core/parsers/dpnParser';
+import { DIAGNOSTIC } from '../constants/diagnostics';
 
 const DEFAULT_DELAY_MS = 450;
 
-function normalizeParseError(err) {
-    if (!err) return { message: 'Unknown error' };
-    if (typeof err === 'string') return { message: err };
+/** Unexpected failure (a bug, not a mistake in the code) as a diagnostic. */
+function unknownError(err) {
     return {
-        message: err.message || err.msg || String(err),
-        line: err.line,
-        col: err.col,
-        severity: err.severity,
+        severity: 'error',
+        code: DIAGNOSTIC.UNKNOWN_ERROR,
+        params: { details: err?.message || String(err ?? '') },
+        line: err?.line,
+        col: err?.col,
     };
 }
 
@@ -27,7 +28,7 @@ export const useCodeChecker = ({ code = '', language = 'dpn', delayMs = DEFAULT_
             try {
                 const parseFn = dpnParser.parse || (dpnParser.default && dpnParser.default.parse);
                 if (!parseFn) {
-                    setErrors([normalizeParseError('Parser not available')]);
+                    setErrors([unknownError('Parser not available')]);
                     return;
                 }
 
@@ -36,7 +37,7 @@ export const useCodeChecker = ({ code = '', language = 'dpn', delayMs = DEFAULT_
 
                 setErrors(parsedErrors.length > 0 ? parsedErrors : []);
             } catch (err) {
-                setErrors([normalizeParseError(err)]);
+                setErrors([unknownError(err)]);
             }
         }, delayMs);
 

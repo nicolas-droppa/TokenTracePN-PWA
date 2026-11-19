@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 import { LANGUAGES, DEFAULT_LANGUAGE } from '@/constants/languages';
+import { DIAGNOSTIC_CODES } from '@/constants/diagnostics';
 
 const files = import.meta.glob('../../src/locales/*/*.json', { eager: true, import: 'default' });
 
-// { en: { common: {...}, matrices: {...} }, sk: {...} }
 const resources = {};
 for (const [path, content] of Object.entries(files)) {
     const [lang, file] = path.split('/').slice(-2);
@@ -15,7 +16,6 @@ for (const [path, content] of Object.entries(files)) {
 
 const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
 
-/** Flat list of keys without plural suffixes: 'copy.tooltip', 'toasts.removedArcs'. */
 const keysOf = (object, prefix = '') =>
     Object.entries(object).flatMap(([key, value]) =>
         value && typeof value === 'object'
@@ -45,7 +45,6 @@ describe('locales', () => {
     }
 });
 
-// --- keys used in code ---------------------------------------------------
 
 const SRC = join(process.cwd(), 'src');
 
@@ -56,13 +55,11 @@ const sourceFiles = (dir) =>
         return /\.(js|jsx)$/.test(name) ? [path] : [];
     });
 
-/** Does 'ns:key' (or key in the default namespace) exist in the default language? */
 const exists = (fullKey, defaultNs) => {
     const [ns, key] = fullKey.includes(':') ? fullKey.split(':') : [defaultNs, fullKey];
     const value = key.split('.').reduce((node, part) => node?.[part], resources[DEFAULT_LANGUAGE][ns]);
     if (typeof value === 'string') return true;
 
-    // plural key: 'toasts.removedArcs' -> 'toasts.removedArcs_one' / '_other'
     const parts = key.split('.');
     const last = parts.pop();
     const parent = parts.reduce((node, part) => node?.[part], resources[DEFAULT_LANGUAGE][ns]);
@@ -74,7 +71,6 @@ describe('translation keys used in code', () => {
         const code = readFileSync(file, 'utf-8');
         const ns = code.match(/useTranslation\('([^']+)'\)/)?.[1] ?? 'common';
 
-        // only literal keys: t('a.b'), t("a.b") and labelKey: 'ns:a.b'
         const used = [
             ...[...code.matchAll(/\bt\(\s*'([^'`$]+)'/g)].map((m) => m[1]),
             ...[...code.matchAll(/labelKey:\s*'([^'`$]+)'/g)].map((m) => m[1]),
@@ -86,4 +82,16 @@ describe('translation keys used in code', () => {
             expect(missing).toEqual([]);
         });
     }
+});
+
+describe('diagnostics', () => {
+    it('every DIAGNOSTIC code has a translation', () => {
+        const keys = Object.keys(resources[DEFAULT_LANGUAGE].diagnostics);
+        const missing = DIAGNOSTIC_CODES.filter((code) => !keys.some((key) => key === code || key.startsWith(`${code}_`)));
+        expect(missing).toEqual([]);
+    });
+
+    it('core and hooks have no plain-text diagnostics left', () => {
+        expect(() => execSync('node scripts/find-old-diagnostics.mjs', { stdio: 'pipe' })).not.toThrow();
+    });
 });

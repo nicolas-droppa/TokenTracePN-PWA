@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCodeChecker } from '../../hooks/useCodeChecker';
+import { formatDiagnostic } from '../../utils/formatDiagnostic';
 
 const IssueFilterButton = ({ label, title, count, theme, active, onClick, filterKey }) => {
     const style = (theme && theme.diagnostics && theme.diagnostics.filter && theme.diagnostics.filter[filterKey])
@@ -92,7 +93,7 @@ export const CodeCheckerPanel = ({ errors = [], theme = {}, code = '', language 
                     <div className="text-[11px]">{t('empty')}</div>
                 ) : (
                     visibleErrors.map((err, idx) => {
-                        const msg = (err && (err.message || err.msg)) || String(err);
+                        const msg = formatDiagnostic(err, t);
                         const line = err && err.line ? ` (${t('line', { line: err.line })})` : '';
                         const severity = (err && err.severity) || 'info';
                         const severityMeta = getSeverityMeta(severity, theme, t);

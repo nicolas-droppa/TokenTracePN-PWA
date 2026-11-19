@@ -1,5 +1,6 @@
 import { PUNCTUATION, KEYWORDS } from '../../constants/dpn.js';
 import { checkSemantics } from './dpnSemantics.js';
+import { DIAGNOSTIC } from '../../constants/diagnostics.js';
 
 export function canParse(code) {
     try {
@@ -10,18 +11,32 @@ export function canParse(code) {
     }
 }
 
+/**
+ * Syntax error with a diagnostic code, thrown by the tokenizer and parser.
+ * @param {string} code - DIAGNOSTIC code.
+ * @param {Object} params - Data for the message (no text).
+ * @param {{line: number, col: number}} pos
+ * @returns {Error}
+ */
+function syntaxError(code, params, pos) {
+    const error = new Error(code);
+    error.code = code;
+    error.params = params;
+    error.line = pos.line;
+    error.col = pos.col;
+    return error;
+}
+
+/**
+ * Turns a thrown error into a diagnostic. Errors without a code are bugs, not user mistakes.
+ */
 function normalizeError(err) {
-    const message = err?.message || String(err);
-    const match = message.match(/line\s+(\d+),\s*col\s+(\d+)/i);
-
-    const line = Number.isFinite(Number(err?.line)) ? Number(err.line) : match ? Number(match[1]) : undefined;
-    const col = Number.isFinite(Number(err?.col)) ? Number(err.col) : match ? Number(match[2]) : undefined;
-
     return {
         severity: 'error',
-        message,
-        line,
-        col,
+        code: err?.code ?? DIAGNOSTIC.UNKNOWN_ERROR,
+        params: err?.code ? err.params ?? {} : { details: err?.message || String(err) },
+        line: Number.isFinite(Number(err?.line)) ? Number(err.line) : undefined,
+        col: Number.isFinite(Number(err?.col)) ? Number(err.col) : undefined,
     };
 }
 
@@ -84,14 +99,14 @@ function handleString(ctx, startLine, startCol, errors) {
 
     while (ctx.i < ctx.src.length && ctx.src[ctx.i] !== quote) {
         if (ctx.src[ctx.i] === '\n') {
-            errors.push(new Error(`String not closed (line ${startLine}, col ${startCol})`));
+            errors.push(syntaxError(DIAGNOSTIC.UNCLOSED_STRING, {}, { line: startLine, col: startCol }));
         }
         str += ctx.src[ctx.i];
         ctx.advance();
     }
 
     if (ctx.i >= ctx.src.length) {
-        errors.push(new Error(`String not closed (line ${startLine}, col ${startCol})`));
+        errors.push(syntaxError(DIAGNOSTIC.UNCLOSED_STRING, {}, { line: startLine, col: startCol }));
         return;
     }
 
@@ -162,7 +177,7 @@ function tokenize(src) {
             continue;
         }
 
-        errors.push(new Error(`Unknown character '${c}' (line ${ctx.line}, col ${ctx.col})`));
+        errors.push(syntaxError(DIAGNOSTIC.UNKNOWN_CHARACTER, { char: c }, ctx));
         ctx.advance();
     }
 
@@ -179,10 +194,7 @@ function parseTokens(tokens) {
     const expect = (type) => {
         const t = peek();
         if (t.type !== type) {
-            const error = new Error(`Expected ${type} but got ${t.type} (line ${t.line}, col ${t.col})`);
-            error.line = t.line;
-            error.col = t.col;
-            throw error;
+            throw syntaxError(DIAGNOSTIC.UNEXPECTED_TOKEN, { expected: type, found: t.type }, t);
         }
         return advance();
     };
@@ -261,10 +273,7 @@ function parseTokens(tokens) {
             };
         }
 
-        const error = new Error(`Expected declaration but got ${t.type} (line ${t.line}, col ${t.col})`);
-        error.line = t.line;
-        error.col = t.col;
-        throw error;
+        throw syntaxError(DIAGNOSTIC.EXPECTED_DECLARATION, { found: t.type }, t);
     }
 
     // attributes = "(" attribute ("," attribute)* ")"
@@ -304,10 +313,7 @@ function parseTokens(tokens) {
     function parseValue() {
         const t = peek();
         if (t.type === 'STRING' || t.type === 'NUMBER') return advance();
-        const error = new Error(`Expected value (STRING or NUMBER) but got ${t.type} (line ${t.line}, col ${t.col})`);
-        error.line = t.line;
-        error.col = t.col;
-        throw error;
+        throw syntaxError(DIAGNOSTIC.EXPECTED_VALUE, { found: t.type }, t);
     }
 
     return parseProgram();

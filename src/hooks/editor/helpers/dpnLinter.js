@@ -1,5 +1,8 @@
 import { linter } from '@codemirror/lint';
 import * as dpnParser from '../../../core/parsers/dpnParser';
+import { DIAGNOSTIC } from '../../../constants/diagnostics';
+import { formatDiagnostic } from '../../../utils/formatDiagnostic';
+import i18n from '../../../i18n';
 
 /** 
  * Linter for DPN code using the dpnParser.
@@ -13,7 +16,7 @@ export const dpnLinter = linter(
         try {
             errors = dpnParser.parse(doc.toString())?.errors || [];
         } catch (err) {
-            errors = [{ message: String(err), line: 1, col: 1 }];
+            errors = [{ severity: 'error', code: DIAGNOSTIC.UNKNOWN_ERROR, params: { details: String(err) }, line: 1, col: 1 }];
         }
 
         return errors.map((err) => {
@@ -27,7 +30,7 @@ export const dpnLinter = linter(
                 from,
                 to: Math.max(to, from),
                 severity: err.severity,
-                message: err.message || String(err),
+                message: formatDiagnostic(err, i18n.t),
             };
         });
     },
