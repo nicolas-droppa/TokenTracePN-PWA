@@ -6,7 +6,7 @@ import { useTheme } from './store/useSettingsStore';
 import { useCodeSync } from './hooks/useCodeSync';
 import { StatusBar } from './components/status-bar/StatusBar';
 import { APP_LAYOUT } from './constants/layout';
-import { AnalysisBar } from './components/analysis-bar/AnalysisBar';
+import { LabBar } from './components/lab-bar/LabBar';
 
 export default function App() {
     const theme = useTheme();
@@ -22,7 +22,7 @@ export default function App() {
                 <div className="relative min-w-0 flex-1">
                     <Workspace />
                 </div>
-                <AnalysisBar />
+                <LabBar />
             </main>
             <StatusBar />
 
