@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDraft } from '../../../hooks/useDraft';
 import { MATRIX_ARROW_STEPS } from '../../../constants/interaction';
 import { CELL, toDraft, cellValue, parseCellDraft, focusCell } from '../helpers/matrixCell';
@@ -45,22 +46,27 @@ const StaticCell = ({ value, theme }) => {
     );
 };
 
-const ResetCell = ({ value, onCommit, theme }) => (
-    <td className={`${CELL} font-mono`} style={{ backgroundColor: `${theme.text.label}14` }}>
-        <label className="flex items-center justify-center">
-            <input
-                type="checkbox"
-                checked={value === 1}
-                onChange={(event) => onCommit(event.target.checked ? 1 : 0)}
-                className="m-0 block size-3.5 cursor-pointer"
-                style={{ accentColor: theme.place.stroke }}
-                aria-label="Reset arc"
-            />
-        </label>
-    </td>
-);
+const ResetCell = ({ value, onCommit, theme }) => {
+    const { t } = useTranslation('matrices');
+
+    return (
+        <td className={`${CELL} font-mono`} style={{ backgroundColor: `${theme.text.label}14` }}>
+            <label className="flex items-center justify-center">
+                <input
+                    type="checkbox"
+                    checked={value === 1}
+                    onChange={(event) => onCommit(event.target.checked ? 1 : 0)}
+                    className="m-0 block size-3.5 cursor-pointer"
+                    style={{ accentColor: theme.place.stroke }}
+                    aria-label={t('cell.resetLabel')}
+                />
+            </label>
+        </td>
+    );
+};
 
 const EditableCell = ({ value, rowIndex, columnIndex, onCommit, theme }) => {
+    const { t } = useTranslation('matrices');
     const inputRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -110,7 +116,7 @@ const EditableCell = ({ value, rowIndex, columnIndex, onCommit, theme }) => {
                 onBlur={handleBlur}
                 className="w-6 bg-transparent p-0 text-center outline-none"
                 style={{ color: isEmpty ? theme.disabled.text : theme.text.code }}
-                aria-label="Matrix value"
+                aria-label={t('cell.valueLabel')}
             />
         </td>
     );

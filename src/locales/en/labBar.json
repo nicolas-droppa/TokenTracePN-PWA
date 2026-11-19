@@ -1,0 +1,9 @@
+{
+    "status": {
+        "locked": "Locked",
+        "todo": "To do",
+        "inProgress": "In progress",
+        "solved": "Solved"
+    },
+    "requires": "Requires: {{labs}}"
+}

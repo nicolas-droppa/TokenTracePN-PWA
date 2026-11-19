@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../store/useSettingsStore.js';
 import { TOOL_GROUPS } from '../../constants/toolbar.js';
 import { TOOL_SHORTCUTS, TOOLBAR_SHORTCUTS } from '../../constants/shortcuts.js';
@@ -25,6 +26,7 @@ const CollapseIcon = ({ isCollapsed }) => (
 );
 
 export const CanvasToolbar = () => {
+    const { t } = useTranslation('canvas');
     const theme = useTheme();
     const { selectedTool, currentId, isRunning, isCollapsed, selectTool, stepTool, toggleCollapsed } =
         useToolbarControls();
@@ -77,7 +79,7 @@ export const CanvasToolbar = () => {
                         onClick={() => stepTool(-1)}
                         disabled={isRunning}
                         tabIndex={isCollapsed ? 0 : -1}
-                        title={withShortcut('Previous tool', TOOLBAR_SHORTCUTS.previousTool)}
+                        title={withShortcut(t('toolbar.previousTool'), TOOLBAR_SHORTCUTS.previousTool)}
                         aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.previousTool)}
                     >
                         ↑
@@ -87,7 +89,7 @@ export const CanvasToolbar = () => {
                         onClick={() => stepTool(1)}
                         disabled={isRunning}
                         tabIndex={isCollapsed ? 0 : -1}
-                        title={withShortcut('Next tool', TOOLBAR_SHORTCUTS.nextTool)}
+                        title={withShortcut(t('toolbar.nextTool'), TOOLBAR_SHORTCUTS.nextTool)}
                         aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.nextTool)}
                     >
                         ↓
@@ -98,7 +100,7 @@ export const CanvasToolbar = () => {
             <ToolbarButton
                 className="mt-0.5 w-full shrink-0"
                 onClick={toggleCollapsed}
-                title={withShortcut(isCollapsed ? 'Expand toolbar' : 'Collapse toolbar', TOOLBAR_SHORTCUTS.toggleCollapse)}
+                title={withShortcut(isCollapsed ? t('toolbar.expand') : t('toolbar.collapse'), TOOLBAR_SHORTCUTS.toggleCollapse)}
                 aria-keyshortcuts={shortcutLabel(TOOLBAR_SHORTCUTS.toggleCollapse)}
                 aria-expanded={!isCollapsed}
             >

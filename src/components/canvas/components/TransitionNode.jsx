@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { useNodeConnecting } from '../../../hooks/canvas/useNodeConnecting';
 import { displayName } from '../../../core/models';
@@ -23,6 +24,7 @@ export const TransitionNode = ({
   onFire,
   onMouseDown,
 }) => {
+  const { t } = useTranslation('canvas');
   const activeThemeKey = useSettingsStore((state) => state.activeTheme);
   const theme = THEMES[activeThemeKey] || THEMES.dark;
 
@@ -65,7 +67,7 @@ export const TransitionNode = ({
       className={cursorClass ?? containerProps.className}
     >
       {isInvalidSource && (
-        <title>Read, inhibitor and reset arcs must start at a place.</title>
+        <title>{t('arcRules.invalidSource')}</title>
       )}
       
       {/* Connecting Indicator */}

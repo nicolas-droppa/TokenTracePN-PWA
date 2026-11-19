@@ -1,0 +1,47 @@
+{
+    "empty": "Add places and transitions to see the matrices.",
+    "allHidden": "All matrices hidden",
+    "views": {
+        "input": "Input (I)",
+        "output": "Output (O)",
+        "read": "Read (R)",
+        "inhibitor": "Inhibitor (H)",
+        "reset": "Reset (Rst)"
+    },
+    "toolbar": {
+        "addPlace": "+ Place",
+        "addTransition": "+ Transition"
+    },
+    "lock": {
+        "edit": "Edit",
+        "editing": "Editing",
+        "tooltipLocked": "Unlock to edit matrices",
+        "tooltipUnlocked": "Lock matrix editing",
+        "tooltipRunning": "Stop the simulation to edit matrices"
+    },
+    "copy": {
+        "chooseFormat": "Choose matrix copy format",
+        "tooltip": "Copy as {{format}}",
+        "copiedTitle": "Matrix copied",
+        "copiedMessage": "Copied as {{format}}.",
+        "failedTitle": "Copy failed",
+        "failedMessage": "Failed to copy matrix."
+    },
+    "cell": {
+        "valueLabel": "Matrix value",
+        "resetLabel": "Reset arc"
+    },
+    "toasts": {
+        "placeDeleted": "Place {{id}} deleted",
+        "transitionDeleted": "Transition {{id}} deleted",
+        "removedArcs_one": "Removed with {{count}} arc.",
+        "removedArcs_other": "Removed with {{count}} arcs.",
+        "noArcs": "It had no arcs.",
+        "arcTypeChangedTitle": "Arc type changed",
+        "arcTypeChangedMessage": "{{id}}: {{from}} → {{to}}"
+    },
+    "table": {
+        "deletePlace": "Delete place {{id}}",
+        "deleteTransition": "Delete transition {{id}}"
+    }
+}

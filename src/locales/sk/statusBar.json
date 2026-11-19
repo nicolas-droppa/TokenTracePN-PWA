@@ -1,0 +1,40 @@
+{
+    "counts": {
+        "placesShort": "P",
+        "transitionsShort": "T",
+        "arcsShort": "A",
+        "places_one": "{{count}} miesto",
+        "places_few": "{{count}} miesta",
+        "places_many": "{{count}} miest",
+        "places_other": "{{count}} miest",
+        "transitions_one": "{{count}} prechod",
+        "transitions_few": "{{count}} prechody",
+        "transitions_many": "{{count}} prechodov",
+        "transitions_other": "{{count}} prechodov",
+        "arcs_one": "{{count}} hrana",
+        "arcs_few": "{{count}} hrany",
+        "arcs_many": "{{count}} hrán",
+        "arcs_other": "{{count}} hrán"
+    },
+    "mode": {
+        "running": "Simulácia",
+        "editing": "Úpravy",
+        "runningTooltip": "Režim simulácie",
+        "editingTooltip": "Režim úprav"
+    },
+    "diagnostics": {
+        "tooltip": "Otvoriť panel problémov",
+        "errors_one": "{{count}} chyba",
+        "errors_few": "{{count}} chyby",
+        "errors_many": "{{count}} chýb",
+        "errors_other": "{{count}} chýb",
+        "warnings_one": "{{count}} varovanie",
+        "warnings_few": "{{count}} varovania",
+        "warnings_many": "{{count}} varovaní",
+        "warnings_other": "{{count}} varovaní",
+        "info_one": "{{count}} informácia",
+        "info_few": "{{count}} informácie",
+        "info_many": "{{count}} informácií",
+        "info_other": "{{count}} informácií"
+    }
+}

@@ -10,7 +10,8 @@ import {
 import { EditorState, Compartment } from '@codemirror/state';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching } from '@codemirror/language';
-import { lintGutter } from '@codemirror/lint';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { forceLinting, lintGutter } from '@codemirror/lint';
 
 import { languageExtensions } from './helpers/languageExtensions';
 import { editorTheme } from './helpers/editorTheme';
@@ -18,6 +19,7 @@ import { editorTheme } from './helpers/editorTheme';
 export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
     const hostRef = useRef(null);
     const viewRef = useRef(null);
+    const uiLanguage = useSettingsStore((s) => s.language);
 
     const setCodeRef = useRef(setCode);
     setCodeRef.current = setCode;
@@ -79,6 +81,11 @@ export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
             effects: compartmentsRef.current.lang.reconfigure(languageExtensions(language)),
         });
     }, [language]);
+
+    // Re-lint so the messages switch to the new UI language
+    useEffect(() => {
+        if (viewRef.current) forceLinting(viewRef.current);
+    }, [uiLanguage]);
 
     // Listen for theme change
     useEffect(() => {

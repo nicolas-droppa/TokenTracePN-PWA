@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { useTheme } from '../../../store/useSettingsStore';
 
@@ -6,6 +7,7 @@ import { useTheme } from '../../../store/useSettingsStore';
  * Shown over the canvas while the code has errors, canvas keeps the last valid net.
  */
 export const CodeErrorBanner = () => {
+    const { t } = useTranslation('canvas');
     const theme = useTheme();
     const visible = usePetriStore((s) => s.codeHasErrors && s.mode !== 'run');
 
@@ -21,7 +23,7 @@ export const CodeErrorBanner = () => {
                 color: theme.diagnostics.errorText,
             }}
         >
-            Fix the errors in the code to edit the canvas
+            {t('codeErrors')}
         </div>
     );
 };

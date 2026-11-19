@@ -1,5 +1,7 @@
 import React from 'react';
-import { useCodeChecker } from '../../hooks/useCodeChecker';
+import { useTranslation } from 'react-i18next';
+import { usePetriStore } from '../../store/usePetriStore';
+import { formatDiagnostic } from '../../utils/formatDiagnostic';
 
 const IssueFilterButton = ({ label, title, count, theme, active, onClick, filterKey }) => {
     const style = (theme && theme.diagnostics && theme.diagnostics.filter && theme.diagnostics.filter[filterKey])
@@ -45,30 +47,30 @@ const IssueFilterButton = ({ label, title, count, theme, active, onClick, filter
     );
 };
 
-const getSeverityMeta = (severity, theme) => {
+const getSeverityMeta = (severity, theme, t) => {
     const palette = theme?.diagnostics ?? {};
     const bySeverity = {
-        error: { color: palette.error, label: 'Error' },
-        warning: { color: palette.warning, label: 'Warning' },
-        info: { color: palette.active, label: 'Info' },
+        error: { color: palette.error, label: t('severity.error') },
+        warning: { color: palette.warning, label: t('severity.warning') },
+        info: { color: palette.active, label: t('severity.info') },
     };
 
-    return bySeverity[severity] ?? { color: theme?.text?.label, label: 'Issue' };
+    return bySeverity[severity] ?? { color: theme?.text?.label, label: t('severity.issue') };
 };
 
-export const CodeCheckerPanel = ({ errors = [], theme = {}, code = '', language = 'dpn' }) => {
+export const CodeCheckerPanel = ({ theme = {} }) => {
+    const { t } = useTranslation('problems');
     const [activeFilter, setActiveFilter] = React.useState('all');
-    const displayErrors = useCodeChecker({ code, language, delayMs: 450 });
-    const finalErrors = displayErrors.length > 0 ? displayErrors : errors || [];
+    const diagnostics = usePetriStore((s) => s.diagnostics);
     const counts = {
-        all: finalErrors.length,
-        error: finalErrors.filter((e) => (e && e.severity) === 'error').length,
-        warning: finalErrors.filter((e) => (e && e.severity) === 'warning').length,
-        info: finalErrors.filter((e) => (e && e.severity) === 'info').length,
+        all: diagnostics.length,
+        error: diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length,
+        warning: diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length,
+        info: diagnostics.filter((diagnostic) => diagnostic.severity === 'info').length,
     };
     const visibleErrors = activeFilter === 'all'
-        ? finalErrors
-        : finalErrors.filter((e) => (e && e.severity) === activeFilter);
+        ? diagnostics
+        : diagnostics.filter((diagnostic) => diagnostic.severity === activeFilter);
 
     return (
         <div
@@ -79,21 +81,21 @@ export const CodeCheckerPanel = ({ errors = [], theme = {}, code = '', language 
             }}
         >
             <div className="sticky top-0 z-10 flex items-center justify-start gap-2 border-b px-2 py-2" style={{ borderColor: (theme && theme.sidebar && theme.sidebar.border), backgroundColor: (theme && theme.sidebar && theme.sidebar.bg) }}>
-                <IssueFilterButton label="Issue(s)" title="All issues" count={counts.all} theme={theme} active={activeFilter === 'all'} onClick={() => setActiveFilter('all')} filterKey="all" />
-                <IssueFilterButton label="Errors" title="Errors" count={counts.error} theme={theme} active={activeFilter === 'error'} onClick={() => setActiveFilter('error')} filterKey="error" />
-                <IssueFilterButton label="Warnings" title="Warnings" count={counts.warning} theme={theme} active={activeFilter === 'warning'} onClick={() => setActiveFilter('warning')} filterKey="warning" />
-                <IssueFilterButton label="Info" title="Info" count={counts.info} theme={theme} active={activeFilter === 'info'} onClick={() => setActiveFilter('info')} filterKey="info" />
+                <IssueFilterButton label={t('filters.all')} title={t('filters.allTitle')} count={counts.all} theme={theme} active={activeFilter === 'all'} onClick={() => setActiveFilter('all')} filterKey="all" />
+                <IssueFilterButton label={t('filters.errors')} title={t('filters.errors')} count={counts.error} theme={theme} active={activeFilter === 'error'} onClick={() => setActiveFilter('error')} filterKey="error" />
+                <IssueFilterButton label={t('filters.warnings')} title={t('filters.warnings')} count={counts.warning} theme={theme} active={activeFilter === 'warning'} onClick={() => setActiveFilter('warning')} filterKey="warning" />
+                <IssueFilterButton label={t('filters.info')} title={t('filters.info')} count={counts.info} theme={theme} active={activeFilter === 'info'} onClick={() => setActiveFilter('info')} filterKey="info" />
             </div>
 
             <div className="min-h-0 flex-1 overflow-auto px-2 py-2" style={{ color: (theme && theme.disabled && theme.disabled.text), backgroundColor: (theme && theme.bg) }}>
                 {visibleErrors.length === 0 ? (
-                    <div className="text-[11px]">No issues</div>
+                    <div className="text-[11px]">{t('empty')}</div>
                 ) : (
                     visibleErrors.map((err, idx) => {
-                        const msg = (err && (err.message || err.msg)) || String(err);
-                        const line = err && err.line ? ` (line ${err.line})` : '';
+                        const msg = formatDiagnostic(err, t);
+                        const line = err && err.line ? ` (${t('line', { line: err.line })})` : '';
                         const severity = (err && err.severity) || 'info';
-                        const severityMeta = getSeverityMeta(severity, theme);
+                        const severityMeta = getSeverityMeta(severity, theme, t);
                         const dotColor = severityMeta.color;
 
                         return (

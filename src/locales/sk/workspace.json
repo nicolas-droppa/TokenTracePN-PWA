@@ -1,0 +1,8 @@
+{
+    "panels": {
+        "canvas": "Plátno",
+        "code": "Kód",
+        "problems": "Problémy",
+        "matrices": "Matice"
+    }
+}

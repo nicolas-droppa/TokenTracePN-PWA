@@ -1,33 +1,33 @@
 import { PANELS } from './workspace.js';
 
 /**
- * Menu definitions for the header bar.
+ * Menu definitions for the header bar. labelKey = i18n key with namespace.
  */
 export const MENUS = [
     {
         id: 'file',
-        label: 'File',
+        labelKey: 'header:menus.file',
         items: [
-            { id: 'newProject', label: 'New project' },
-            { id: 'openFile', label: 'Open file' },
-            { id: 'save', label: 'Save' },
+            { id: 'newProject', labelKey: 'header:items.newProject' },
+            { id: 'openFile', labelKey: 'header:items.openFile' },
+            { id: 'save', labelKey: 'header:items.save' },
         ],
     },
     {
         id: 'edit',
-        label: 'Edit',
+        labelKey: 'header:menus.edit',
         items: [
-            { id: 'undo', label: 'Undo' },
-            { id: 'redo', label: 'Redo' },
-            { id: 'deleteSelected', label: 'Delete selected' },
+            { id: 'undo', labelKey: 'header:items.undo' },
+            { id: 'redo', labelKey: 'header:items.redo' },
+            { id: 'deleteSelected', labelKey: 'header:items.deleteSelected' },
         ],
     },
     {
         id: 'view',
-        label: 'View',
+        labelKey: 'header:menus.view',
         items: [
-            ...PANELS.map((panel) => ({ id: `show:${panel.id}`, label: panel.title })),
-            { id: 'resetLayout', label: 'Reset layout' },
+            ...PANELS.map((panel) => ({ id: `show:${panel.id}`, labelKey: `workspace:panels.${panel.id}` })),
+            { id: 'resetLayout', labelKey: 'header:items.resetLayout' },
         ],
     },
 ];

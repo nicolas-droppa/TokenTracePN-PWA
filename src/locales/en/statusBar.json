@@ -1,0 +1,28 @@
+{
+    "counts": {
+        "placesShort": "P",
+        "transitionsShort": "T",
+        "arcsShort": "A",
+        "places_one": "{{count}} place",
+        "places_other": "{{count}} places",
+        "transitions_one": "{{count}} transition",
+        "transitions_other": "{{count}} transitions",
+        "arcs_one": "{{count}} arc",
+        "arcs_other": "{{count}} arcs"
+    },
+    "mode": {
+        "running": "Running",
+        "editing": "Editing",
+        "runningTooltip": "Simulation mode",
+        "editingTooltip": "Edit mode"
+    },
+    "diagnostics": {
+        "tooltip": "Open Problems panel",
+        "errors_one": "{{count}} error",
+        "errors_other": "{{count}} errors",
+        "warnings_one": "{{count}} warning",
+        "warnings_other": "{{count}} warnings",
+        "info_one": "{{count}} info",
+        "info_other": "{{count}} info"
+    }
+}

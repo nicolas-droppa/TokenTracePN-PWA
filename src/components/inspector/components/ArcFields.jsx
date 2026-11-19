@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ARC_TYPE } from '../../../constants/net';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { InputField } from './InputField';
 
 export const ArcFields = ({ element, isRunning, theme }) => {
+    const { t } = useTranslation('inspector');
     const setAttribute = usePetriStore((s) => s.setAttribute);
     const places = usePetriStore((s) => s.places);
     const transitions = usePetriStore((s) => s.transitions);
@@ -19,7 +21,7 @@ export const ArcFields = ({ element, isRunning, theme }) => {
         <div className="space-y-2.5">
             {!isResetArc && (
                 <InputField
-                    label="Weight"
+                    label={t('fields.weight')}
                     type="number"
                     min={1}
                     value={element.weight ?? 1}
@@ -32,16 +34,16 @@ export const ArcFields = ({ element, isRunning, theme }) => {
             )}
 
             <InputField
-                label="Type"
+                label={t('fields.type')}
                 select
                 value={selectedArcType}
                 disabled={isRunning}
                 onChange={(nextValue) => setAttribute(element.id, 'type', nextValue)}
                 options={[
-                    { value: ARC_TYPE.REGULAR, label: 'Regular' },
-                    { value: ARC_TYPE.READ, label: 'Read', disabled: !isPlaceToTransition },
-                    { value: ARC_TYPE.INHIBITOR, label: 'Inhibitor', disabled: !isPlaceToTransition },
-                    { value: ARC_TYPE.RESET, label: 'Reset', disabled: !isPlaceToTransition },
+                    { value: ARC_TYPE.REGULAR, label: t('common:arcTypes.regular') },
+                    { value: ARC_TYPE.READ, label: t('common:arcTypes.read'), disabled: !isPlaceToTransition },
+                    { value: ARC_TYPE.INHIBITOR, label: t('common:arcTypes.inhibitor'), disabled: !isPlaceToTransition },
+                    { value: ARC_TYPE.RESET, label: t('common:arcTypes.reset'), disabled: !isPlaceToTransition },
                 ]}
                 theme={theme}
             />

@@ -3,7 +3,7 @@ import { DockviewReact, themeDark, themeLight } from 'dockview-react';
 import { useSettingsStore, useTheme } from '../../store/useSettingsStore';
 import { useWorkspaceStore } from '../../store/useWorkspaceStore';
 import { LAYOUT_VERSION } from '../../constants/workspace';
-import { applyDefaultLayout } from '../../utils/dockLayout';
+import { applyDefaultLayout, translatePanelTitles } from '../../utils/dockLayout';
 import { PANEL_COMPONENTS } from './panelComponents';
 import './dockviewTheme.css';
 
@@ -41,6 +41,8 @@ const restoreLayout = (api) => {
 export const DockWorkspace = () => {
     const theme = useTheme();
     const activeTheme = useSettingsStore((s) => s.activeTheme);
+    const language = useSettingsStore((s) => s.language);
+    const dockApi = useWorkspaceStore((s) => s.dockApi);
     const setDockApi = useWorkspaceStore((s) => s.setDockApi);
     const cleanupRef = useRef(null);
 
@@ -48,6 +50,7 @@ export const DockWorkspace = () => {
         cleanupRef.current?.();
 
         if (!restoreLayout(api)) applyDefaultLayout(api);
+        translatePanelTitles(api);
         setDockApi(api);
 
         // Save the layout after the user stops interacting
@@ -64,6 +67,11 @@ export const DockWorkspace = () => {
             subscription.dispose();
         };
     };
+
+    // Tab titles follow the selected language
+    useEffect(() => {
+        if (dockApi) translatePanelTitles(dockApi);
+    }, [dockApi, language]);
 
     useEffect(
         () => () => {

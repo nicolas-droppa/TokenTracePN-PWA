@@ -35,10 +35,10 @@ export function kindOf(statement, symbols) {
  * Value types usable in ATTRIBUTE_SCHEMA.
  */
 export const VALUE_TYPES = {
-    number:         { test: (v) => typeof v === 'number',         label: 'a number' },
-    string:         { test: (v) => typeof v === 'string',         label: 'a string' },
-    nonNegativeInt: { test: (v) => Number.isInteger(v) && v >= 0, label: 'a whole number ≥ 0' },
-    positiveInt:    { test: (v) => Number.isInteger(v) && v >= 1, label: 'a whole number ≥ 1' },
+    number:         { test: (v) => typeof v === 'number' },
+    string:         { test: (v) => typeof v === 'string' },
+    nonNegativeInt: { test: (v) => Number.isInteger(v) && v >= 0 },
+    positiveInt:    { test: (v) => Number.isInteger(v) && v >= 1 },
 };
 
 export function matchesSchema(value, expected) {
@@ -46,7 +46,3 @@ export function matchesSchema(value, expected) {
     return VALUE_TYPES[expected]?.test(value) ?? false;
 }
 
-export function describeExpected(expected) {
-    if (Array.isArray(expected)) return `one of: ${expected.join(', ')}`;
-    return VALUE_TYPES[expected]?.label ?? expected;
-}

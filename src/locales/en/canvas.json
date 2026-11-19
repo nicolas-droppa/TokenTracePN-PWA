@@ -1,0 +1,26 @@
+{
+    "toolbar": {
+        "previousTool": "Previous tool",
+        "nextTool": "Next tool",
+        "expand": "Expand toolbar",
+        "collapse": "Collapse toolbar",
+        "stopToEdit": "Stop the simulation to edit",
+        "tools": {
+            "select": "Select",
+            "pan": "Pan",
+            "place": "Place",
+            "transition": "Transition",
+            "regular": "Regular arc",
+            "inhibitor": "Inhibitor arc",
+            "read": "Read arc",
+            "reset": "Reset arc"
+        }
+    },
+    "popup": {
+        "close": "Close inspector"
+    },
+    "arcRules": {
+        "invalidSource": "Read, inhibitor and reset arcs must start at a place."
+    },
+    "codeErrors": "Fix the errors in the code to edit the canvas"
+}

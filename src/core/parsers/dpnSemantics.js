@@ -1,6 +1,7 @@
 import { ATTRIBUTE_SCHEMA, PLACE_TO_TRANSITION_ONLY } from '../../constants/dpn.js';
 import { ARC_TYPE } from '../../constants/net.js';
-import { canonicalKey, kindOf, matchesSchema, describeExpected } from './dpnSchema.js';
+import { DIAGNOSTIC } from '../../constants/diagnostics.js';
+import { canonicalKey, kindOf, matchesSchema } from './dpnSchema.js';
 
 /**
  * Runs all semantic rules over the AST.
@@ -52,15 +53,18 @@ function buildContext(model) {
 
 /**
  * Creates a diagnostic in the shape shared by parser and semantics.
+ * The text is not created here, UI translates the code (diagnostics:<code>).
  * @param {'error'|'warning'|'info'} severity
- * @param {string} message
+ * @param {string} code - DIAGNOSTIC code.
+ * @param {Object} params - Data for the message: names, lines, types (no text).
  * @param {{line: number, col: number}} pos - Any AST node or position object.
  * @returns {Object} Diagnostic.
  */
-function diagnostic(severity, message, pos) {
+function diagnostic(severity, code, params, pos) {
     return {
         severity,
-        message,
+        code,
+        params,
         line: pos.line,
         col: pos.col,
     };
@@ -180,7 +184,7 @@ function levenshtein(a, b) {
  */
 function checkUniqueNames({ declarations }) {
     return findDuplicates(declarations, (decl) => decl.name).map(({ item, first }) =>
-        diagnostic('error', `'${item.name}' is already declared on line ${first.line}`, item.namePos)
+        diagnostic('error', DIAGNOSTIC.DUPLICATE_DECLARATION, { name: item.name, line: first.line }, item.namePos)
     );
 }
 
@@ -198,7 +202,7 @@ function checkUndeclaredNames({ arcs, configurations, symbols }) {
 
     return references
         .filter(({ name }) => !symbols.has(name))
-        .map(({ name, pos }) => diagnostic('error', `'${name}' is not declared`, pos));
+        .map(({ name, pos }) => diagnostic('error', DIAGNOSTIC.UNDECLARED_NAME, { name }, pos));
 }
 
 /**
@@ -209,7 +213,7 @@ function checkArcEndpoints({ arcs, symbols }) {
         .map((arc) => ({ arc, from: symbols.get(arc.from), to: symbols.get(arc.to) }))
         .filter(({ from, to }) => from && to && from.keyword === to.keyword)
         .map(({ arc, from, to }) =>
-            diagnostic('error', `Arc cannot connect ${from.keyword} '${arc.from}' to ${to.keyword} '${arc.to}'`, arc)
+            diagnostic('error', DIAGNOSTIC.INVALID_ARC_ENDPOINTS, { kind: from.keyword, from: arc.from, to: arc.to }, arc)
         );
 }
 
@@ -225,7 +229,7 @@ function checkSpecialArcDirection({ arcs, symbols }) {
         const from = symbols.get(arc.from);
         if (!from || from.keyword === 'place') return [];
 
-        return [diagnostic('error', `Arc of type '${typeAttr.value}' must go from a place to a transition`, typeAttr)];
+        return [diagnostic('error', DIAGNOSTIC.SPECIAL_ARC_DIRECTION, { type: typeAttr.value }, typeAttr)];
     });
 }
 
@@ -238,14 +242,11 @@ function checkUniqueArcs({ arcs }) {
         const firstType = arcTypeOf(first);
 
         if (itemType === firstType) {
-            const summary = itemType === ARC_TYPE.RESET
-                ? 'this duplicate reset arc has no effect'
-                : 'their weights will be combined';
-
-            return diagnostic('info', `Arc '${key}' is already declared on line ${first.line}, ${summary}`, item);
+            const code = itemType === ARC_TYPE.RESET ? DIAGNOSTIC.DUPLICATE_RESET_ARC : DIAGNOSTIC.DUPLICATE_ARC;
+            return diagnostic('info', code, { arc: key, line: first.line }, item);
         }
 
-        return diagnostic('error', `Arc '${key}' is already a ${firstType} arc on line ${first.line}, it cannot also be a ${itemType} arc`, item);
+        return diagnostic('error', DIAGNOSTIC.ARC_TYPE_CONFLICT, { arc: key, line: first.line, firstType, type: itemType }, item);
     });
 }
 
@@ -258,7 +259,7 @@ function checkArcWeights({ arcs }) {
         const weightAttr = arc.attributes.find((attr) => canonicalKey(attr.key) === 'weight');
 
         if (type === ARC_TYPE.RESET && weightAttr) {
-            return [diagnostic('error', `Reset arc '${labelOf(arc)}' cannot have a weight`, weightAttr)];
+            return [diagnostic('error', DIAGNOSTIC.RESET_ARC_WEIGHT, { arc: labelOf(arc) }, weightAttr)];
         }
 
         return [];
@@ -276,7 +277,8 @@ function checkUniqueAttributes({ statements }) {
     return findDuplicates(entries, (entry) => `${entry.group}.${canonicalKey(entry.attr.key)}`).map(({ item, first }) =>
         diagnostic(
             'warning',
-            `'${item.attr.key}' on '${item.owner}' is already set as '${first.attr.key}' on line ${first.attr.line}, ignoring this one`,
+            DIAGNOSTIC.DUPLICATE_ATTRIBUTE,
+            { key: item.attr.key, owner: item.owner, firstKey: first.attr.key, line: first.attr.line },
             item.attr
         )
     );
@@ -293,9 +295,7 @@ function checkUnknownAttributes(ctx) {
         .filter(({ expected }) => expected === undefined)
         .map(({ attr, kind, key, schema }) => {
             const suggestion = suggestKey(key, schema);
-            const hint = suggestion ? `, did you mean '${suggestion}'?` : '';
-
-            return diagnostic('error', `Unknown attribute '${attr.key}' on ${kind}${hint}`, attr);
+            return diagnostic('error', DIAGNOSTIC.UNKNOWN_ATTRIBUTE, { key: attr.key, kind, suggestion }, attr);
         });
 }
 
@@ -306,7 +306,9 @@ function checkAttributeValues(ctx) {
     return schemaEntries(ctx)
         .filter(({ attr, expected }) => expected !== undefined && !matchesSchema(attr.value, expected))
         .map(({ attr, expected }) =>
-            diagnostic('error', `'${attr.key}' must be ${describeExpected(expected)}`, attr)
+            Array.isArray(expected)
+                ? diagnostic('error', DIAGNOSTIC.INVALID_ATTRIBUTE_OPTION, { key: attr.key, options: expected }, attr)
+                : diagnostic('error', DIAGNOSTIC.INVALID_ATTRIBUTE_TYPE, { key: attr.key, expected }, attr)
         );
 }
 
@@ -319,5 +321,5 @@ function checkUnconnectedNodes({ declarations, arcs }) {
 
     return declarations
         .filter((decl) => !connected.has(decl.name))
-        .map((decl) => diagnostic('info', `${decl.keyword} '${decl.name}' is not connected`, decl.namePos));
+        .map((decl) => diagnostic('info', DIAGNOSTIC.NOT_CONNECTED, { kind: decl.keyword, name: decl.name }, decl.namePos));
 }

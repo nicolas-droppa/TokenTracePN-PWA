@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { useElapsedTime } from '../../../hooks/useElapsedTime';
@@ -9,6 +10,7 @@ import { RunButton } from './RunButton';
  * Fired-transition counter, simulation timer and Run/Stop button.
  */
 export const SimulationControls = () => {
+    const { t } = useTranslation('header');
     const theme = useTheme();
     const isRunning = usePetriStore((s) => s.mode === 'run');
     const stepCount = usePetriStore((s) => s.history.length);
@@ -23,7 +25,7 @@ export const SimulationControls = () => {
             <span
                 className={`${statClass} hidden w-9 text-center md:block`}
                 style={{ color: theme.text.label, opacity: stepCount > 0 || isRunning ? 0.7 : 0.25 }}
-                title="Fired transitions"
+                title={t('simulation.firedTransitions')}
                 aria-live="polite"
             >
                 {stepCount}
@@ -32,7 +34,7 @@ export const SimulationControls = () => {
             <span
                 className={`${statClass} hidden min-w-[4.5rem] text-center md:block`}
                 style={{ color: theme.text.label, opacity: isRunning ? 0.85 : 0.45 }}
-                title="Simulation time"
+                title={t('simulation.simulationTime')}
             >
                 {formatElapsedTime(elapsedSeconds)}
             </span>

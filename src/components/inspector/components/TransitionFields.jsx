@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { Field } from './Field';
 import { InputField } from './InputField';
 
 export const TransitionFields = ({ element, isFireable, isRunning, theme }) => {
+    const { t } = useTranslation('inspector');
     const setAttribute = usePetriStore((s) => s.setAttribute);
     const arcs = usePetriStore((s) => s.arcs);
     const places = usePetriStore((s) => s.places);
@@ -19,7 +21,7 @@ export const TransitionFields = ({ element, isFireable, isRunning, theme }) => {
     return (
         <div className="space-y-2.5">
             <InputField
-                label="Label"
+                label={t('fields.label')}
                 value={element.label || ''}
                 placeholder={element.id}
                 disabled={isRunning}
@@ -28,14 +30,14 @@ export const TransitionFields = ({ element, isFireable, isRunning, theme }) => {
             />
 
             <Field
-                label="Input places"
+                label={t('fields.inputPlaces')}
                 value={inputPlaces.length ? inputPlaces.join(', ') : '—'}
                 theme={theme}
                 readOnly
             />
 
             <Field
-                label="Output places"
+                label={t('fields.outputPlaces')}
                 value={outputPlaces.length ? outputPlaces.join(', ') : '—'}
                 theme={theme}
                 readOnly
@@ -43,8 +45,8 @@ export const TransitionFields = ({ element, isFireable, isRunning, theme }) => {
 
             {isRunning && (
                 <Field
-                    label="Enabled"
-                    value={isFireable ? 'yes' : 'no'}
+                    label={t('fields.enabled')}
+                    value={isFireable ? t('common:yes') : t('common:no')}
                     theme={theme}
                     readOnly
                 />

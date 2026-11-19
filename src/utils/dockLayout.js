@@ -1,6 +1,7 @@
-import { PANELS, DEFAULT_LAYOUT } from '../constants/workspace.js';
+import i18n from '../i18n';
+import { DEFAULT_LAYOUT } from '../constants/workspace.js';
 
-const titleOf = (id) => PANELS.find((panel) => panel.id === id)?.title ?? id;
+const titleOf = (id) => i18n.t(`workspace:panels.${id}`);
 
 /**
  * Adds a panel where DEFAULT_LAYOUT says.
@@ -20,6 +21,14 @@ const addPanel = (api, id) => {
         ...(initialWidth && { initialWidth }),
         ...(initialHeight && { initialHeight }),
     });
+};
+
+/**
+ * Re-translates tab titles (restored layouts keep the title from the time they were saved).
+ * @param {import('dockview-react').DockviewApi} api
+ */
+export const translatePanelTitles = (api) => {
+    api.panels.forEach((panel) => panel.api.setTitle(titleOf(panel.id)));
 };
 
 /**

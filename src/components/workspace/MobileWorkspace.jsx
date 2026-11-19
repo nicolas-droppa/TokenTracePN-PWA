@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../store/useSettingsStore';
 import { useWorkspaceStore } from '../../store/useWorkspaceStore';
 import { PANELS } from '../../constants/workspace';
@@ -9,6 +10,7 @@ import { usePetriStore } from '../../store/usePetriStore';
  * Phone workspace - one panel at a time, switched by bottombar.
  */
 export const MobileWorkspace = () => {
+    const { t } = useTranslation('workspace');
     const theme = useTheme();
     const activeId = useWorkspaceStore((s) => s.mobilePanel);
     const showPanel = useWorkspaceStore((s) => s.showPanel);
@@ -37,7 +39,7 @@ export const MobileWorkspace = () => {
                 className="flex shrink-0 border-t"
                 style={{ backgroundColor: theme.sidebar.bg, borderColor: theme.sidebar.border }}
             >
-                {PANELS.map(({ id, title }) => {
+                {PANELS.map(({ id }) => {
                     const isActive = id === activeId;
 
                     return (
@@ -52,7 +54,7 @@ export const MobileWorkspace = () => {
                                 boxShadow: isActive ? `inset 0 2px 0 ${theme.place.stroke}` : 'none',
                             }}
                         >
-                            {title}
+                            {t(`panels.${id}`)}
                         </button>
                     );
                 })}

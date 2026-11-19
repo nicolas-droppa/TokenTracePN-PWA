@@ -1,0 +1,26 @@
+{
+    "toolbar": {
+        "previousTool": "Predchádzajúci nástroj",
+        "nextTool": "Nasledujúci nástroj",
+        "expand": "Rozbaliť panel nástrojov",
+        "collapse": "Zbaliť panel nástrojov",
+        "stopToEdit": "Na úpravy zastavte simuláciu",
+        "tools": {
+            "select": "Výber",
+            "pan": "Posun",
+            "place": "Miesto",
+            "transition": "Prechod",
+            "regular": "Bežná hrana",
+            "inhibitor": "Inhibičná hrana",
+            "read": "Čítacia hrana",
+            "reset": "Resetovacia hrana"
+        }
+    },
+    "popup": {
+        "close": "Zavrieť inšpektor"
+    },
+    "arcRules": {
+        "invalidSource": "Čítacie, inhibičné a resetovacie hrany musia začínať v mieste."
+    },
+    "codeErrors": "Na úpravu plátna opravte chyby v kóde"
+}

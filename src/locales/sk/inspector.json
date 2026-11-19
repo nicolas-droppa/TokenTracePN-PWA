@@ -1,0 +1,15 @@
+{
+    "position": "Pozícia",
+    "fields": {
+        "label": "Názov",
+        "initialTokens": "Počiatočné žetóny",
+        "currentMarking": "Aktuálne značenie",
+        "inputTransitions": "Vstupné prechody",
+        "outputTransitions": "Výstupné prechody",
+        "inputPlaces": "Vstupné miesta",
+        "outputPlaces": "Výstupné miesta",
+        "enabled": "Spustiteľný",
+        "weight": "Váha",
+        "type": "Typ"
+    }
+}
