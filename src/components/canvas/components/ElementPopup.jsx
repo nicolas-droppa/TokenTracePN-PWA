@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { ElementForm } from '../../inspector/ElementForm';
@@ -21,6 +22,7 @@ export const ElementPopup = ({ width, height, pan, zoom }) => {
 };
 
 const PopupCard = ({ element, width, height, pan, zoom }) => {
+    const { t } = useTranslation('canvas');
     const closeInspector = usePetriStore((s) => s.closeInspector);
     const places = usePetriStore((s) => s.places);
     const transitions = usePetriStore((s) => s.transitions);
@@ -41,7 +43,7 @@ const PopupCard = ({ element, width, height, pan, zoom }) => {
         { codes: POPUP_SHORTCUTS.close, handler: closeInspector, enabled: Boolean(element) },
     ]);
 
-    const typeLabel = element.type ? element.type.charAt(0).toUpperCase() + element.type.slice(1) : '';
+    const typeLabel = element.type ? t(`common:net.${element.type}`) : '';
 
     const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
@@ -77,7 +79,7 @@ const PopupCard = ({ element, width, height, pan, zoom }) => {
 
                 <button
                     type="button"
-                    aria-label="Close inspector"
+                    aria-label={t('popup.close')}
                     onClick={closeInspector}
                     className="flex size-6 items-center justify-center rounded-md text-base leading-none transition-colors hover:opacity-80"
                     style={{

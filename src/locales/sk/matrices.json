@@ -1,0 +1,49 @@
+{
+    "empty": "Pridajte miesta a prechody, aby sa zobrazili matice.",
+    "allHidden": "Všetky matice sú skryté",
+    "views": {
+        "input": "Vstupná (I)",
+        "output": "Výstupná (O)",
+        "read": "Čítacia (R)",
+        "inhibitor": "Inhibičná (H)",
+        "reset": "Resetovacia (Rst)"
+    },
+    "toolbar": {
+        "addPlace": "+ Miesto",
+        "addTransition": "+ Prechod"
+    },
+    "lock": {
+        "edit": "Upraviť",
+        "editing": "Úpravy",
+        "tooltipLocked": "Odomknúť úpravu matíc",
+        "tooltipUnlocked": "Zamknúť úpravu matíc",
+        "tooltipRunning": "Na úpravu matíc zastavte simuláciu"
+    },
+    "copy": {
+        "chooseFormat": "Vyberte formát kopírovania",
+        "tooltip": "Kopírovať ako {{format}}",
+        "copiedTitle": "Matica skopírovaná",
+        "copiedMessage": "Skopírované ako {{format}}.",
+        "failedTitle": "Kopírovanie zlyhalo",
+        "failedMessage": "Maticu sa nepodarilo skopírovať."
+    },
+    "cell": {
+        "valueLabel": "Hodnota matice",
+        "resetLabel": "Resetovacia hrana"
+    },
+    "toasts": {
+        "placeDeleted": "Miesto {{id}} odstránené",
+        "transitionDeleted": "Prechod {{id}} odstránený",
+        "removedArcs_one": "Spolu s {{count}} hranou.",
+        "removedArcs_few": "Spolu s {{count}} hranami.",
+        "removedArcs_many": "Spolu s {{count}} hranami.",
+        "removedArcs_other": "Spolu s {{count}} hranami.",
+        "noArcs": "Nemalo žiadne hrany.",
+        "arcTypeChangedTitle": "Typ hrany zmenený",
+        "arcTypeChangedMessage": "{{id}}: {{from}} → {{to}}"
+    },
+    "table": {
+        "deletePlace": "Odstrániť miesto {{id}}",
+        "deleteTransition": "Odstrániť prechod {{id}}"
+    }
+}

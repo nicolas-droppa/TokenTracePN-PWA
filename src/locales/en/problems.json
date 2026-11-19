@@ -1,0 +1,17 @@
+{
+    "filters": {
+        "all": "Issue(s)",
+        "allTitle": "All issues",
+        "errors": "Errors",
+        "warnings": "Warnings",
+        "info": "Info"
+    },
+    "empty": "No issues",
+    "line": "line {{line}}",
+    "severity": {
+        "error": "Error",
+        "warning": "Warning",
+        "info": "Info",
+        "issue": "Issue"
+    }
+}

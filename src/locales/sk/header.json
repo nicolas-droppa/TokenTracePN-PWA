@@ -1,0 +1,26 @@
+{
+    "menus": {
+        "file": "Súbor",
+        "edit": "Úpravy",
+        "view": "Zobrazenie",
+        "settings": "Nastavenia",
+        "theme": "Téma"
+    },
+    "items": {
+        "newProject": "Nový projekt",
+        "openFile": "Otvoriť súbor",
+        "save": "Uložiť",
+        "undo": "Späť",
+        "redo": "Obnoviť",
+        "deleteSelected": "Vymazať výber",
+        "resetLayout": "Obnoviť rozloženie"
+    },
+    "simulation": {
+        "run": "Spustiť",
+        "stop": "Zastaviť",
+        "startTooltip": "Spustiť simuláciu",
+        "stopTooltip": "Zastaviť simuláciu",
+        "firedTransitions": "Odpálené prechody",
+        "simulationTime": "Čas simulácie"
+    }
+}

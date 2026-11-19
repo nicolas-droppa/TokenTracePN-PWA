@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { ARC_TYPE } from '../../../constants/net';
 import { CELL } from '../helpers/matrixCell';
@@ -37,6 +38,7 @@ const DeleteNodeButton = ({ label, onClick, theme }) => (
  * @param {{ ref: Function, onScroll: Function }} [props.scroll] - Optional synced scrolling.
  */
 export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCellCommit, onDeleteNode, scroll }) => {
+    const { t } = useTranslation('matrices');
     const theme = useTheme();
     const headerStyle = { backgroundColor: theme.sidebar.bg, color: theme.text.label };
     const isReset = view.arcType === ARC_TYPE.RESET;
@@ -69,7 +71,7 @@ export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCe
                                     <span className="block text-center">{column.label}</span>
                                     {editable && (
                                         <DeleteNodeButton
-                                            label={`Delete transition ${column.id}`}
+                                            label={t('table.deleteTransition', { id: column.id })}
                                             onClick={() => onDeleteNode?.(column.id, 'transition')}
                                             theme={theme}
                                         />
@@ -94,7 +96,7 @@ export const MatrixTable = ({ title, rows, columns, matrix, view, editable, onCe
                                         <span className="block">{row.label}</span>
                                         {editable && (
                                             <DeleteNodeButton
-                                                label={`Delete place ${row.id}`}
+                                                label={t('table.deletePlace', { id: row.id })}
                                                 onClick={() => onDeleteNode?.(row.id, 'place')}
                                                 theme={theme}
                                             />

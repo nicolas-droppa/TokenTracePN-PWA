@@ -1,0 +1,26 @@
+{
+    "menus": {
+        "file": "File",
+        "edit": "Edit",
+        "view": "View",
+        "settings": "Settings",
+        "theme": "Theme"
+    },
+    "items": {
+        "newProject": "New project",
+        "openFile": "Open file",
+        "save": "Save",
+        "undo": "Undo",
+        "redo": "Redo",
+        "deleteSelected": "Delete selected",
+        "resetLayout": "Reset layout"
+    },
+    "simulation": {
+        "run": "Run",
+        "stop": "Stop",
+        "startTooltip": "Start simulation",
+        "stopTooltip": "Stop simulation",
+        "firedTransitions": "Fired transitions",
+        "simulationTime": "Simulation time"
+    }
+}

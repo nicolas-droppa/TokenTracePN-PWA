@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../store/useSettingsStore';
 import { usePetriStore } from '../../store/usePetriStore';
 import { isEnabled } from '../../core/petriEngine';
@@ -9,6 +10,7 @@ import { ArcFields } from './components/ArcFields';
 import { Divider } from '../ui/Divider';
 
 export const ElementForm = ({ element }) => {
+    const { t } = useTranslation('inspector');
     const mode = usePetriStore((s) => s.mode);
     const marking = usePetriStore((s) => s.marking);
     const setAttribute = usePetriStore((s) => s.setAttribute);
@@ -33,7 +35,7 @@ export const ElementForm = ({ element }) => {
                         className="text-[9px] font-medium uppercase tracking-[0.12em]"
                         style={{ color: theme.text.label }}
                     >
-                        Position
+                        {t('position')}
                     </div>
                     <div className="flex w-full items-center gap-2.5">
                         <InputField

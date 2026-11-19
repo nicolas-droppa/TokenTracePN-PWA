@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePetriStore } from '../../../store/usePetriStore';
 import { Field } from './Field';
 import { InputField } from './InputField';
 
 export const PlaceFields = ({ element, isRunning, theme }) => {
+    const { t } = useTranslation('inspector');
     const setAttribute = usePetriStore((s) => s.setAttribute);
     const marking = usePetriStore((s) => s.marking);
     const arcs = usePetriStore((s) => s.arcs);
@@ -20,7 +22,7 @@ export const PlaceFields = ({ element, isRunning, theme }) => {
     return (
         <div className="space-y-2.5">
             <InputField
-                label="Label"
+                label={t('fields.label')}
                 value={element.label || ''}
                 placeholder={element.id}
                 disabled={isRunning}
@@ -29,7 +31,7 @@ export const PlaceFields = ({ element, isRunning, theme }) => {
             />
 
             <InputField
-                label="Initial tokens"
+                label={t('fields.initialTokens')}
                 type="number"
                 min={0}
                 value={element.tokens ?? 0}
@@ -41,14 +43,14 @@ export const PlaceFields = ({ element, isRunning, theme }) => {
             />
 
             <Field
-                label="Input transitions"
+                label={t('fields.inputTransitions')}
                 value={incomingTransitions.length ? incomingTransitions.join(', ') : '—'}
                 theme={theme}
                 readOnly
             />
 
             <Field
-                label="Output transitions"
+                label={t('fields.outputTransitions')}
                 value={outgoingTransitions.length ? outgoingTransitions.join(', ') : '—'}
                 theme={theme}
                 readOnly
@@ -56,7 +58,7 @@ export const PlaceFields = ({ element, isRunning, theme }) => {
 
             {isRunning && (
                 <Field
-                    label="Current marking"
+                    label={t('fields.currentMarking')}
                     value={marking?.[element.id] ?? 0}
                     theme={theme}
                 />

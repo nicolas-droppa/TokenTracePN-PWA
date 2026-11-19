@@ -1,0 +1,8 @@
+{
+    "panels": {
+        "canvas": "Canvas",
+        "code": "Code",
+        "problems": "Problems",
+        "matrices": "Matrices"
+    }
+}

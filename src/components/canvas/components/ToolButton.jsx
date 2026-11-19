@@ -1,9 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore, useTheme } from '../../../store/useSettingsStore.js';
 
 /**
  * Renders one tool button in canvas toolbar.
- * @param {{label: string, icon: string}} tool - Item from TOOL_GROUPS.
+ * @param {{id: string, icon: string}} tool - Item from TOOL_GROUPS.
  * @param {string} [shortcut] - Key shown in the corner ('3').
  * @param {boolean} isActive - Currently selected tool.
  * @param {boolean} disabled - Simulation running.
@@ -11,6 +12,7 @@ import { useSettingsStore, useTheme } from '../../../store/useSettingsStore.js';
  * @param {Function} onSelect - Selects the tool.
  */
 export const ToolButton = ({ tool, shortcut, isActive, disabled, focusable, onSelect }) => {
+    const { t } = useTranslation('canvas');
     const theme = useTheme();
     const activeTheme = useSettingsStore((s) => s.activeTheme);
     const iconFilter = activeTheme === 'light' ? 'none' : 'invert(1)';
@@ -19,9 +21,10 @@ export const ToolButton = ({ tool, shortcut, isActive, disabled, focusable, onSe
     const iconVisibility = isActive || disabled ? 'opacity-100' : 'opacity-70 group-hover:opacity-100';
     const hintVisibility = isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100';
 
-    let title = tool.label;
-    if (disabled) title = 'Stop the simulation to edit';
-    else if (shortcut) title = `${tool.label} (${shortcut})`;
+    const label = t(`toolbar.tools.${tool.id}`);
+    let title = label;
+    if (disabled) title = t('toolbar.stopToEdit');
+    else if (shortcut) title = `${label} (${shortcut})`;
 
     return (
         <button
@@ -30,7 +33,7 @@ export const ToolButton = ({ tool, shortcut, isActive, disabled, focusable, onSe
             disabled={disabled}
             tabIndex={focusable ? 0 : -1}
             title={title}
-            aria-label={tool.label}
+            aria-label={label}
             aria-keyshortcuts={shortcut || undefined}
             aria-pressed={isActive}
             className={`group flex h-9 w-full items-center gap-2 rounded-md px-2 transition-colors duration-150 ${

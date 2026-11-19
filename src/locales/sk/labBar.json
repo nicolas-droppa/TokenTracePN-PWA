@@ -1,0 +1,9 @@
+{
+    "status": {
+        "locked": "Zamknuté",
+        "todo": "Nezačaté",
+        "inProgress": "Rozpracované",
+        "solved": "Vyriešené"
+    },
+    "requires": "Vyžaduje: {{labs}}"
+}

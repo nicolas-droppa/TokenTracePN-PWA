@@ -2,11 +2,12 @@
  * Workspace (dockview) configuration.
  */
 
+/** Panel ids, titles come from locales (workspace:panels.<id>). */
 export const PANELS = [
-    { id: 'canvas', title: 'Canvas' },
-    { id: 'code', title: 'Code' },
-    { id: 'problems', title: 'Problems' },
-    { id: 'matrices', title: 'Matrices' }
+    { id: 'canvas' },
+    { id: 'code' },
+    { id: 'problems' },
+    { id: 'matrices' },
 ];
 
 export const DEFAULT_LAYOUT = [

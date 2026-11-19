@@ -6,11 +6,13 @@ import { useWorkspaceStore } from '../../store/useWorkspaceStore';
 import { selectIsRunning } from '../../store/slices/simulationSlice';
 import { DiagnosticCount } from './components/DiagnosticCount';
 import { StatusItem } from './components/StatusItem';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Bottom status bar.
  */
 export const StatusBar = () => {
+    const { t } = useTranslation('statusBar');
     const theme = useTheme();
     const placesCount = usePetriStore((s) => s.places.length);
     const transitionsCount = usePetriStore((s) => s.transitions.length);
@@ -23,11 +25,11 @@ export const StatusBar = () => {
 
     const diagnosticsLabel = (
         <>
-            <DiagnosticCount count={errorCount} color={theme.diagnostics.error} title={`${errorCount} errors`} theme={theme} />
-            <span className="mx-1.5" style={{ color: theme.text.label }} aria-hidden="true">·</span>
-            <DiagnosticCount count={warningCount} color={theme.diagnostics.warning} title={`${warningCount} warnings`} theme={theme} />
-            <span className="mx-1.5" style={{ color: theme.text.label }} aria-hidden="true">·</span>
-            <DiagnosticCount count={infoCount} color={theme.diagnostics.active} title={`${infoCount} info`} theme={theme} />
+            <DiagnosticCount count={errorCount} color={theme.diagnostics.error} title={t('diagnostics.errors', { count: errorCount })} theme={theme} />
+            <span className="mx-1.5" aria-hidden="true" style={{ color: theme.text.label }}>·</span>
+            <DiagnosticCount count={warningCount} color={theme.diagnostics.warning} title={t('diagnostics.warnings', { count: warningCount })} theme={theme} />
+            <span className="mx-1.5" aria-hidden="true" style={{ color: theme.text.label }}>·</span>
+            <DiagnosticCount count={infoCount} color={theme.diagnostics.active} title={t('diagnostics.info', { count: infoCount })} theme={theme} />
         </>
     );
 
@@ -40,25 +42,34 @@ export const StatusBar = () => {
                 borderColor: theme.sidebar.border,
             }}
         >
-            <div className="flex items-center gap-2">
-                <StatusItem label={`P ${placesCount}`} title={`${placesCount} places`} />
-                <span aria-hidden="true" style={{ color: theme.text.label }}>·</span>
-                <StatusItem label={`T ${transitionsCount}`} title={`${transitionsCount} transitions`} />
-                <span aria-hidden="true" style={{ color: theme.text.label }}>·</span>
-                <StatusItem label={`A ${arcsCount}`} title={`${arcsCount} arcs`} />
+            <div className="flex items-center gap-1">
+                <StatusItem
+                    label={`${t('counts.placesShort')} ${placesCount}`}
+                    title={t('counts.places', { count: placesCount })}
+                />
+                <span className="mx-1" aria-hidden="true" style={{ color: theme.text.label }}>·</span>
+                <StatusItem
+                    label={`${t('counts.transitionsShort')} ${transitionsCount}`}
+                    title={t('counts.transitions', { count: transitionsCount })}
+                />
+                <span className="mx-1" aria-hidden="true" style={{ color: theme.text.label }}>·</span>
+                <StatusItem
+                    label={`${t('counts.arcsShort')} ${arcsCount}`}
+                    title={t('counts.arcs', { count: arcsCount })}
+                />
             </div>
 
             <div className="flex items-center gap-2">
                 <div className="hidden sm:flex">
                     <StatusItem
-                        label={isRunning ? 'Running' : 'Editing'}
-                        title={isRunning ? 'Simulation mode' : 'Edit mode'}
+                        label={isRunning ? t('mode.running') : t('mode.editing')}
+                        title={isRunning ? t('mode.runningTooltip') : t('mode.editingTooltip')}
                     />
                 </div>
 
                 <StatusItem
                     label={diagnosticsLabel}
-                    title="Open Problems panel"
+                    title={t('diagnostics.tooltip')}
                     onClick={() => showPanel('problems')}
                 />
             </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 
 const PlayIcon = () => (
@@ -19,13 +20,14 @@ const StopIcon = () => (
  * @param {Function} onClick - Toggles the simulation.
  */
 export const RunButton = ({ isRunning, onClick }) => {
+    const { t } = useTranslation('header');
     const theme = useTheme();
 
     return (
         <button
             type="button"
             onClick={onClick}
-            title={isRunning ? 'Stop simulation' : 'Start simulation'}
+            title={isRunning ? t('simulation.stopTooltip') : t('simulation.startTooltip')}
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-[11px] font-medium leading-none transition-colors duration-150 ease-out hover:bg-slate-400/10"
             style={{ color: theme.text.label, opacity: 0.92 }}
         >
@@ -35,7 +37,7 @@ export const RunButton = ({ isRunning, onClick }) => {
             >
                 {isRunning ? <StopIcon /> : <PlayIcon />}
             </span>
-            <span className="hidden md:inline">{isRunning ? 'Stop' : 'Run'}</span>
+            <span className="hidden md:inline">{isRunning ? t('simulation.stop') : t('simulation.run')}</span>
         </button>
     );
 };

@@ -1,14 +1,15 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { LAB_STATUS } from '../../../constants/labs';
 import { useLabStore, selectLabStatus, missingRequirements } from '../../../store/useLabStore';
 import { getLab } from '../../../labs/labRegistry';
 
-const STATUS_LABELS = {
-    [LAB_STATUS.LOCKED]: 'Locked',
-    [LAB_STATUS.TODO]: 'To do',
-    [LAB_STATUS.IN_PROGRESS]: 'In progress',
-    [LAB_STATUS.SOLVED]: 'Solved',
+const STATUS_KEYS = {
+    [LAB_STATUS.LOCKED]: 'status.locked',
+    [LAB_STATUS.TODO]: 'status.todo',
+    [LAB_STATUS.IN_PROGRESS]: 'status.inProgress',
+    [LAB_STATUS.SOLVED]: 'status.solved',
 };
 
 const getStatusColor = (status, theme) => {
@@ -26,15 +27,16 @@ const getStatusColor = (status, theme) => {
  * @param {Function} props.onClick - Click handler.
  */
 export const LabBarItem = ({ lab, isActive = false, onClick }) => {
+    const { t } = useTranslation('labBar');
     const theme = useTheme();
     const status = useLabStore(selectLabStatus(lab));
     const solvedLabs = useLabStore((s) => s.solvedLabs);
-    const statusLabel = STATUS_LABELS[status] ?? STATUS_LABELS[LAB_STATUS.LOCKED];
+    const statusLabel = t(STATUS_KEYS[status] ?? STATUS_KEYS[LAB_STATUS.LOCKED]);
 
     let tooltip = `${lab.title} [${statusLabel}]\n${lab.description}`;
     if (status === LAB_STATUS.LOCKED) {
         const missing = missingRequirements(lab, solvedLabs).map((labId) => getLab(labId)?.title ?? labId);
-        tooltip = `${lab.title} [Locked]\nRequires: ${missing.join(', ')}`;
+        tooltip = `${lab.title} [${statusLabel}]\n${t('requires', { labs: missing.join(', ') })}`;
     }
 
     return (

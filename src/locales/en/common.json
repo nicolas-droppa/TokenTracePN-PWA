@@ -1,0 +1,26 @@
+{
+    "actions": {
+        "copy": "Copy",
+        "cancel": "Cancel",
+        "run": "Run",
+        "check": "Check",
+        "reset": "Reset"
+    },
+    "language": "Language",
+    "yes": "Yes",
+    "no": "No",
+    "net": {
+        "place": "Place",
+        "transition": "Transition",
+        "arc": "Arc",
+        "places": "Places",
+        "transitions": "Transitions",
+        "arcs": "Arcs"
+    },
+    "arcTypes": {
+        "regular": "Regular",
+        "read": "Read",
+        "inhibitor": "Inhibitor",
+        "reset": "Reset"
+    }
+}

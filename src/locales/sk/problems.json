@@ -1,0 +1,17 @@
+{
+    "filters": {
+        "all": "Problémy",
+        "allTitle": "Všetky problémy",
+        "errors": "Chyby",
+        "warnings": "Varovania",
+        "info": "Informácie"
+    },
+    "empty": "Žiadne problémy",
+    "line": "riadok {{line}}",
+    "severity": {
+        "error": "Chyba",
+        "warning": "Varovanie",
+        "info": "Informácia",
+        "issue": "Problém"
+    }
+}

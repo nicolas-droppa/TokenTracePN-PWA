@@ -1,0 +1,26 @@
+{
+    "actions": {
+        "copy": "Kopírovať",
+        "cancel": "Zrušiť",
+        "run": "Spustiť",
+        "check": "Skontrolovať",
+        "reset": "Obnoviť"
+    },
+    "language": "Jazyk",
+    "yes": "Áno",
+    "no": "Nie",
+    "net": {
+        "place": "Miesto",
+        "transition": "Prechod",
+        "arc": "Hrana",
+        "places": "Miesta",
+        "transitions": "Prechody",
+        "arcs": "Hrany"
+    },
+    "arcTypes": {
+        "regular": "Bežná",
+        "read": "Čítacia",
+        "inhibitor": "Inhibičná",
+        "reset": "Resetovacia"
+    }
+}

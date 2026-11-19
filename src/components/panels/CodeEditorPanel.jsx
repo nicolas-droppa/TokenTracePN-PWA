@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { THEMES } from '../../theme';
 import { useCodeEditor } from '../../hooks/editor/useCodeEditor';
 
 export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
+    const { t } = useTranslation('codeEditor');
     const activeThemeKey = useSettingsStore((state) => state.activeTheme);
     const theme = THEMES[activeThemeKey] || THEMES.dark;
     const isDark = String(activeThemeKey || 'dark').toLowerCase().includes('dark');
@@ -19,9 +21,9 @@ export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
                 className="flex items-center justify-between px-4 py-2 border-b text-xs font-semibold"
                 style={{ borderColor: theme.sidebar.border, color: theme.text.label }}
             >
-                <span>CODE</span>
+                <span>{t('code')}</span>
                 <div className="text-[10px] uppercase" style={{ color: theme.disabled.text }}>
-                    <label htmlFor="code-language" className="sr-only">Code language</label>
+                    <label htmlFor="code-language" className="sr-only">{t('codeLanguage')}</label>
                     <select
                         id="code-language"
                         value={language}
@@ -33,8 +35,8 @@ export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
                             border: `1px solid ${theme.sidebar.border}`,
                         }}
                     >
-                        <option value="dpn">DPN (Fast prototype)</option>
-                        <option value="dot">DOT (Graphviz)</option>
+                        <option value="dpn">{t('dpn')}</option>
+                        <option value="dot">{t('dot')}</option>
                     </select>
                 </div>
             </div>

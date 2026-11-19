@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore, useTheme } from '../../../store/useSettingsStore';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
 import { useClickOutside } from '../../../hooks/useClickOutside';
@@ -14,6 +15,7 @@ import { MenuItem } from '../../ui/MenuItem';
  * @param {number[][]} props.matrix
  */
 export const MatrixCopyMenu = ({ matrix }) => {
+    const { t } = useTranslation('matrices');
     const theme = useTheme();
     const matrixCopyFormat = useSettingsStore((state) => state.matrixCopyFormat);
     const setMatrixCopyFormat = useSettingsStore((state) => state.setMatrixCopyFormat);
@@ -28,8 +30,8 @@ export const MatrixCopyMenu = ({ matrix }) => {
 
         notify(
             success
-                ? { status: NOTIFY_STATUS.SUCCESS, topic: NOTIFY_TOPIC.COPY, title: 'Matrix copied', message: `Copied as ${label}.` }
-                : { status: NOTIFY_STATUS.ERROR, topic: NOTIFY_TOPIC.COPY, title: 'Copy failed', message: 'Failed to copy matrix.' }
+                ? { status: NOTIFY_STATUS.SUCCESS, topic: NOTIFY_TOPIC.COPY, title: t('copy.copiedTitle'), message: t('copy.copiedMessage', { format: label }) }
+                : { status: NOTIFY_STATUS.ERROR, topic: NOTIFY_TOPIC.COPY, title: t('copy.failedTitle'), message: t('copy.failedMessage') }
         );
 
         if (success) {
@@ -50,17 +52,17 @@ export const MatrixCopyMenu = ({ matrix }) => {
                 <button
                     type="button"
                     onClick={() => handleSelect(matrixCopyFormat)}
-                    title={`Copy as ${matrixCopyFormat}`}
-                    aria-label={`Copy as ${matrixCopyFormat}`}
+                    title={t('copy.tooltip', { format: matrixCopyFormat })}
+                    aria-label={t('copy.tooltip', { format: matrixCopyFormat })}
                     className="cursor-pointer px-2 py-1 text-[11px] font-medium transition-colors hover:bg-[var(--hover)]"
                     style={{ color: theme.text.label, '--hover': `${theme.text.label}14` }}
                 >
-                    Copy
+                    {t('common:actions.copy')}
                 </button>
                 <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    aria-label="Choose matrix copy format"
+                    aria-label={t('copy.chooseFormat')}
                     aria-haspopup="menu"
                     aria-expanded={isOpen}
                     className="cursor-pointer border-l px-1.5 py-1 text-[10px] transition-colors hover:bg-[var(--hover)]"

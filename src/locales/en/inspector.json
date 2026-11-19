@@ -1,0 +1,15 @@
+{
+    "position": "Position",
+    "fields": {
+        "label": "Label",
+        "initialTokens": "Initial tokens",
+        "currentMarking": "Current marking",
+        "inputTransitions": "Input transitions",
+        "outputTransitions": "Output transitions",
+        "inputPlaces": "Input places",
+        "outputPlaces": "Output places",
+        "enabled": "Enabled",
+        "weight": "Weight",
+        "type": "Type"
+    }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ARC_TYPE } from '../../constants/net';
 import { usePetriStore } from '../../store/usePetriStore';
 import { useSettingsStore, useTheme } from '../../store/useSettingsStore';
@@ -16,6 +17,7 @@ import { NOTIFY_STATUS, NOTIFY_TOPIC } from '../../constants/notifications';
  * Input and output matrices of the current net, recomputed only on change.
  */
 export const MatricesView = () => {
+    const { t } = useTranslation('matrices');
     const theme = useTheme();
     const places = usePetriStore((s) => s.places);
     const transitions = usePetriStore((s) => s.transitions);
@@ -48,14 +50,12 @@ export const MatricesView = () => {
 
     const deleteNode = (id, kind) => {
         const count = arcs.filter((arc) => arc.source === id || arc.target === id).length;
-        const label = kind === 'place' ? 'Place' : 'Transition';
-
         execute({ type: 'deleteElement', id });
         notify({
             status: NOTIFY_STATUS.INFO,
             topic: NOTIFY_TOPIC.EDIT,
-            title: `${label} ${id} deleted`,
-            message: count > 0 ? `Removed with ${count} ${count === 1 ? 'arc' : 'arcs'}.` : 'No arcs were attached.',
+            title: t(kind === 'place' ? 'toasts.placeDeleted' : 'toasts.transitionDeleted', { id }),
+            message: count > 0 ? t('toasts.removedArcs', { count }) : t('toasts.noArcs'),
         });
     };
 
@@ -82,8 +82,12 @@ export const MatricesView = () => {
             notify({
                 status: NOTIFY_STATUS.INFO,
                 topic: NOTIFY_TOPIC.EDIT,
-                title: 'Arc type changed',
-                message: `${command.id} changed from ${previousType} to ${command.values.type}`,
+                title: t('toasts.arcTypeChangedTitle'),
+                message: t('toasts.arcTypeChangedMessage', {
+                    id: command.id,
+                    from: t(`common:arcTypes.${previousType}`),
+                    to: t(`common:arcTypes.${command.values.type}`),
+                }),
             });
         }
 
@@ -93,7 +97,7 @@ export const MatricesView = () => {
     if (places.length === 0 || transitions.length === 0) {
         return (
             <p className="p-3 text-xs" style={{ color: theme.disabled.text }}>
-                Add places and transitions to see the matrices.
+                {t('empty')}
             </p>
         );
     }
@@ -132,7 +136,7 @@ export const MatricesView = () => {
                                         opacity: isVisible || (hasArc ? 1 : 0.45),
                                     }}
                                 />
-                                {view.title}
+                                {t(`views.${view.key}`)}
                             </button>
                         );
                     })}
@@ -150,7 +154,7 @@ export const MatricesView = () => {
                                 color: theme.text.code,
                             }}
                         >
-                            + Place
+                            {t('toolbar.addPlace')}
                         </button>
                         <button
                             type="button"
@@ -162,7 +166,7 @@ export const MatricesView = () => {
                                 color: theme.text.code,
                             }}
                         >
-                            + Transition
+                            {t('toolbar.addTransition')}
                         </button>
                     </div>
                 )}
@@ -172,7 +176,7 @@ export const MatricesView = () => {
                     onClick={toggleMatrixEditable}
                     disabled={isRunning}
                     aria-pressed={isMatrixEditable}
-                    title={isRunning ? 'Stop the simulation to edit matrices' : isMatrixEditable ? 'Lock matrix editing' : 'Unlock to edit matrices'}
+                    title={isRunning ? t('lock.tooltipRunning') : isMatrixEditable ? t('lock.tooltipUnlocked') : t('lock.tooltipLocked')}
                     className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
                     style={{
                         backgroundColor: isMatrixEditable ? `${theme.place.stroke}18` : 'transparent',
@@ -180,20 +184,20 @@ export const MatricesView = () => {
                     }}
                 >
                     <span aria-hidden="true">{isMatrixEditable ? 'Y' : 'N'}</span>
-                    <span>{isMatrixEditable ? 'Editing' : 'Edit'}</span>
+                    <span>{isMatrixEditable ? t('lock.editing') : t('lock.edit')}</span>
                 </button>
             </div>
 
             <div className="flex min-h-0 flex-1 gap-2 p-2">
                 {visible.length === 0 ? (
                     <div className="flex w-full items-center justify-center text-xs" style={{ color: theme.text.label }}>
-                        All matrices hidden
+                        {t('allHidden')}
                     </div>
                 ) : (
                     visible.map((view, index) => (
                         <MatrixTable
                             key={view.key}
-                            title={view.title}
+                            title={t(`views.${view.key}`)}
                             rows={rows}
                             columns={columns}
                             matrix={matrices[view.key]}
