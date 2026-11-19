@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCodeChecker } from '../../hooks/useCodeChecker';
+import { usePetriStore } from '../../store/usePetriStore';
 import { formatDiagnostic } from '../../utils/formatDiagnostic';
 
 const IssueFilterButton = ({ label, title, count, theme, active, onClick, filterKey }) => {
@@ -58,20 +58,19 @@ const getSeverityMeta = (severity, theme, t) => {
     return bySeverity[severity] ?? { color: theme?.text?.label, label: t('severity.issue') };
 };
 
-export const CodeCheckerPanel = ({ errors = [], theme = {}, code = '', language = 'dpn' }) => {
+export const CodeCheckerPanel = ({ theme = {} }) => {
     const { t } = useTranslation('problems');
     const [activeFilter, setActiveFilter] = React.useState('all');
-    const displayErrors = useCodeChecker({ code, language, delayMs: 450 });
-    const finalErrors = displayErrors.length > 0 ? displayErrors : errors || [];
+    const diagnostics = usePetriStore((s) => s.diagnostics);
     const counts = {
-        all: finalErrors.length,
-        error: finalErrors.filter((e) => (e && e.severity) === 'error').length,
-        warning: finalErrors.filter((e) => (e && e.severity) === 'warning').length,
-        info: finalErrors.filter((e) => (e && e.severity) === 'info').length,
+        all: diagnostics.length,
+        error: diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length,
+        warning: diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length,
+        info: diagnostics.filter((diagnostic) => diagnostic.severity === 'info').length,
     };
     const visibleErrors = activeFilter === 'all'
-        ? finalErrors
-        : finalErrors.filter((e) => (e && e.severity) === activeFilter);
+        ? diagnostics
+        : diagnostics.filter((diagnostic) => diagnostic.severity === activeFilter);
 
     return (
         <div
