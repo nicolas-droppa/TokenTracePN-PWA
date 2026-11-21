@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useLabStore, selectLabStatus, missingRequirements } from '../../store/useLabStore';
 import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
-import { LAB_STATUS } from '../../constants/labs';
 import { LabTabs } from './components/LabTabs';
 import { LabHeader } from './components/LabHeader';
 import { LabDescription } from './components/LabDescription';

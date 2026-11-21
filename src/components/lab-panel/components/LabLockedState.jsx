@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { useLabStore } from '../../../store/useLabStore';
-import { getLab } from '../../../labs/labRegistry';
+import { getLab, getLabText } from '../../../labs/labRegistry';
 import { LabIcon, LAB_UI_ICONS } from './LabIcon';
 
 /**
@@ -13,11 +13,17 @@ import { LabIcon, LAB_UI_ICONS } from './LabIcon';
  */
 export const LabLockedState = ({ tab, missingRequirements = [] }) => {
     const { t } = useTranslation('labPanel');
+    const { i18n } = useTranslation();
     const theme = useTheme();
     const openLab = useLabStore((s) => s.openLab);
 
+    const resolveLabTitle = (id) => {
+        const reqLab = getLab(id);
+        return reqLab ? getLabText(reqLab, i18n.language).title : id;
+    };
+
     const firstMissing = getLab(missingRequirements[0]);
-    const labs = missingRequirements.map((id) => getLab(id)?.title ?? id).join(', ');
+    const labs = missingRequirements.map(resolveLabTitle).join(', ');
 
     return (
         <div
@@ -44,7 +50,7 @@ export const LabLockedState = ({ tab, missingRequirements = [] }) => {
                         '--hover': `${theme.text.label}14`,
                     }}
                 >
-                    {t('locked.open', { lab: firstMissing.title })} →
+                    {t('locked.open', { lab: resolveLabTitle(firstMissing.id) })} →
                 </button>
             )}
         </div>

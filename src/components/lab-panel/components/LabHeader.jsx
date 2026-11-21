@@ -6,6 +6,7 @@ import { getLab } from '../../../labs/labRegistry';
 import { labStatusColor } from '../../../utils/labStatusColor';
 import { LabIconBox } from './LabIconBox';
 import { LabLink } from './LabLink';
+import { useLabText } from '../../../hooks/useLabText';
 
 /**
  * Title, status and actions of the open lab.
@@ -14,6 +15,7 @@ import { LabLink } from './LabLink';
 export const LabHeader = ({ lab, status, isLocked, missingRequirements = [], onReset, onCheck }) => {
     const { t } = useTranslation('labPanel');
     const theme = useTheme();
+    const { title } = useLabText(lab);
     const statusColor = labStatusColor(status, theme);
 
     return (
@@ -32,7 +34,7 @@ export const LabHeader = ({ lab, status, isLocked, missingRequirements = [], onR
                         className="truncate text-xs font-bold tracking-wide"
                         style={{ color: isLocked ? theme.disabled.text : theme.text.label }}
                     >
-                        {lab.title}
+                        {title}
                     </h2>
 
                     {isLocked ? (

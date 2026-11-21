@@ -2,6 +2,7 @@ import React from 'react';
 import { useTheme } from '../../../store/useSettingsStore';
 import { useLabStore, selectLabStatus } from '../../../store/useLabStore';
 import { labStatusColor } from '../../../utils/labStatusColor';
+import { useLabText } from '../../../hooks/useLabText';
 
 /**
  * Chip that opens another lab (used for missing requirements).
@@ -12,6 +13,7 @@ export const LabLink = ({ lab }) => {
     const theme = useTheme();
     const status = useLabStore(selectLabStatus(lab));
     const openLab = useLabStore((s) => s.openLab);
+    const { title } = useLabText(lab);
 
     return (
         <button
@@ -25,7 +27,7 @@ export const LabLink = ({ lab }) => {
             }}
         >
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: labStatusColor(status, theme) }} />
-            {lab.title}
+            {title}
             <span aria-hidden="true" style={{ color: theme.text.label }}></span>
         </button>
     );

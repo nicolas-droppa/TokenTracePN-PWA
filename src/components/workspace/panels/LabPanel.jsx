@@ -3,7 +3,23 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
 import { useLabStore } from '../../../store/useLabStore';
 import { LABS, getLab } from '../../../labs/labRegistry';
+import { useLabText } from '../../../hooks/useLabText';
 import { LabView } from '../../lab-panel/LabView';
+
+const LabPanelListItem = ({ lab, onOpen, borderColor, hoverColor }) => {
+    const { title } = useLabText(lab);
+
+    return (
+        <button
+            type="button"
+            onClick={() => onOpen(lab.id)}
+            className="cursor-pointer rounded-md border px-2 py-1.5 text-left transition-colors hover:bg-[var(--hover)]"
+            style={{ borderColor, '--hover': hoverColor }}
+        >
+            {title}
+        </button>
+    );
+};
 
 /**
  * Dockview panel showing the active lab.
@@ -24,15 +40,13 @@ export const LabPanel = () => {
                 <div className="flex flex-col gap-2 p-3 text-xs" style={{ color: theme.text.label }}>
                     <p>{t('empty')}</p>
                     {LABS.map((item) => (
-                        <button
+                        <LabPanelListItem
                             key={item.id}
-                            type="button"
-                            onClick={() => openLab(item.id)}
-                            className="cursor-pointer rounded-md border px-2 py-1.5 text-left transition-colors hover:bg-[var(--hover)]"
-                            style={{ borderColor: theme.sidebar.border, '--hover': `${theme.text.label}14` }}
-                        >
-                            {item.title}
-                        </button>
+                            lab={item}
+                            onOpen={openLab}
+                            borderColor={theme.sidebar.border}
+                            hoverColor={`${theme.text.label}14`}
+                        />
                     ))}
                 </div>
             )}

@@ -5,34 +5,40 @@ import { LAB_STATUS, LAB_STATUS_KEYS } from '../../../constants/labs';
 import { labStatusColor } from '../../../utils/labStatusColor';
 import { LabIconBox } from '../../lab-panel/components/LabIconBox';
 import { useLabStore, selectLabStatus, missingRequirements } from '../../../store/useLabStore';
-import { getLab } from '../../../labs/labRegistry';
+import { getLab, getLabText } from '../../../labs/labRegistry';
+import { useLabText } from '../../../hooks/useLabText';
 
 /**
  * One icon in the lab bar.
  * @param {Object} props - Component props.
- * @param {Object} props.lab - Lab with id, title, icon and description.
+ * @param {Object} props.lab - Lab with id, icon and texts.
  * @param {boolean} props.isActive - Whether the lab is currently active.
  * @param {Function} props.onClick - Click handler.
  */
 export const LabBarItem = ({ lab, isActive = false, onClick }) => {
     const { t } = useTranslation('labBar');
+    const { i18n } = useTranslation();
     const theme = useTheme();
     const status = useLabStore(selectLabStatus(lab));
     const solvedLabs = useLabStore((s) => s.solvedLabs);
     const isLocked = status === LAB_STATUS.LOCKED;
     const statusLabel = t(LAB_STATUS_KEYS[status] ?? LAB_STATUS_KEYS[LAB_STATUS.LOCKED]);
+    const { title, summary } = useLabText(lab);
 
-    let tooltip = `${lab.title} [${statusLabel}]\n${lab.description}`;
+    let tooltip = summary ? `${title} [${statusLabel}]\n${summary}` : `${title} [${statusLabel}]`;
     if (status === LAB_STATUS.LOCKED) {
-        const missing = missingRequirements(lab, solvedLabs).map((labId) => getLab(labId)?.title ?? labId);
-        tooltip = `${lab.title} [${statusLabel}]\n${t('requires', { labs: missing.join(', ') })}`;
+        const missing = missingRequirements(lab, solvedLabs).map((labId) => {
+            const reqLab = getLab(labId);
+            return reqLab ? getLabText(reqLab, i18n.language).title : labId;
+        });
+        tooltip = `${title} [${statusLabel}]\n${t('requires', { labs: missing.join(', ') })}`;
     }
 
     return (
         <button
             type="button"
             title={tooltip}
-            aria-label={`${lab.title}, ${statusLabel}`}
+            aria-label={`${title}, ${statusLabel}`}
             aria-pressed={isActive}
             onClick={onClick}
             className="group relative flex h-12 w-full cursor-pointer items-center justify-center"
