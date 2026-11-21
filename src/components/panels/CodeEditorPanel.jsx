@@ -19,7 +19,7 @@ export const CodeEditorPanel = ({ code, setCode, language, setLanguage }) => {
         >
             <div
                 className="flex items-center justify-between px-4 py-2 border-b text-xs font-semibold"
-                style={{ borderColor: theme.sidebar.border, color: theme.text.label }}
+                style={{ borderColor: theme.sidebar.border, color: theme.text.label, backgroundColor: theme.sidebar.bg }}
             >
                 <span>{t('code')}</span>
                 <div className="text-[10px] uppercase" style={{ color: theme.disabled.text }}>

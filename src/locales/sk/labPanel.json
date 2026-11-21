@@ -1,0 +1,27 @@
+{
+    "empty": "Vyber lab, ktorý sa má zobraziť.",
+    "tabs": {
+        "task": "Úloha",
+        "code": "Kód",
+        "reference": "Vzor"
+    },
+    "readOnly": "Iba na čítanie",
+    "locked": {
+        "solveFirst": "Najprv vyrieš",
+        "code": "Kód sa odomkne po vyriešení: {{labs}}.",
+        "reference": "Vzorové riešenie sa odomkne po vyriešení: {{labs}}.",
+        "open": "Otvoriť {{lab}}"
+    },
+    "reference": {
+        "title": "Vzorové riešenie",
+        "lockedUntilSolved": "Odomkne sa, keď prejdú všetky testy tohto labu. Potom si s ním porovnaj svoj postup.",
+        "editorTitle": "Vzor",
+        "loading": "Načítavam…",
+        "missing": "Tento lab zatiaľ nemá vzorové riešenie."
+    },
+    "noDescription": "Tento lab zatiaľ nemá zadanie.",
+    "actions": {
+        "resetTooltip": "Nahradiť tvoj kód šablónou",
+        "checkTooltip": "Skontrolovať riešenie"
+    }
+}

@@ -1,23 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../store/useSettingsStore';
-import { LAB_STATUS } from '../../../constants/labs';
+import { LAB_STATUS, LAB_STATUS_KEYS } from '../../../constants/labs';
+import { labStatusColor } from '../../../utils/labStatusColor';
+import { LabIconBox } from '../../lab-panel/components/LabIconBox';
 import { useLabStore, selectLabStatus, missingRequirements } from '../../../store/useLabStore';
 import { getLab } from '../../../labs/labRegistry';
-
-const STATUS_KEYS = {
-    [LAB_STATUS.LOCKED]: 'status.locked',
-    [LAB_STATUS.TODO]: 'status.todo',
-    [LAB_STATUS.IN_PROGRESS]: 'status.inProgress',
-    [LAB_STATUS.SOLVED]: 'status.solved',
-};
-
-const getStatusColor = (status, theme) => {
-    if (status === LAB_STATUS.SOLVED) return theme.status.run;
-    if (status === LAB_STATUS.IN_PROGRESS) return theme.diagnostics.warning;
-    if (status === LAB_STATUS.TODO) return theme.diagnostics.active;
-    return theme.disabled.text;
-};
 
 /**
  * One icon in the lab bar.
@@ -31,7 +19,8 @@ export const LabBarItem = ({ lab, isActive = false, onClick }) => {
     const theme = useTheme();
     const status = useLabStore(selectLabStatus(lab));
     const solvedLabs = useLabStore((s) => s.solvedLabs);
-    const statusLabel = t(STATUS_KEYS[status] ?? STATUS_KEYS[LAB_STATUS.LOCKED]);
+    const isLocked = status === LAB_STATUS.LOCKED;
+    const statusLabel = t(LAB_STATUS_KEYS[status] ?? LAB_STATUS_KEYS[LAB_STATUS.LOCKED]);
 
     let tooltip = `${lab.title} [${statusLabel}]\n${lab.description}`;
     if (status === LAB_STATUS.LOCKED) {
@@ -46,27 +35,13 @@ export const LabBarItem = ({ lab, isActive = false, onClick }) => {
             aria-label={`${lab.title}, ${statusLabel}`}
             aria-pressed={isActive}
             onClick={onClick}
-            className="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded transition-colors hover:bg-[var(--hover)]"
-            style={{
-                '--hover': `${theme.text.label}14`,
-                backgroundColor: isActive ? `${theme.place.stroke}18` : 'transparent',
-                color: status === LAB_STATUS.LOCKED ? theme.disabled.text : theme.text.label,
-                opacity: status === LAB_STATUS.LOCKED ? 0.65 : 1,
-                outline: isActive ? `1px solid ${theme.place.stroke}` : 'none',
-            }}
+            className="group relative flex h-12 w-full cursor-pointer items-center justify-center"
         >
+            <LabIconBox lab={lab} isActive={isActive} isLocked={isLocked} />
+
             <span
-                className="flex h-10 w-10 items-center justify-center rounded-md border text-[11px] font-semibold"
-                style={{ borderColor: isActive ? theme.place.stroke : theme.sidebar.border }}
-            >
-                {lab.icon}
-            </span>
-            <span
-                className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full border"
-                style={{
-                    backgroundColor: getStatusColor(status, theme),
-                    borderColor: theme.sidebar.bg,
-                }}
+                className="absolute bottom-1 right-[9px] h-[5px] w-[5px] rounded-full"
+                style={{ backgroundColor: labStatusColor(status, theme), boxShadow: `0 0 0 2px ${theme.sidebar.bg}` }}
                 aria-hidden="true"
             />
         </button>

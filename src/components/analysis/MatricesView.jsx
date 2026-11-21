@@ -122,9 +122,9 @@ export const MatricesView = () => {
                                 type="button"
                                 aria-pressed={isVisible}
                                 onClick={() => toggleMatrix(view.key)}
-                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
+                                className="inline-flex h-6 cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-[10px] font-medium uppercase leading-none tracking-wide transition-all duration-150"  
                                 style={{
-                                    backgroundColor: isVisible ? `${theme.place.stroke}18` : 'transparent',
+                                    backgroundColor: isVisible ? `${theme.text.label}15` : 'transparent',
                                     color: isVisible ? theme.text.code : theme.text.label,
                                     opacity: isVisible || (hasArc ? 1 : 0.7),
                                 }}
@@ -147,7 +147,7 @@ export const MatricesView = () => {
                         <button
                             type="button"
                             onClick={() => addNode('place')}
-                            className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
+                            className="inline-flex h-6 cursor-pointer items-center gap-1 rounded-md border px-2 text-[10px] font-medium uppercase leading-none tracking-wide transition-all duration-150"
                             style={{
                                 borderColor: theme.sidebar.border,
                                 backgroundColor: `${theme.place.stroke}18`,
@@ -159,7 +159,7 @@ export const MatricesView = () => {
                         <button
                             type="button"
                             onClick={() => addNode('transition')}
-                            className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150"
+                            className="inline-flex h-6 cursor-pointer items-center gap-1 rounded-md border px-2 text-[10px] font-medium uppercase leading-none tracking-wide transition-all duration-150"
                             style={{
                                 borderColor: theme.sidebar.border,
                                 backgroundColor: `${theme.transition.stroke}18`,
@@ -177,7 +177,7 @@ export const MatricesView = () => {
                     disabled={isRunning}
                     aria-pressed={isMatrixEditable}
                     title={isRunning ? t('lock.tooltipRunning') : isMatrixEditable ? t('lock.tooltipUnlocked') : t('lock.tooltipLocked')}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex h-6 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[10px] font-medium uppercase leading-none tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40"
                     style={{
                         backgroundColor: isMatrixEditable ? `${theme.place.stroke}18` : 'transparent',
                         color: isMatrixEditable ? theme.text.code : theme.text.label,

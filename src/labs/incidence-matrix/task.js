@@ -1,7 +1,6 @@
 export default {
     id: 'incidence-matrix',
     title: 'Incidence matrix',
-    icon: 'C',
     order: 1,
     lecture: 1,
     requires: [],

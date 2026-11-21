@@ -22,5 +22,11 @@
         "read": "Read",
         "inhibitor": "Inhibitor",
         "reset": "Reset"
+    },
+    "labStatus": {
+        "locked": "Locked",
+        "todo": "To do",
+        "inProgress": "In progress",
+        "solved": "Solved"
     }
 }

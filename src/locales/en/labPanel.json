@@ -1,0 +1,27 @@
+{
+    "empty": "Choose a lab to be displayed.",
+    "tabs": {
+        "task": "Task",
+        "code": "Code",
+        "reference": "Reference"
+    },
+    "readOnly": "Read only",
+    "locked": {
+        "solveFirst": "Solve first",
+        "code": "Code unlocks after you solve {{labs}}.",
+        "reference": "The reference solution unlocks after you solve {{labs}}.",
+        "open": "Open {{lab}}"
+    },
+    "reference": {
+        "title": "Reference solution",
+        "lockedUntilSolved": "Unlocks once all tests of this lab pass. Then compare your approach with it.",
+        "editorTitle": "Reference",
+        "loading": "Loading…",
+        "missing": "This lab has no reference solution yet."
+    },
+    "noDescription": "This lab has no description yet.",
+    "actions": {
+        "resetTooltip": "Replace your code with the template",
+        "checkTooltip": "Check your solution"
+    }
+}

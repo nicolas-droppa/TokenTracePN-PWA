@@ -22,5 +22,11 @@
         "read": "Čítacia",
         "inhibitor": "Inhibičná",
         "reset": "Resetovacia"
+    },
+    "labStatus": {
+        "locked": "Zamknuté",
+        "todo": "Nezačaté",
+        "inProgress": "Rozpracované",
+        "solved": "Vyriešené"
     }
 }

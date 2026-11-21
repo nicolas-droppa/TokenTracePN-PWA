@@ -1,7 +1,6 @@
 export default {
     id: 'p-invariants',
     title: 'P-invariants',
-    icon: 'P',
     order: 4,
     lecture: 7,
     requires: ['incidence-matrix'],

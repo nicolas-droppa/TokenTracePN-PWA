@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-python": "^6.2.1",
     "@codemirror/lang-xml": "^6.1.0",
     "@codemirror/language": "^6.12.4",
     "@codemirror/lint": "^6.9.7",

@@ -4,6 +4,9 @@ import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { LANGUAGES, DEFAULT_LANGUAGE } from '@/constants/languages';
 import { DIAGNOSTIC_CODES } from '@/constants/diagnostics';
+import { LAB_TABS, LAB_STATUS_KEYS } from '@/constants/labs';
+import { MATRIX_VIEWS } from '@/constants/matrices';
+import { PANELS } from '@/constants/workspace';
 
 const files = import.meta.glob('../../src/locales/*/*.json', { eager: true, import: 'default' });
 
@@ -80,6 +83,22 @@ describe('translation keys used in code', () => {
         it(`${file.replace(SRC, 'src')} uses existing keys`, () => {
             const missing = used.filter((key) => !exists(key, ns));
             expect(missing).toEqual([]);
+        });
+    }
+});
+
+
+describe('dynamic translation keys', () => {
+    const cases = {
+        'lab tabs': LAB_TABS.map((tab) => `labPanel:tabs.${tab}`),
+        'lab statuses': Object.values(LAB_STATUS_KEYS),
+        'matrix views': MATRIX_VIEWS.map((view) => `matrices:views.${view.key}`),
+        'panel titles': PANELS.map(({ id }) => `workspace:panels.${id}`),
+    };
+
+    for (const [name, keys] of Object.entries(cases)) {
+        it(`${name} have translations`, () => {
+            expect(keys.filter((key) => !exists(key, 'common'))).toEqual([]);
         });
     }
 });
