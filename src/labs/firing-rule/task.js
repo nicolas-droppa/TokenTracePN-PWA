@@ -1,7 +1,6 @@
 export default {
     id: 'firing-rule',
     title: 'Firing rule',
-    icon: 'F',
     order: 2,
     lecture: 1,
     requires: [],

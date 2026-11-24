@@ -7,9 +7,11 @@ import { useCodeSync } from './hooks/useCodeSync';
 import { StatusBar } from './components/status-bar/StatusBar';
 import { APP_LAYOUT } from './constants/layout';
 import { LabBar } from './components/lab-bar/LabBar';
+import { useThemeCssVars } from './hooks/useThemeCssVars';
 
 export default function App() {
     const theme = useTheme();
+    useThemeCssVars(theme);
     useCodeSync();
 
     return (

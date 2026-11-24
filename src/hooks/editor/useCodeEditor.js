@@ -1,20 +1,11 @@
 import { useEffect, useRef } from 'react';
-import {
-    EditorView,
-    keymap,
-    lineNumbers,
-    highlightActiveLine,
-    highlightActiveLineGutter,
-    drawSelection,
-} from '@codemirror/view';
+import { EditorView } from '@codemirror/view';
 import { EditorState, Compartment } from '@codemirror/state';
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching } from '@codemirror/language';
-import { useSettingsStore } from '../../store/useSettingsStore';
 import { forceLinting, lintGutter } from '@codemirror/lint';
-
-import { languageExtensions } from './helpers/languageExtensions';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { baseExtensions } from './helpers/editorSetup';
 import { editorTheme } from './helpers/editorTheme';
+import { languageExtensions } from './helpers/languageExtensions';
 
 export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
     const hostRef = useRef(null);
@@ -37,21 +28,10 @@ export const useCodeEditor = ({ code, setCode, language, theme, isDark }) => {
             state: EditorState.create({
                 doc: code ?? '',
                 extensions: [
-                    lineNumbers(),
-                    highlightActiveLineGutter(),
-                    highlightActiveLine(),
-                    drawSelection(),
-                    history(),
-                    bracketMatching(),
+                    ...baseExtensions(),
                     lintGutter(),
-                    keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-                    EditorView.contentAttributes.of({
-                        spellcheck: 'false',
-                        autocorrect: 'off',
-                        autocapitalize: 'off',
-                    }),
                     EditorView.updateListener.of((update) => {
-                        if (update.docChanged) setCodeRef.current(update.state.doc.toString());
+                        if (update.docChanged) setCodeRef.current?.(update.state.doc.toString());
                     }),
                     lang.of(languageExtensions(language)),
                     themeComp.of(editorTheme(theme, isDark)),

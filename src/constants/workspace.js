@@ -8,6 +8,7 @@ export const PANELS = [
     { id: 'code' },
     { id: 'problems' },
     { id: 'matrices' },
+    { id: 'lab' },
 ];
 
 export const DEFAULT_LAYOUT = [
@@ -15,8 +16,9 @@ export const DEFAULT_LAYOUT = [
     { id: 'code', position: { referencePanel: 'canvas', direction: 'left' }, initialWidth: 320 },
     { id: 'problems', position: { referencePanel: 'code', direction: 'below' }, initialHeight: 180 },
     { id: 'matrices', position: { referencePanel: 'canvas', direction: 'below' } },
+    { id: 'lab', position: { direction: 'right' }, initialWidth: 420, openByDefault: false },
 ];
 
-export const LAYOUT_VERSION = 3;
+export const LAYOUT_VERSION = 4;
 
 export const MOBILE_MEDIA_QUERY = '(max-width: 767px)';

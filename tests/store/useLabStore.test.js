@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { missingRequirements, selectLabStatus } from '@/store/useLabStore';
+import { missingRequirements, selectLabStatus, useLabStore } from '@/store/useLabStore';
 import { LAB_STATUS as S } from '@/constants/labs';
 
 const lab = (id, requires = []) => ({ id, requires, template: 'TEMPLATE' });
@@ -38,5 +38,18 @@ describe('selectLabStatus', () => {
 describe('missingRequirements', () => {
     it('returns only unsolved requirement ids', () => {
         expect(missingRequirements(lab('a', ['b', 'c']), ['b'])).toEqual(['c']);
+    });
+});
+
+describe('lab actions', () => {
+    it('openLab switches to the lab, toggleLab closes it again', () => {
+        useLabStore.getState().openLab('a');
+        expect(useLabStore.getState().activeLabId).toBe('a');
+
+        useLabStore.getState().openLab('b');
+        expect(useLabStore.getState().activeLabId).toBe('b');
+
+        useLabStore.getState().toggleLab('b');
+        expect(useLabStore.getState().activeLabId).toBeNull();
     });
 });

@@ -63,7 +63,7 @@ export const THEMES = {
         sidebar: {
             bg: '#0f172a',
             border: '#1e293b',
-            inputBg: '#020617',
+            inputBg: '#070c1e',
             inputBorder: '#1e293b',
             resizeHandle: '#1e293b',
             resizeHandleHover: '#38bdf8',
@@ -142,7 +142,7 @@ export const THEMES = {
         sidebar: {
             bg: '#222124',
             border: '#2d2a2e',
-            inputBg: '#19181a',
+            inputBg: '#1c1b1d',
             inputBorder: '#2d2a2e',
             resizeHandle: '#2d2a2e',
             resizeHandleHover: '#ff6188',

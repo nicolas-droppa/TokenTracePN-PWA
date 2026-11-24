@@ -15,6 +15,10 @@ export const useLabStore = create(
             toggleLab: (labId) =>
                 set((state) => ({ activeLabId: state.activeLabId === labId ? null : labId })),
 
+            openLab: (labId) => set({ activeLabId: labId }),
+
+            closeLab: () => set({ activeLabId: null }),
+
             setLabCode: (labId, code) =>
                 set((state) => ({ codeByLab: { ...state.codeByLab, [labId]: code } })),
 
@@ -45,6 +49,7 @@ export const useLabStore = create(
                 };
             },
             partialize: (state) => ({
+                activeLabId: state.activeLabId,
                 codeByLab: state.codeByLab,
                 solvedLabs: state.solvedLabs,
             }),
